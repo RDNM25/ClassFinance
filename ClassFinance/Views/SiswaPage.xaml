@@ -24,8 +24,6 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
@@ -33,11 +31,8 @@
                                             <TextBlock Text="{Binding Nis, StringFormat='NIS: {0}'}" FontSize="12" Foreground="{StaticResource TextGray}" />
                                         </StackPanel>
 
-                                        <TextBlock Grid.Column="1" Text="{Binding Username, StringFormat='login: {0}'}"
-                                                   FontSize="12" Foreground="{StaticResource TextGray}" VerticalAlignment="Center" Margin="0,0,16,0" />
-
-                                        <Button Grid.Column="2" Content="Hapus" Style="{StaticResource SmallOutlineButton}"
-                                                Tag="{Binding}" Click="Hapus_Click" Margin="0,0,8,0" />
+                                        <Button Grid.Column="1" Content="Hapus" Style="{StaticResource SmallOutlineButton}"
+                                                Tag="{Binding}" Click="Hapus_Click" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>

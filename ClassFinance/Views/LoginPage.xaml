@@ -32,16 +32,7 @@
                     <TextBlock x:Name="ErrorText" Foreground="{StaticResource PrimaryRed}" FontSize="12"
                                Margin="4,0,0,12" Visibility="Collapsed" TextWrapping="Wrap" />
 
-                    <Button Content="LOGIN" Style="{StaticResource PrimaryButton}" Click="LoginButton_Click" Margin="0,6,0,16" />
-
-                    <Border Background="{StaticResource AppBackground}" CornerRadius="10" Padding="12">
-                        <StackPanel>
-                            <TextBlock Text="Demo accounts" FontWeight="Bold" FontSize="11" Foreground="{StaticResource TextGray}" />
-                            <TextBlock Text="Bendahara &#8594; admin / admin" FontSize="11" Foreground="{StaticResource TextGray}" Margin="0,4,0,0" />
-                            <TextBlock Text="Wali Kelas &#8594; wali / wali123" FontSize="11" Foreground="{StaticResource TextGray}" />
-                            <TextBlock Text="No students yet &#8212; add one from the dashboard, then log in with the username/password set for them." FontSize="11" Foreground="{StaticResource TextGray}" Margin="0,4,0,0" TextWrapping="Wrap" />
-                        </StackPanel>
-                    </Border>
+                    <Button Content="LOGIN" Style="{StaticResource PrimaryButton}" Click="LoginButton_Click" Margin="0,6,0,4" />
                 </StackPanel>
             </StackPanel>
         </Border>

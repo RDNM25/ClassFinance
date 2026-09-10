@@ -9,13 +9,7 @@
         <TextBox x:Name="NameBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
 
         <TextBlock Text="NIS" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
-        <TextBox x:Name="NisBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
-
-        <TextBlock Text="Username" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
-        <TextBox x:Name="UsernameBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
-
-        <TextBlock Text="Password" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
-        <PasswordBox x:Name="PasswordBoxInput" Style="{StaticResource RoundedPasswordBox}" Margin="0,0,0,10" />
+        <TextBox x:Name="NisBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,10" />
 
         <TextBlock x:Name="ErrorText" Foreground="{StaticResource PrimaryRed}" FontSize="12" Margin="2,0,0,10"
                    Visibility="Collapsed" TextWrapping="Wrap" />

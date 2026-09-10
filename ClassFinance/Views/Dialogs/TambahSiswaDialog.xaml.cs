@@ -25,19 +25,17 @@ namespace ClassFinance.Views.Dialogs
         {
             var name = NameBox.Text.Trim();
             var nis = NisBox.Text.Trim();
-            var username = UsernameBox.Text.Trim();
-            var password = PasswordBoxInput.Password;
 
-            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(nis))
             {
-                ErrorText.Text = "Nama, username dan password wajib diisi.";
+                ErrorText.Text = "Nama dan NIS wajib diisi.";
                 ErrorText.Visibility = Visibility.Visible;
                 return;
             }
 
-            if (DataStore.Instance.Users.Any(u => u.Username.Equals(username, StringComparison.OrdinalIgnoreCase)))
+            if (DataStore.Instance.Users.OfType<Siswa>().Any(s => s.Nis == nis))
             {
-                ErrorText.Text = "Username sudah digunakan.";
+                ErrorText.Text = "NIS sudah terdaftar.";
                 ErrorText.Visibility = Visibility.Visible;
                 return;
             }
@@ -47,9 +45,12 @@ namespace ClassFinance.Views.Dialogs
                 Id = DataStore.Instance.NextUserId(),
                 Name = name,
                 Nis = nis,
-                Username = username,
-                PasswordHash = password,
-                KelasId = _kelasId
+                KelasId = _kelasId,
+                // Students are roster entries only and never log in, but the base
+                // User model still requires these -- filled with unusable placeholders
+                // that are never shown or checked against anywhere.
+                Username = $"siswa-{nis}",
+                PasswordHash = Guid.NewGuid().ToString("N")
             };
             DataStore.Instance.Users.Add(siswa);
 
