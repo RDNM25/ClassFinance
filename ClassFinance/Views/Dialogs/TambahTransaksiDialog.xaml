@@ -1,0 +1,35 @@
+<UserControl x:Class="ClassFinance.Views.Dialogs.TambahTransaksiDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="380">
+    <StackPanel Margin="26">
+        <TextBlock Text="Tambah Transaksi" FontSize="18" FontWeight="Bold" Margin="0,0,0,16" />
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+            <RadioButton x:Name="MasukRadio" Content="Kas Masuk" GroupName="Jenis" IsChecked="True" Margin="0,0,20,0" VerticalAlignment="Center" />
+            <RadioButton x:Name="KeluarRadio" Content="Kas Keluar" GroupName="Jenis" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <TextBlock Text="Keterangan" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
+        <TextBox x:Name="DescriptionBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
+
+        <TextBlock Text="Jumlah (Rp)" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
+        <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
+
+        <TextBlock Text="Tanggal" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
+        <DatePicker x:Name="DatePickerInput" Margin="0,0,0,10" />
+
+        <TextBlock x:Name="ErrorText" Foreground="{StaticResource PrimaryRed}" FontSize="12" Margin="2,0,0,10"
+                   Visibility="Collapsed" TextWrapping="Wrap" />
+
+        <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Batal" Style="{StaticResource OutlineButton}" Click="Cancel_Click" />
+            <Button Grid.Column="2" Content="Simpan" Style="{StaticResource PrimaryButton}" Click="Save_Click" />
+        </Grid>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,49 @@
+<Page x:Class="ClassFinance.Views.LoginPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Login" Background="{StaticResource AppBackground}">
+    <Grid>
+        <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="420"
+                Background="White" CornerRadius="18">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24" Opacity="0.15" ShadowDepth="4" Color="Black" />
+            </Border.Effect>
+            <StackPanel>
+                <!--  Red hero header  -->
+                <Border Background="{StaticResource PrimaryRed}" CornerRadius="18,18,60,60" Padding="0,36,0,36">
+                    <StackPanel HorizontalAlignment="Center">
+                        <Border Background="White" Width="84" Height="84" CornerRadius="20">
+                            <TextBlock Text="&#128176;" FontSize="38" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="Welcome Back" Foreground="White" FontSize="24" FontWeight="Bold"
+                                   HorizontalAlignment="Center" Margin="0,16,0,4" />
+                        <TextBlock Text="Sign in to Class Finance" Foreground="#FFE0E0" FontSize="13"
+                                   HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Margin="36,32,36,32">
+                    <TextBlock Text="Username" FontSize="12" Foreground="{StaticResource TextGray}" Margin="4,0,0,6" />
+                    <TextBox x:Name="UsernameBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,16" />
+
+                    <TextBlock Text="Password" FontSize="12" Foreground="{StaticResource TextGray}" Margin="4,0,0,6" />
+                    <PasswordBox x:Name="PasswordBoxInput" Style="{StaticResource RoundedPasswordBox}" Margin="0,0,0,10" />
+
+                    <TextBlock x:Name="ErrorText" Foreground="{StaticResource PrimaryRed}" FontSize="12"
+                               Margin="4,0,0,12" Visibility="Collapsed" TextWrapping="Wrap" />
+
+                    <Button Content="LOGIN" Style="{StaticResource PrimaryButton}" Click="LoginButton_Click" Margin="0,6,0,16" />
+
+                    <Border Background="{StaticResource AppBackground}" CornerRadius="10" Padding="12">
+                        <StackPanel>
+                            <TextBlock Text="Demo accounts" FontWeight="Bold" FontSize="11" Foreground="{StaticResource TextGray}" />
+                            <TextBlock Text="Bendahara &#8594; admin / admin" FontSize="11" Foreground="{StaticResource TextGray}" Margin="0,4,0,0" />
+                            <TextBlock Text="Wali Kelas &#8594; wali / wali123" FontSize="11" Foreground="{StaticResource TextGray}" />
+                            <TextBlock Text="No students yet &#8212; add one from the dashboard, then log in with the username/password set for them." FontSize="11" Foreground="{StaticResource TextGray}" Margin="0,4,0,0" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>

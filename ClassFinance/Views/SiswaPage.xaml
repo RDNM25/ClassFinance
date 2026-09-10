@@ -1,0 +1,53 @@
+<Page x:Class="ClassFinance.Views.SiswaPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Data Siswa" Background="{StaticResource AppBackground}">
+    <DockPanel Margin="32,28,32,28">
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="DATA SISWA" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+            <Button x:Name="TambahButton" Grid.Column="1" Content="+ TAMBAH SISWA"
+                    Style="{StaticResource PrimaryButton}" Click="TambahButton_Click" />
+        </Grid>
+
+        <Border Style="{StaticResource Card}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <ItemsControl x:Name="SiswaItems">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ListRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15" />
+                                            <TextBlock Text="{Binding Nis, StringFormat='NIS: {0}'}" FontSize="12" Foreground="{StaticResource TextGray}" />
+                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="1" Text="{Binding Username, StringFormat='login: {0}'}"
+                                                   FontSize="12" Foreground="{StaticResource TextGray}" VerticalAlignment="Center" Margin="0,0,16,0" />
+
+                                        <Button Grid.Column="2" Content="Hapus" Style="{StaticResource SmallOutlineButton}"
+                                                Tag="{Binding}" Click="Hapus_Click" Margin="0,0,8,0" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock x:Name="EmptyText" Text="Belum ada siswa terdaftar di kelas ini." Foreground="{StaticResource TextGray}"
+                               HorizontalAlignment="Center" Margin="0,30,0,0" Visibility="Collapsed" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </DockPanel>
+</Page>
