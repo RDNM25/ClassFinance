@@ -7,6 +7,12 @@ using ClassFinance.Views.Dialogs;
 
 namespace ClassFinance.Views
 {
+    public class TransaksiDisplayItem
+    {
+        public Transaksi Transaksi { get; set; }
+        public string TagihanName { get; set; }
+    }
+
     public partial class RiwayatTransaksiPage : Page
     {
         private readonly User _currentUser;
@@ -65,8 +71,25 @@ namespace ClassFinance.Views
                 }
                 : all;
 
-            TransaksiItems.ItemsSource = filtered;
+            var showTagihan = !string.IsNullOrEmpty(_nis);
+            TransaksiItems.ItemsSource = filtered.Select(t => new TransaksiDisplayItem
+            {
+                Transaksi = t,
+                TagihanName = showTagihan ? ResolveTagihanName(t) : null
+            }).ToList();
             EmptyText.Visibility = filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private static string ResolveTagihanName(Transaksi t)
+        {
+            if (!t.TagihanSiswaId.HasValue) return null;
+
+            var tagihanSiswa = DataStore.Instance.TagihanSiswaList
+                .FirstOrDefault(ts => ts.Id == t.TagihanSiswaId.Value);
+            if (tagihanSiswa == null) return null;
+
+            return DataStore.Instance.TagihanList
+                .FirstOrDefault(tag => tag.Id == tagihanSiswa.TagihanId)?.Name;
         }
 
         private Siswa FindSiswaByNis(string nis) =>
