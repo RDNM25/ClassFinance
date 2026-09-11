@@ -12,14 +12,14 @@ namespace ClassFinance.Views
         private readonly User _currentUser;
         private readonly MainWindow _mainWindow;
         private readonly int _kelasId;
-        private readonly int? _siswaId;
+        private readonly string _nis;
 
-        public RiwayatTransaksiPage(User currentUser, MainWindow mainWindow, int? siswaId = null)
+        public RiwayatTransaksiPage(User currentUser, MainWindow mainWindow, string nis = null)
         {
             InitializeComponent();
             _currentUser = currentUser;
             _mainWindow = mainWindow;
-            _siswaId = siswaId;
+            _nis = nis;
             _kelasId = currentUser switch
             {
                 Siswa s => s.KelasId,
@@ -27,9 +27,9 @@ namespace ClassFinance.Views
                 _ => DataStore.Instance.KelasList.First().Id
             };
 
-            if (siswaId.HasValue)
+            if (!string.IsNullOrEmpty(nis))
             {
-                var siswa = DataStore.Instance.Users.OfType<Siswa>().FirstOrDefault(s => s.Id == siswaId.Value);
+                var siswa = FindSiswaByNis(nis);
                 TitleText.Text = siswa != null
                     ? $"RIWAYAT TRANSAKSI — {siswa.Name}"
                     : "RIWAYAT TRANSAKSI";
@@ -48,8 +48,9 @@ namespace ClassFinance.Views
         {
             var all = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
 
-            if (_siswaId.HasValue)
-                all = all.Where(t => t.SiswaId == _siswaId.Value).ToList();
+            var siswa = FindSiswaByNis(_nis);
+            if (siswa != null)
+                all = all.Where(t => t.SiswaId == siswa.Id).ToList();
 
             var filterIndex = FilterCombo.SelectedIndex;
             var filtered = filterIndex switch
@@ -62,6 +63,12 @@ namespace ClassFinance.Views
             TransaksiItems.ItemsSource = filtered;
             EmptyText.Visibility = filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
         }
+
+        private Siswa FindSiswaByNis(string nis) =>
+            string.IsNullOrEmpty(nis)
+                ? null
+                : DataStore.Instance.Users.OfType<Siswa>()
+                    .FirstOrDefault(s => s.KelasId == _kelasId && s.Nis == nis);
 
         private void FilterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) => Refresh();
 
