@@ -12,6 +12,9 @@ namespace ClassFinance.Models
         public decimal Amount { get; set; }
         public DateTime DueDate { get; set; }
 
+        /// <summary>When this tagihan was actually created (set automatically, not user-editable).</summary>
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
+
         /// <summary>
         /// Creates one TagihanSiswa entry per student currently enrolled in the class.
         /// Takes the DataStore explicitly (instead of reading the static DataStore.Instance)

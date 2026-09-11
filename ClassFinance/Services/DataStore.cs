@@ -69,7 +69,8 @@ namespace ClassFinance.Services
                 KelasId = kelasId,
                 Name = name,
                 Amount = amount,
-                DueDate = dueDate
+                DueDate = dueDate,
+                CreatedDate = DateTime.Now
             };
             TagihanList.Add(tagihan);
             tagihan.GenerateTagihanSiswa(this);

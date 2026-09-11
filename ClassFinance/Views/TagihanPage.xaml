@@ -46,10 +46,8 @@
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0">
                                                 <TextBlock Text="{Binding Tagihan.Name}" FontWeight="Bold" FontSize="15" />
-                                                <TextBlock FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,3,0,0">
-                                                    <Run Text="Jatuh tempo: " />
-                                                    <Run Text="{Binding Tagihan.DueDate, StringFormat='dd MMM yyyy'}" />
-                                                </TextBlock>
+                                                <TextBlock Text="{Binding Tagihan.CreatedDate, StringFormat='dd MMM yyyy'}"
+                                                           FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,3,0,0" />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding Tagihan.Amount, Converter={StaticResource Rupiah}}"
                                                        FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,12,0" />

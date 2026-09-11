@@ -13,6 +13,18 @@ namespace ClassFinance.Views
         public string TagihanName { get; set; }
     }
 
+    /// <summary>
+    /// Per-student row: a class tagihan on the left, and what this specific student
+    /// paid toward it on the right (blank if they haven't paid at all).
+    /// </summary>
+    public class TagihanPaymentDisplayItem
+    {
+        public Tagihan Tagihan { get; set; }
+        public bool HasPaid { get; set; }
+        public decimal AmountPaid { get; set; }
+        public string AmountPaidDisplay => HasPaid ? $"Rp {AmountPaid:N0}" : string.Empty;
+    }
+
     public partial class RiwayatTransaksiPage : Page
     {
         private readonly User _currentUser;
@@ -37,10 +49,11 @@ namespace ClassFinance.Views
             {
                 var siswa = FindSiswaByNis(nis);
                 TitleText.Text = siswa != null
-                    ? $"RIWAYAT TRANSAKSI — {siswa.Name}"
-                    : "RIWAYAT TRANSAKSI";
+                    ? $"STATUS TAGIHAN — {siswa.Name}"
+                    : "STATUS TAGIHAN";
                 FilterCombo.Visibility = Visibility.Collapsed;
                 TambahButton.Visibility = Visibility.Collapsed;
+                SummaryRow.Visibility = Visibility.Collapsed;
             }
             else
             {
@@ -56,40 +69,79 @@ namespace ClassFinance.Views
 
         private void Refresh()
         {
+            var siswa = FindSiswaByNis(_nis);
+
+            if (siswa != null)
+            {
+                RefreshTagihanStatus(siswa);
+                return;
+            }
+
+            RefreshTransaksi();
+        }
+
+        /// <summary>Class-wide transaction history (no specific student selected).</summary>
+        private void RefreshTransaksi()
+        {
             var all = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
 
-            var siswa = FindSiswaByNis(_nis);
-            if (siswa != null)
-                all = all.Where(t => t.SiswaId == siswa.Id).ToList();
+            // Totals always reflect every transaction for the class, regardless of
+            // whatever the type filter below is currently narrowed down to.
+            var totalEarned = all.Where(t => t.Type == JenisTransaksi.Masuk).Sum(t => t.Amount);
+            var totalSpent = all.Where(t => t.Type == JenisTransaksi.Keluar).Sum(t => t.Amount);
+            TotalKasText.Text = $"Rp {(totalEarned - totalSpent):N0}";
+            TotalEarnedText.Text = $"Rp {totalEarned:N0}";
+            TotalSpentText.Text = $"Rp {totalSpent:N0}";
 
-            var filtered = string.IsNullOrEmpty(_nis)
-                ? FilterCombo.SelectedIndex switch
-                {
-                    1 => all.Where(t => t.Type == JenisTransaksi.Masuk).ToList(),
-                    2 => all.Where(t => t.Type == JenisTransaksi.Keluar).ToList(),
-                    _ => all
-                }
-                : all;
+            var filtered = FilterCombo.SelectedIndex switch
+            {
+                1 => all.Where(t => t.Type == JenisTransaksi.Masuk).ToList(),
+                2 => all.Where(t => t.Type == JenisTransaksi.Keluar).ToList(),
+                _ => all
+            };
 
-            var showTagihan = !string.IsNullOrEmpty(_nis);
             TransaksiItems.ItemsSource = filtered.Select(t => new TransaksiDisplayItem
             {
                 Transaksi = t,
-                TagihanName = showTagihan ? ResolveTagihanName(t) : null
+                TagihanName = null
             }).ToList();
+            TransaksiItems.Visibility = Visibility.Visible;
+            TagihanPaymentItems.Visibility = Visibility.Collapsed;
+
+            EmptyText.Text = "Belum ada transaksi.";
             EmptyText.Visibility = filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        private static string ResolveTagihanName(Transaksi t)
+        /// <summary>
+        /// Per-student view: every class tagihan on the left, with what this student
+        /// paid toward each one on the right -- a checkmark if fully paid, blank if not.
+        /// </summary>
+        private void RefreshTagihanStatus(Siswa siswa)
         {
-            if (!t.TagihanSiswaId.HasValue) return null;
+            var tagihanList = DataStore.Instance.TagihanList
+                .Where(t => t.KelasId == _kelasId)
+                .OrderByDescending(t => t.Id) // most recently created first
+                .Select(t =>
+                {
+                    var entry = DataStore.Instance.TagihanSiswaList
+                        .FirstOrDefault(ts => ts.TagihanId == t.Id && ts.SiswaId == siswa.Id);
+                    bool hasPaid = entry != null && entry.Status == StatusTagihan.Lunas;
 
-            var tagihanSiswa = DataStore.Instance.TagihanSiswaList
-                .FirstOrDefault(ts => ts.Id == t.TagihanSiswaId.Value);
-            if (tagihanSiswa == null) return null;
+                    return new TagihanPaymentDisplayItem
+                    {
+                        Tagihan = t,
+                        HasPaid = hasPaid,
+                        AmountPaid = hasPaid ? t.Amount - entry.AmountDue : 0
+                    };
+                })
+                .ToList();
 
-            return DataStore.Instance.TagihanList
-                .FirstOrDefault(tag => tag.Id == tagihanSiswa.TagihanId)?.Name;
+            TagihanPaymentItems.ItemsSource = tagihanList;
+            TagihanPaymentItems.Visibility = Visibility.Visible;
+            TransaksiItems.Visibility = Visibility.Collapsed;
+
+            EmptyText.Text = "Belum ada tagihan.";
+            EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private Siswa FindSiswaByNis(string nis) =>
