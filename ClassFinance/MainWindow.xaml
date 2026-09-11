@@ -13,7 +13,7 @@
 
         <!--  Sidebar (shown after login)  -->
         <Border x:Name="SidebarBorder" Grid.Column="0" Background="{StaticResource SidebarBackground}" Visibility="Collapsed">
-            <DockPanel LastChildFill="True" Margin="0,20,0,20">
+            <DockPanel LastChildFill="False" Margin="0,20,0,20">
                 <StackPanel DockPanel.Dock="Top">
                     <Border Background="White" Width="52" Height="52" CornerRadius="14" Margin="20,0,0,10" HorizontalAlignment="Left">
                         <TextBlock Text="CF" FontWeight="Bold" FontSize="18" Foreground="{StaticResource PrimaryRed}"
