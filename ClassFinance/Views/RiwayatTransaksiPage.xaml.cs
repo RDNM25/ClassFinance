@@ -12,18 +12,28 @@ namespace ClassFinance.Views
         private readonly User _currentUser;
         private readonly MainWindow _mainWindow;
         private readonly int _kelasId;
+        private readonly int? _siswaId;
 
-        public RiwayatTransaksiPage(User currentUser, MainWindow mainWindow)
+        public RiwayatTransaksiPage(User currentUser, MainWindow mainWindow, int? siswaId = null)
         {
             InitializeComponent();
             _currentUser = currentUser;
             _mainWindow = mainWindow;
+            _siswaId = siswaId;
             _kelasId = currentUser switch
             {
                 Siswa s => s.KelasId,
                 WaliKelas w => w.KelasId,
                 _ => DataStore.Instance.KelasList.First().Id
             };
+
+            if (siswaId.HasValue)
+            {
+                var siswa = DataStore.Instance.Users.OfType<Siswa>().FirstOrDefault(s => s.Id == siswaId.Value);
+                TitleText.Text = siswa != null
+                    ? $"RIWAYAT TRANSAKSI — {siswa.Name}"
+                    : "RIWAYAT TRANSAKSI";
+            }
 
             TambahButton.Visibility = currentUser is Bendahara ? Visibility.Visible : Visibility.Collapsed;
             Refresh();
@@ -37,6 +47,9 @@ namespace ClassFinance.Views
         private void Refresh()
         {
             var all = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
+
+            if (_siswaId.HasValue)
+                all = all.Where(t => t.SiswaId == _siswaId.Value).ToList();
 
             var filterIndex = FilterCombo.SelectedIndex;
             var filtered = filterIndex switch

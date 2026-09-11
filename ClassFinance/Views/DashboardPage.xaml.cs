@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views.Dialogs;
@@ -11,6 +12,7 @@ namespace ClassFinance.Views
     /// <summary>Small display-only wrapper so the student list can show a computed total next to each name.</summary>
     public class SiswaDisplayItem
     {
+        public int SiswaId { get; set; }
         public string Name { get; set; }
         public string Nis { get; set; }
         public decimal TotalDibayar { get; set; }
@@ -70,6 +72,7 @@ namespace ClassFinance.Views
 
             var displaySiswa = siswaList.Select(s => new SiswaDisplayItem
             {
+                SiswaId = s.Id,
                 Name = s.Name,
                 Nis = s.Nis,
                 TotalDibayar = DataStore.Instance.TransaksiList
@@ -100,6 +103,12 @@ namespace ClassFinance.Views
         private void LihatSemuaButton_Click(object sender, RoutedEventArgs e)
         {
             _mainWindow.NavigateTo(new RiwayatTransaksiPage(_currentUser, _mainWindow));
+        }
+
+        private void SiswaRow_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement el && el.Tag is SiswaDisplayItem item)
+                _mainWindow.NavigateTo(new RiwayatTransaksiPage(_currentUser, _mainWindow, item.SiswaId));
         }
     }
 }

@@ -27,7 +27,8 @@
                                         </Grid.ColumnDefinitions>
 
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15" />
+                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15"
+                                                       Cursor="Hand" MouseLeftButtonUp="SiswaName_Click" Tag="{Binding}" />
                                             <TextBlock Text="{Binding Nis, StringFormat='NIS: {0}'}" FontSize="12" Foreground="{StaticResource TextGray}" />
                                         </StackPanel>
 

@@ -77,7 +77,8 @@
                         <ItemsControl x:Name="SiswaItems">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource ListRow}">
+                                    <Border Style="{StaticResource ListRow}" Cursor="Hand"
+                                            MouseLeftButtonUp="SiswaRow_Click" Tag="{Binding}">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />

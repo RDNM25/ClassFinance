@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views.Dialogs;
@@ -56,6 +57,12 @@ namespace ClassFinance.Views
                     Refresh();
                 }
             }
+        }
+
+        private void SiswaName_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement el && el.Tag is Siswa siswa)
+                _mainWindow.NavigateTo(new RiwayatTransaksiPage(_currentUser, _mainWindow, siswa.Id));
         }
     }
 }
