@@ -33,15 +33,19 @@ namespace ClassFinance.Views
                 TitleText.Text = siswa != null
                     ? $"RIWAYAT TRANSAKSI — {siswa.Name}"
                     : "RIWAYAT TRANSAKSI";
+                FilterCombo.Visibility = Visibility.Collapsed;
+                TambahButton.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                TambahButton.Visibility = currentUser is Bendahara ? Visibility.Visible : Visibility.Collapsed;
+                // Attached here (instead of in XAML) so it can't fire during InitializeComponent(),
+                // before _kelasId above is set -- that used to crash with "Sequence contains no
+                // matching element" because _kelasId was still 0 at that point.
+                FilterCombo.SelectionChanged += FilterCombo_SelectionChanged;
             }
 
-            TambahButton.Visibility = currentUser is Bendahara ? Visibility.Visible : Visibility.Collapsed;
             Refresh();
-
-            // Attached here (instead of in XAML) so it can't fire during InitializeComponent(),
-            // before _kelasId above is set -- that used to crash with "Sequence contains no
-            // matching element" because _kelasId was still 0 at that point.
-            FilterCombo.SelectionChanged += FilterCombo_SelectionChanged;
         }
 
         private void Refresh()
@@ -52,13 +56,14 @@ namespace ClassFinance.Views
             if (siswa != null)
                 all = all.Where(t => t.SiswaId == siswa.Id).ToList();
 
-            var filterIndex = FilterCombo.SelectedIndex;
-            var filtered = filterIndex switch
-            {
-                1 => all.Where(t => t.Type == JenisTransaksi.Masuk).ToList(),
-                2 => all.Where(t => t.Type == JenisTransaksi.Keluar).ToList(),
-                _ => all
-            };
+            var filtered = string.IsNullOrEmpty(_nis)
+                ? FilterCombo.SelectedIndex switch
+                {
+                    1 => all.Where(t => t.Type == JenisTransaksi.Masuk).ToList(),
+                    2 => all.Where(t => t.Type == JenisTransaksi.Keluar).ToList(),
+                    _ => all
+                }
+                : all;
 
             TransaksiItems.ItemsSource = filtered;
             EmptyText.Visibility = filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
