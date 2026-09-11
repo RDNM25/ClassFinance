@@ -8,7 +8,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>ClassFinance</RootNamespace>
     <AssemblyName>ClassFinance</AssemblyName>
-    <ApplicationIcon />
+    <ApplicationIcon>Assets\logo.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\logo.png" />
+  </ItemGroup>
 
 </Project>

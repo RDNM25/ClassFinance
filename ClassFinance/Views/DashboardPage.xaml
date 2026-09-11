@@ -110,7 +110,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="TRANSAKSI TERBARU" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
                             <Button x:Name="LihatSemuaButton" Grid.Column="1" Content="Lihat semua &#8594;"
-                                    Background="Transparent" BorderThickness="0" Foreground="{StaticResource PrimaryRed}"
+                                    Style="{StaticResource SmallOutlineButton}"
                                     FontWeight="Bold" Cursor="Hand" Click="LihatSemuaButton_Click" />
                         </Grid>
 

@@ -15,10 +15,7 @@
         <Border x:Name="SidebarBorder" Grid.Column="0" Background="{StaticResource SidebarBackground}" Visibility="Collapsed">
             <DockPanel LastChildFill="False" Margin="0,20,0,20">
                 <StackPanel DockPanel.Dock="Top">
-                    <Border Background="White" Width="52" Height="52" CornerRadius="14" Margin="20,0,0,10" HorizontalAlignment="Left">
-                        <TextBlock Text="CF" FontWeight="Bold" FontSize="18" Foreground="{StaticResource PrimaryRed}"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
+                    <Image Source="/Assets/logo.png" Width="100" Height="100" Stretch="Uniform" Margin="20,0,0,10" HorizontalAlignment="Left" />
                     <TextBlock Text="CLASS FINANCE" Foreground="White" FontWeight="Bold" FontSize="15" Margin="20,4,0,2" />
                     <TextBlock x:Name="SidebarUserText" Text="" Foreground="#FFCDD2" FontSize="12" Margin="20,0,0,20" />
 

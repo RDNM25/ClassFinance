@@ -12,9 +12,7 @@
                 <!--  Red hero header  -->
                 <Border Background="{StaticResource PrimaryRed}" CornerRadius="18,18,60,60" Padding="0,36,0,36">
                     <StackPanel HorizontalAlignment="Center">
-                        <Border Background="White" Width="84" Height="84" CornerRadius="20">
-                            <TextBlock Text="&#128176;" FontSize="38" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
+                        <Image Source="/Assets/logo.png" Width="110" Height="110" Stretch="Uniform" />
                         <TextBlock Text="Welcome Back" Foreground="White" FontSize="24" FontWeight="Bold"
                                    HorizontalAlignment="Center" Margin="0,16,0,4" />
                         <TextBlock Text="Sign in to Class Finance" Foreground="#FFE0E0" FontSize="13"

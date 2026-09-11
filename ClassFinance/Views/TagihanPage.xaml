@@ -2,13 +2,14 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:conv="clr-namespace:ClassFinance.Converters"
-      Title="Tagihan" Background="{StaticResource AppBackground}">
+      Title="Tagihan" Background="{StaticResource AppBackground}" Width="973">
     <Page.Resources>
         <conv:RupiahConverter x:Key="Rupiah" />
         <conv:StatusToBrushConverter x:Key="StatusBrush" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Page.Resources>
 
-    <Grid Margin="32,28,32,28">
+    <Grid Margin="32,28,32,28" Grid.IsSharedSizeScope="True">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="20" />
@@ -16,14 +17,17 @@
         </Grid.ColumnDefinitions>
 
         <!--  Left: list of tagihan  -->
-        <DockPanel Grid.Column="0">
+        <DockPanel Grid.Column="0" Grid.ColumnSpan="2">
             <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" SharedSizeGroup="TagihanHeaderRow" />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="TAGIHAN" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
-                <Button x:Name="BuatTagihanButton" Grid.Column="1" Content="+ BUAT TAGIHAN"
+                <Button Grid.Column="1" x:Name="BuatTagihanButton" Content="+ BUAT TAGIHAN"
                         Style="{StaticResource PrimaryButton}" Click="BuatTagihanButton_Click" />
             </Grid>
 
@@ -33,18 +37,28 @@
                         <ItemsControl x:Name="TagihanItems">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource ListRow}" Cursor="Hand" MouseLeftButtonUp="TagihanRow_Click" Tag="{Binding}">
+                                    <Border Style="{StaticResource ListRow}" Cursor="Hand" MouseLeftButtonUp="TagihanRow_Click" Tag="{Binding Tagihan}">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0">
-                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15" />
-                                                <TextBlock Text="{Binding DueDate, StringFormat='Jatuh tempo: dd MMM yyyy'}" FontSize="12" Foreground="{StaticResource TextGray}" />
+                                                <TextBlock Text="{Binding Tagihan.Name}" FontWeight="Bold" FontSize="15" />
+                                                <TextBlock FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,3,0,0">
+                                                    <Run Text="Jatuh tempo: " />
+                                                    <Run Text="{Binding Tagihan.DueDate, StringFormat='dd MMM yyyy'}" />
+                                                </TextBlock>
                                             </StackPanel>
-                                            <TextBlock Grid.Column="1" Text="{Binding Amount, Converter={StaticResource Rupiah}}"
-                                                       FontWeight="Bold" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Tagihan.Amount, Converter={StaticResource Rupiah}}"
+                                                       FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                            <Border Grid.Column="2" Width="24" Height="24" CornerRadius="12" Background="#2E7D32"
+                                                    VerticalAlignment="Center" ToolTip="Lunas &#8212; semua siswa sudah bayar"
+                                                    Visibility="{Binding IsFullyPaid, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="&#10003;" Foreground="White" FontSize="13" FontWeight="Bold"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -58,9 +72,14 @@
         </DockPanel>
 
         <!--  Right: detail of selected tagihan  -->
-        <DockPanel Grid.Column="2">
-            <TextBlock DockPanel.Dock="Top" x:Name="DetailTitle" Text="Pilih tagihan untuk melihat status pembayaran"
-                       FontSize="16" FontWeight="Bold" Margin="0,0,0,20" TextWrapping="Wrap" />
+        <DockPanel Grid.Column="2" Margin="30,0,10,0">
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" SharedSizeGroup="TagihanHeaderRow" />
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="DetailTitle" Text="status pembayaran"
+                           FontSize="16" FontWeight="Bold" VerticalAlignment="Top" TextWrapping="Wrap" Margin="27,19,18,0" TextAlignment="Right" />
+            </Grid>
 
             <Border Style="{StaticResource Card}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">

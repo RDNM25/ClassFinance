@@ -39,6 +39,13 @@
         </Setter>
     </Style>
 
+    <!--
+        "Pop" button: a white pill button meant to sit on top of a colored card
+        (e.g. the Tarik Kas button on the red Total Saldo card). Colors are
+        self-contained rather than TemplateBinding'd. Hovering smoothly animates
+        the background from white to deep red and the text from red to white,
+        plus a soft glow, instead of any instant color snap.
+    -->
     <Style x:Key="PopButton" TargetType="Button">
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="14" />
@@ -199,6 +206,12 @@
         </Setter>
     </Style>
 
+    <!--
+        Rounded ComboBox: pill-shaped closed state matching RoundedTextBox, with a
+        red chevron that flips on open, and a rounded dropdown whose items highlight
+        in the app's red accent on hover/selection. Built for non-editable selection
+        combos like the Riwayat Transaksi type filter.
+    -->
     <Style x:Key="RoundedComboBox" TargetType="ComboBox">
         <Setter Property="Background" Value="White" />
         <Setter Property="BorderBrush" Value="#BDBDBD" />
@@ -225,7 +238,7 @@
                                         <Setter TargetName="itemBorder" Property="Background" Value="{StaticResource PrimaryRedLight}" />
                                     </Trigger>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="itemBorder" Property="Background" Value="Gray" />
+                                        <Setter TargetName="itemBorder" Property="Background" Value="{StaticResource PrimaryRed}" />
                                         <Setter Property="Foreground" Value="White" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
@@ -322,7 +335,7 @@
     <Style x:Key="ListRow" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource CardBackground}" />
         <Setter Property="CornerRadius" Value="12" />
-        <Setter Property="Padding" Value="16,14" />
+        <Setter Property="Padding" Value="16,16" />
         <Setter Property="Margin" Value="0,0,0,10" />
     </Style>
 

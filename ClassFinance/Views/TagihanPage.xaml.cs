@@ -14,6 +14,13 @@ namespace ClassFinance.Views
         public string SiswaName { get; set; }
     }
 
+    /// <summary>Wraps a Tagihan with a computed flag for whether every student has paid it off.</summary>
+    public class TagihanDisplayItem
+    {
+        public Tagihan Tagihan { get; set; }
+        public bool IsFullyPaid { get; set; }
+    }
+
     public partial class TagihanPage : Page
     {
         private readonly User _currentUser;
@@ -40,7 +47,18 @@ namespace ClassFinance.Views
         private void Refresh()
         {
             var tagihanList = DataStore.Instance.TagihanList.Where(t => t.KelasId == _kelasId)
-                .OrderByDescending(t => t.DueDate).ToList();
+                .OrderByDescending(t => t.Id) // Id increments on creation, so this puts the newest tagihan first
+                .Select(t =>
+                {
+                    var entries = DataStore.Instance.TagihanSiswaList.Where(ts => ts.TagihanId == t.Id).ToList();
+                    return new TagihanDisplayItem
+                    {
+                        Tagihan = t,
+                        IsFullyPaid = entries.Any() && entries.All(ts => ts.Status == StatusTagihan.Lunas)
+                    };
+                })
+                .ToList();
+
             TagihanItems.ItemsSource = tagihanList;
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
 
