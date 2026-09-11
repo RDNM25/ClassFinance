@@ -24,9 +24,9 @@ namespace ClassFinance.Models
             return DataStore.Instance.TambahTransaksi(kelasId, JenisTransaksi.Keluar, amount, date, category, null, Name);
         }
 
-        public Tagihan BuatTagihan(int kelasId, string name, decimal amount, DateTime dueDate)
+        public Tagihan BuatTagihan(int kelasId, string name, decimal amount)
         {
-            var tagihan = DataStore.Instance.BuatTagihan(kelasId, name, amount, dueDate);
+            var tagihan = DataStore.Instance.BuatTagihan(kelasId, name, amount);
             Notifikasi.KirimUntukTagihanBaru(kelasId, tagihan.Id);
             return tagihan;
         }

@@ -11,10 +11,7 @@
         <TextBox x:Name="NameBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
 
         <TextBlock Text="Jumlah per Siswa (Rp)" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
-        <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
-
-        <TextBlock Text="Jatuh Tempo" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
-        <DatePicker x:Name="DueDatePicker" Margin="0,0,0,10" />
+        <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,10" />
 
         <TextBlock x:Name="ErrorText" Foreground="{StaticResource PrimaryRed}" FontSize="12" Margin="2,0,0,10"
                    Visibility="Collapsed" TextWrapping="Wrap" />
