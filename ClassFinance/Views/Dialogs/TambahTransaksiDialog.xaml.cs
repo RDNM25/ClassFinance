@@ -1,8 +1,10 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using ClassFinance.Models;
+using ClassFinance.Services; // Added to access DataStore
 
 namespace ClassFinance.Views.Dialogs
 {
@@ -37,10 +39,24 @@ namespace ClassFinance.Views.Dialogs
                 return;
             }
 
-            if (MasukRadio.IsChecked == true)
-                _bendahara.TambahPemasukan(_kelasId, description, amount, dateValue);
-            else
-                _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue);
+            // --- NEW BALANCE CHECK LOGIC ---
+            // Calculate current balance
+            var riwayat = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
+            var totalEarned = riwayat.Where(t => t.Type == JenisTransaksi.Masuk).Sum(t => t.Amount);
+            var totalSpent = riwayat.Where(t => t.Type == JenisTransaksi.Keluar).Sum(t => t.Amount);
+            var saldoSekarang = totalEarned - totalSpent;
+
+            // Prevent overdraft
+            if (amount > saldoSekarang)
+            {
+                decimal kurangAmount = amount - saldoSekarang;
+                ErrorText.Text = $"Uang kas tidak cukup, kurang Rp {kurangAmount:N0}";
+                ErrorText.Visibility = Visibility.Visible;
+                return;
+            }
+            // -------------------------------
+
+            _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue);
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();

@@ -44,12 +44,6 @@ namespace ClassFinance.Models
                 $"Pembayaran dari {siswa.Name}", tagihanSiswaId, Name, proofFile, siswaId: siswa.Id);
         }
 
-        public string CetakBuktiPembayaran(int transaksiId)
-        {
-            var t = DataStore.Instance.TransaksiList.First(x => x.Id == transaksiId);
-            return $"BUKTI PEMBAYARAN\n{t.Description}\nJumlah: Rp{t.Amount:N0}\nTanggal: {t.Date:dd MMM yyyy HH:mm}\nDicatat oleh: {t.CreatedBy}";
-        }
-
         public string GenerateLaporan(int kelasId, string periode, string format)
         {
             var kelas = DataStore.Instance.KelasList.First(k => k.Id == kelasId);
