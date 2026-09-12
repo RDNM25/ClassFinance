@@ -6,6 +6,8 @@
     <Page.Resources>
         <conv:TransaksiSignConverter x:Key="Sign" />
         <conv:TransaksiColorConverter x:Key="SignColor" />
+        <conv:RupiahConverter x:Key="Rupiah" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Page.Resources>
 
     <DockPanel Margin="32,28,32,28">
@@ -29,6 +31,38 @@
 
             <Button x:Name="TambahButton" Grid.Column="3" Content="+ TAMBAH TRANSAKSI"
                     Style="{StaticResource PrimaryButton}" Click="TambahButton_Click" />
+        </Grid>
+
+        <!--  Summary cards: hidden in the per-student tagihan view  -->
+        <Grid x:Name="SummaryRow" DockPanel.Dock="Top" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="18" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{StaticResource PrimaryRed}" CornerRadius="16" Padding="20">
+                <StackPanel>
+                    <TextBlock Text="Total Kas" Foreground="#FFE0E0" FontSize="13" />
+                    <TextBlock x:Name="TotalKasText" Text="Rp 0" Foreground="White" FontSize="24" FontWeight="Bold" Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Total Pemasukan" Foreground="{StaticResource TextGray}" FontSize="13" />
+                    <TextBlock x:Name="TotalEarnedText" Text="Rp 0" FontSize="24" FontWeight="Bold" Foreground="{StaticResource PrimaryRed}" Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="4" Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Total Pengeluaran" Foreground="{StaticResource TextGray}" FontSize="13" />
+                    <TextBlock x:Name="TotalSpentText" Text="Rp 0" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextDark}" Margin="0,6,0,0" />
+                </StackPanel>
+            </Border>
         </Grid>
 
         <Border Style="{StaticResource Card}">
@@ -65,6 +99,43 @@
                                                 </TextBlock.Style>
                                             </TextBlock>
                                         </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!--  Per-student view: tagihan details on the left, what this student paid on the right  -->
+                    <ItemsControl x:Name="TagihanPaymentItems" Visibility="Collapsed">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ListRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <!--  Left: tagihan details  -->
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Tagihan.Name}" FontWeight="Bold" FontSize="15" />
+                                            <TextBlock FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,3,0,0">
+                                                <Run Text="{Binding Tagihan.CreatedDate, StringFormat='dd MMM yyyy'}" />
+                                                <Run Text=" &#8226; " />
+                                                <Run Text="{Binding Tagihan.Amount, Converter={StaticResource Rupiah}}" />
+                                            </TextBlock>
+                                        </StackPanel>
+
+                                        <!--  Right: what this student paid, blank if they haven't paid  -->
+                                        <TextBlock Grid.Column="1" Text="{Binding AmountPaidDisplay}" FontWeight="Bold"
+                                                   Foreground="{StaticResource PrimaryRed}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                        <Border Grid.Column="2" Width="24" Height="24" CornerRadius="12" Background="#2E7D32"
+                                                VerticalAlignment="Center" ToolTip="Sudah dibayar"
+                                                Visibility="{Binding HasPaid, Converter={StaticResource BoolToVis}}">
+                                            <TextBlock Text="&#10003;" Foreground="White" FontSize="13" FontWeight="Bold"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

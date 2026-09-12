@@ -10,7 +10,9 @@ namespace ClassFinance.Models
         public int KelasId { get; set; }
         public string Name { get; set; }
         public decimal Amount { get; set; }
-        public DateTime DueDate { get; set; }
+
+        /// <summary>When this tagihan was actually created (set automatically, not user-editable).</summary>
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         /// <summary>
         /// Creates one TagihanSiswa entry per student currently enrolled in the class.

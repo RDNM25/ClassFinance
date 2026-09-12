@@ -33,7 +33,7 @@ namespace ClassFinance.Models
             foreach (var siswa in DataStore.Instance.Users.OfType<Siswa>().Where(s => s.KelasId == kelasId))
             {
                 Kirim(siswa.Id, "Tagihan Baru",
-                    $"Tagihan '{tagihan.Name}' sebesar Rp{tagihan.Amount:N0} telah dibuat. Jatuh tempo {tagihan.DueDate:dd MMM yyyy}.");
+                    $"Tagihan '{tagihan.Name}' sebesar Rp{tagihan.Amount:N0} telah dibuat.");
             }
         }
     }

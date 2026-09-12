@@ -20,13 +20,11 @@ namespace ClassFinance.Views.Dialogs
             _kelasId = kelasId;
             _mainWindow = mainWindow;
             _onSaved = onSaved;
-            DueDatePicker.SelectedDate = DateTime.Now.AddDays(14);
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             var name = NameBox.Text.Trim();
-            var dueDate = DueDatePicker.SelectedDate ?? DateTime.Now.AddDays(14);
 
             if (string.IsNullOrWhiteSpace(name) ||
                 !decimal.TryParse(AmountBox.Text.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) ||
@@ -37,7 +35,7 @@ namespace ClassFinance.Views.Dialogs
                 return;
             }
 
-            _bendahara.BuatTagihan(_kelasId, name, amount, dueDate);
+            _bendahara.BuatTagihan(_kelasId, name, amount);
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();
