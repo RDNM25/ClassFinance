@@ -21,8 +21,10 @@ namespace ClassFinance.Views
     {
         public Tagihan Tagihan { get; set; }
         public bool HasPaid { get; set; }
+        public bool IsLunas { get; set; }
         public decimal AmountPaid { get; set; }
-        public string AmountPaidDisplay => HasPaid ? $"Rp {AmountPaid:N0}" : string.Empty;
+        // Display the amount if they have paid anything (even partially)
+        public string AmountPaidDisplay => AmountPaid > 0 ? $"Rp {AmountPaid:N0}" : string.Empty;
     }
 
     public partial class RiwayatTransaksiPage : Page
@@ -58,9 +60,6 @@ namespace ClassFinance.Views
             else
             {
                 TambahButton.Visibility = currentUser is Bendahara ? Visibility.Visible : Visibility.Collapsed;
-                // Attached here (instead of in XAML) so it can't fire during InitializeComponent(),
-                // before _kelasId above is set -- that used to crash with "Sequence contains no
-                // matching element" because _kelasId was still 0 at that point.
                 FilterCombo.SelectionChanged += FilterCombo_SelectionChanged;
             }
 
@@ -85,8 +84,6 @@ namespace ClassFinance.Views
         {
             var all = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
 
-            // Totals always reflect every transaction for the class, regardless of
-            // whatever the type filter below is currently narrowed down to.
             var totalEarned = all.Where(t => t.Type == JenisTransaksi.Masuk).Sum(t => t.Amount);
             var totalSpent = all.Where(t => t.Type == JenisTransaksi.Keluar).Sum(t => t.Amount);
             TotalKasText.Text = $"Rp {(totalEarned - totalSpent):N0}";
@@ -114,24 +111,28 @@ namespace ClassFinance.Views
 
         /// <summary>
         /// Per-student view: every class tagihan on the left, with what this student
-        /// paid toward each one on the right -- a checkmark if fully paid, blank if not.
+        /// paid toward each one on the right.
         /// </summary>
         private void RefreshTagihanStatus(Siswa siswa)
         {
             var tagihanList = DataStore.Instance.TagihanList
                 .Where(t => t.KelasId == _kelasId)
-                .OrderByDescending(t => t.Id) // most recently created first
+                .OrderByDescending(t => t.Id)
                 .Select(t =>
                 {
                     var entry = DataStore.Instance.TagihanSiswaList
                         .FirstOrDefault(ts => ts.TagihanId == t.Id && ts.SiswaId == siswa.Id);
-                    bool hasPaid = entry != null && entry.Status == StatusTagihan.Lunas;
+
+                    // Use the new JumlahDibayar and Status properties to reflect partial/full payments
+                    bool hasPaid = entry != null && entry.JumlahDibayar > 0;
+                    bool isLunas = entry != null && entry.Status == StatusTagihan.Lunas;
 
                     return new TagihanPaymentDisplayItem
                     {
                         Tagihan = t,
                         HasPaid = hasPaid,
-                        AmountPaid = hasPaid ? t.Amount - entry.AmountDue : 0
+                        IsLunas = isLunas,
+                        AmountPaid = entry?.JumlahDibayar ?? 0
                     };
                 })
                 .ToList();

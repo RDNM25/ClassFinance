@@ -1,0 +1,27 @@
+<UserControl x:Class="ClassFinance.Views.Dialogs.BayarManualDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="400" Background="White">
+    <Border Padding="24" CornerRadius="8" Background="White">
+        <StackPanel>
+            <TextBlock Text="Bayar Manual" FontSize="20" FontWeight="Bold" Margin="0,0,0,16"/>
+            <TextBlock x:Name="SiswaNameText" FontWeight="Bold"/>
+            <TextBlock x:Name="AmountDueText" Foreground="#666" Margin="0,0,0,16"/>
+
+            <TextBlock Text="Nominal yang dibayar (Rp)" FontSize="12" Foreground="#666" Margin="0,0,0,4"/>
+            <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,8" />
+
+            <TextBlock x:Name="ErrorText" Foreground="Red" FontSize="12" Visibility="Collapsed" Margin="0,0,0,16"/>
+
+            <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Batal" Style="{StaticResource OutlineButton}" Click="Cancel_Click"/>
+                <Button Grid.Column="2" Content="Simpan" Style="{StaticResource PrimaryButton}" Click="Save_Click"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

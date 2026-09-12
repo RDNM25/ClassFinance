@@ -108,5 +108,29 @@ namespace ClassFinance.Views
                 Refresh();
             }
         }
+        private void BayarManual_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is not Bendahara bendahara)
+            {
+                MessageBox.Show("Hanya Bendahara yang dapat mencatat pembayaran.", "Akses ditolak");
+                return;
+            }
+
+            if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display && display.Entry.Status != StatusTagihan.Lunas)
+            {
+                // 1. Fetch the student to see if they have saved balance (Saldo Titipan)
+                var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == display.Entry.SiswaId);
+
+                // 2. Open the manual payment dialog, passing along the student and the tagihan
+                var dialog = new BayarManualDialog(
+                    bendahara,
+                    siswa,
+                    display.Entry,
+                    _mainWindow,
+                    onSaved: () => Refresh()); // Refresh the UI when the dialog finishes
+
+                _mainWindow.ShowModal(dialog);
+            }
+        }
     }
 }

@@ -34,6 +34,7 @@
             <Border Style="{StaticResource Card}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
+                        <!-- Left items control remains standard for listing bills -->
                         <ItemsControl x:Name="TagihanItems">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
@@ -81,6 +82,7 @@
 
             <Border Style="{StaticResource Card}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <!-- Right items control updated with student details, partial payments, and buttons -->
                     <ItemsControl x:Name="DetailItems">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -90,12 +92,28 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="{Binding SiswaName}" FontWeight="Bold" VerticalAlignment="Center" />
+
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding SiswaName}" FontWeight="Bold" FontSize="14" />
+                                            <TextBlock FontSize="11" Foreground="{StaticResource TextGray}" Margin="0,2,0,0">
+                                                <Run Text="Sisa: Rp "/>
+                                                <Run Text="{Binding Entry.AmountDue, Converter={StaticResource Rupiah}}"/>
+                                                <Run Text=" (Dibayar: Rp "/>
+                                                <Run Text="{Binding Entry.JumlahDibayar, Converter={StaticResource Rupiah}}"/>
+                                                <Run Text=")"/>
+                                            </TextBlock>
+                                        </StackPanel>
+
                                         <TextBlock Grid.Column="1" Text="{Binding Entry.Status}" Foreground="{Binding Entry.Status, Converter={StaticResource StatusBrush}}"
                                                    FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,12,0" />
+
                                         <Button Grid.Column="2" Content="Tandai Lunas" Style="{StaticResource SmallOutlineButton}"
-                                                Tag="{Binding}" Click="TandaiLunas_Click" />
+                                                Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,6,0" />
+
+                                        <Button Grid.Column="3" Content="Bayar Manual" Style="{StaticResource SmallOutlineButton}"
+                                                Tag="{Binding}" Click="BayarManual_Click" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>

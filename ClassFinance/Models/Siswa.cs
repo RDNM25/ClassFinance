@@ -1,6 +1,6 @@
+using ClassFinance.Services;
 using System.Collections.Generic;
 using System.Linq;
-using ClassFinance.Services;
 
 namespace ClassFinance.Models
 {
@@ -10,9 +10,13 @@ namespace ClassFinance.Models
         public string Nis { get; set; }
         public int KelasId { get; set; }
 
+        // Tracks excess payments saved for future bills
+        public decimal SaldoTitipan { get; set; }
+
         public Siswa()
         {
             Role = Role.Siswa;
+            SaldoTitipan = 0; 
         }
 
         public override string GetDashboardTitle() => "Dashboard Siswa";

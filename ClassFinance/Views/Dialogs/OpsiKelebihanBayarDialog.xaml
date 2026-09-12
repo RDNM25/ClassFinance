@@ -1,0 +1,26 @@
+<UserControl x:Class="ClassFinance.Views.Dialogs.OpsiKelebihanBayarDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="420" Background="White">
+    <Border Padding="24" CornerRadius="8" Background="White">
+        <StackPanel>
+            <TextBlock Text="Kelebihan Pembayaran" FontSize="20" FontWeight="Bold" Margin="0,0,0,8"/>
+            <TextBlock x:Name="InfoText" TextWrapping="Wrap" Foreground="#666" Margin="0,0,0,16"/>
+
+            <TextBlock Text="Pilih tindakan untuk kelebihan dana:" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+            <RadioButton x:Name="SimpanRadio" Content="Simpan sebagai Saldo Titipan siswa untuk tagihan berikutnya" IsChecked="True" Margin="0,0,0,8"/>
+            <RadioButton x:Name="KembalikanRadio" Content="Kembalikan tunai sebagai uang kembalian (Refund)" Margin="0,0,0,16"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Content="Batal" Style="{StaticResource OutlineButton}" Click="Cancel_Click"/>
+                <Button Grid.Column="2" Content="Proses" Style="{StaticResource PrimaryButton}" Click="Process_Click"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

@@ -28,12 +28,18 @@
 
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15"
-                                                       Cursor="Hand" MouseLeftButtonUp="SiswaName_Click" Tag="{Binding}" />
-                                            <TextBlock Text="{Binding Nis, StringFormat='NIS: {0}'}" FontSize="12" Foreground="{StaticResource TextGray}" />
+                                       Cursor="Hand" MouseLeftButtonUp="SiswaName_Click" Tag="{Binding}" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Nis, StringFormat='NIS: {0}'}" FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,0,12,0" />
+                                                <TextBlock FontSize="12" Foreground="#2E7D32" FontWeight="SemiBold">
+                                    <Run Text="Saldo Titipan: Rp "/>
+                                    <Run Text="{Binding SaldoTitipan, StringFormat={}{0:N0}}"/>
+                                                </TextBlock>
+                                            </StackPanel>
                                         </StackPanel>
 
                                         <Button Grid.Column="1" Content="Hapus" Style="{StaticResource SmallOutlineButton}"
-                                                Tag="{Binding}" Click="Hapus_Click" />
+                                Tag="{Binding}" Click="Hapus_Click" />
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -41,7 +47,7 @@
                     </ItemsControl>
 
                     <TextBlock x:Name="EmptyText" Text="Belum ada siswa terdaftar di kelas ini." Foreground="{StaticResource TextGray}"
-                               HorizontalAlignment="Center" Margin="0,30,0,0" Visibility="Collapsed" />
+               HorizontalAlignment="Center" Margin="0,30,0,0" Visibility="Collapsed" />
                 </StackPanel>
             </ScrollViewer>
         </Border>

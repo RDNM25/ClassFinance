@@ -16,6 +16,7 @@ namespace ClassFinance.Models
     public enum StatusTagihan
     {
         BelumBayar,
+        Sebagian,
         Lunas
     }
 }
