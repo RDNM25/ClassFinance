@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,6 +12,9 @@ namespace ClassFinance
 {
     public partial class MainWindow : Window
     {
+        private readonly Stack<Page> _backStack = new();
+        private bool _isNavigatingBack;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -20,6 +25,7 @@ namespace ClassFinance
         {
             SidebarColumn.Width = new GridLength(0);
             SidebarBorder.Visibility = Visibility.Collapsed;
+            _backStack.Clear();
             ContentFrame.Navigate(new LoginPage(this));
             ClearNavigationHistory();
             UpdateBackButton();
@@ -31,29 +37,51 @@ namespace ClassFinance
             SidebarBorder.Visibility = Visibility.Visible;
             SidebarUserText.Text = $"{user.Name} \u2022 {user.Role}";
             BuildNav(user);
-            NavigateTo(new DashboardPage(user, this));
+            _backStack.Clear();
+            NavigateTo(new DashboardPage(user, this), recordHistory: false);
             ClearNavigationHistory();
             UpdateBackButton();
         }
 
-        public void NavigateTo(Page page)
+        public void NavigateTo(Page page, bool recordHistory = true)
         {
+            if (recordHistory && !_isNavigatingBack && ContentFrame.Content is Page current && current is not LoginPage)
+                _backStack.Push(current);
+
             ContentFrame.Navigate(page);
+            _isNavigatingBack = false;
+            UpdateBackButton();
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ContentFrame.CanGoBack)
-                ContentFrame.GoBack();
+            var previous = PopSafePreviousPage();
+            if (previous == null) return;
+
+            _isNavigatingBack = true;
+            ContentFrame.Navigate(previous);
+            UpdateBackButton();
+        }
+
+        private Page PopSafePreviousPage()
+        {
+            while (_backStack.Count > 0)
+            {
+                var previous = _backStack.Pop();
+                if (previous is not LoginPage)
+                    return previous;
+            }
+
+            return null;
         }
 
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e) => UpdateBackButton();
 
         private void UpdateBackButton()
         {
-            BackButton.Visibility = SidebarBorder.Visibility == Visibility.Visible && ContentFrame.CanGoBack
-                ? Visibility.Visible
-                : Visibility.Collapsed;
+            var canGoBack = SidebarBorder.Visibility == Visibility.Visible &&
+                            _backStack.Any(page => page is not LoginPage);
+            BackButton.Visibility = canGoBack ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void ClearNavigationHistory()
