@@ -14,42 +14,66 @@
         </Grid>
 
         <Border Style="{StaticResource Card}">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <ItemsControl x:Name="SiswaItems">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Style="{StaticResource ListRow}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
+            <DockPanel>
+                <Border DockPanel.Dock="Top" Margin="0,0,0,16" Background="White" BorderBrush="#E0E0E0" BorderThickness="2" CornerRadius="20">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="36" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15"
-                                       Cursor="Hand" MouseLeftButtonUp="SiswaName_Click" Tag="{Binding}" />
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding Nis, StringFormat='NIS: {0}'}" FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,0,12,0" />
-                                                <TextBlock FontSize="12" Foreground="#2E7D32" FontWeight="SemiBold">
-                                    <Run Text="Saldo Titipan: Rp "/>
-                                    <Run Text="{Binding SaldoTitipan, StringFormat={}{0:N0}}"/>
-                                                </TextBlock>
+                        <Canvas Grid.Column="0" Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Ellipse Width="10" Height="10" Canvas.Left="0" Canvas.Top="0"
+                                     Stroke="{StaticResource TextGray}" StrokeThickness="1.6" />
+                            <Line X1="9" Y1="9" X2="15" Y2="15" Stroke="{StaticResource TextGray}"
+                                  StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                        </Canvas>
+
+                        <!-- Search Input Box -->
+                        <TextBox x:Name="SearchBox" Grid.Column="1" BorderThickness="0" Background="Transparent" 
+                         Padding="0,8,10,8" VerticalContentAlignment="Center"
+                         FontSize="14" Tag="Cari nama atau NIS siswa..." 
+                         TextChanged="SearchBox_TextChanged" />
+                    </Grid>
+                </Border>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <ItemsControl x:Name="SiswaItems">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource ListRow}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15"
+                                           Cursor="Hand" MouseLeftButtonUp="SiswaName_Click" Tag="{Binding}" />
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Nis, StringFormat='NIS: {0}'}" FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,0,12,0" />
+                                                    <TextBlock FontSize="12" Foreground="#2E7D32" FontWeight="SemiBold">
+                                        <Run Text="Saldo Titipan: Rp "/>
+                                        <Run Text="{Binding SaldoTitipan, StringFormat={}{0:N0}}"/>
+                                                    </TextBlock>
+                                                </StackPanel>
                                             </StackPanel>
-                                        </StackPanel>
 
-                                        <Button Grid.Column="1" Content="Hapus" Style="{StaticResource SmallOutlineButton}"
-                                Tag="{Binding}" Click="Hapus_Click" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                            <Button Grid.Column="1" Content="Hapus" Style="{StaticResource SmallOutlineButton}"
+                                    Tag="{Binding}" Click="Hapus_Click" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
-                    <TextBlock x:Name="EmptyText" Text="Belum ada siswa terdaftar di kelas ini." Foreground="{StaticResource TextGray}"
-               HorizontalAlignment="Center" Margin="0,30,0,0" Visibility="Collapsed" />
-                </StackPanel>
-            </ScrollViewer>
+                        <TextBlock x:Name="EmptyText" Text="Belum ada siswa terdaftar di kelas ini." Foreground="{StaticResource TextGray}"
+                   HorizontalAlignment="Center" Margin="0,30,0,0" Visibility="Collapsed" />
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
         </Border>
     </DockPanel>
 </Page>

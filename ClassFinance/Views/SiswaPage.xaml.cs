@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -39,10 +38,49 @@ namespace ClassFinance.Views
             EmptyText.Visibility = siswaList.Any() ? Visibility.Collapsed : Visibility.Visible;
         }
 
+
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ApplyFilter();
+        }
+
+        private void ApplyFilter()
+        {
+            var allSiswa = DataStore.Instance.Users
+                .OfType<Siswa>()
+                .Where(s => s.KelasId == _kelasId)
+                .ToList();
+
+            var keyword = SearchBox.Text?.Trim().ToLower() ?? string.Empty;
+
+            var filtered = string.IsNullOrEmpty(keyword)
+                ? allSiswa
+                : allSiswa.Where(s =>
+                    (s.Name != null && s.Name.ToLower().Contains(keyword)) ||
+                    (s.Nis != null && s.Nis.ToLower().Contains(keyword))
+                  ).ToList();
+
+            SiswaItems.ItemsSource = filtered;
+
+            // Handle empty state visibility
+            if (filtered.Count == 0)
+            {
+                EmptyText.Visibility = Visibility.Visible;
+                EmptyText.Text = allSiswa.Count == 0
+                    ? "Belum ada siswa terdaftar di kelas ini."
+                    : "Siswa tidak ditemukan.";
+            }
+            else
+            {
+                EmptyText.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private void TambahButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new TambahSiswaDialog(_kelasId, _mainWindow, Refresh);
             _mainWindow.ShowModal(dialog);
+            ApplyFilter();
         }
 
         private void Hapus_Click(object sender, RoutedEventArgs e)
@@ -54,6 +92,7 @@ namespace ClassFinance.Views
                 if (confirm == MessageBoxResult.Yes)
                 {
                     DataStore.Instance.HapusSiswa(siswa.Id);
+                    ApplyFilter();
                     Refresh();
                 }
             }

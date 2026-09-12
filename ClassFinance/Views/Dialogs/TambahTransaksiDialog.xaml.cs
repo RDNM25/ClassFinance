@@ -1,10 +1,9 @@
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using ClassFinance.Models;
-using ClassFinance.Services; // Added to access DataStore
+using ClassFinance.Services;
 
 namespace ClassFinance.Views.Dialogs
 {
@@ -51,7 +50,7 @@ namespace ClassFinance.Views.Dialogs
             {
                 ErrorText.Text = $"Uang kas tidak cukup, kurang Rp {amount - saldoSekarang:N0}";
                 ErrorText.Visibility = Visibility.Visible;
-                return; // <-- CRITICAL: Added return to stop the save process
+                return;
             }
 
             // Hide error if valid
