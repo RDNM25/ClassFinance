@@ -12,7 +12,6 @@ namespace ClassFinance
 {
     public partial class MainWindow : Window
     {
-        // 1. Simplified state: We only need the current page and the current user
         private Page _currentPage;
         private User _currentUser;
 
@@ -61,7 +60,6 @@ namespace ClassFinance
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            // 2. Always navigate straight back to the Dashboard when clicked
             if (_currentUser != null)
             {
                 NavigateTo(new DashboardPage(_currentUser, this));
@@ -84,7 +82,7 @@ namespace ClassFinance
                 return;
             }
 
-            // 3. Hide if we are already on the Dashboard page
+            // Hide if we are already on the Dashboard page
             if (_currentPage is DashboardPage)
             {
                 BackButton.Visibility = Visibility.Collapsed;
