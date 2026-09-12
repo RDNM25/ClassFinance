@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views;
@@ -20,6 +21,8 @@ namespace ClassFinance
             SidebarColumn.Width = new GridLength(0);
             SidebarBorder.Visibility = Visibility.Collapsed;
             ContentFrame.Navigate(new LoginPage(this));
+            ClearNavigationHistory();
+            UpdateBackButton();
         }
 
         public void ShowShell(User user)
@@ -29,11 +32,34 @@ namespace ClassFinance
             SidebarUserText.Text = $"{user.Name} \u2022 {user.Role}";
             BuildNav(user);
             NavigateTo(new DashboardPage(user, this));
+            ClearNavigationHistory();
+            UpdateBackButton();
         }
 
         public void NavigateTo(Page page)
         {
             ContentFrame.Navigate(page);
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContentFrame.CanGoBack)
+                ContentFrame.GoBack();
+        }
+
+        private void ContentFrame_Navigated(object sender, NavigationEventArgs e) => UpdateBackButton();
+
+        private void UpdateBackButton()
+        {
+            BackButton.Visibility = SidebarBorder.Visibility == Visibility.Visible && ContentFrame.CanGoBack
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+        }
+
+        private void ClearNavigationHistory()
+        {
+            while (ContentFrame.CanGoBack)
+                ContentFrame.RemoveBackEntry();
         }
 
         private void BuildNav(User user)

@@ -28,7 +28,13 @@
         </Border>
 
         <!--  Content  -->
-        <Frame x:Name="ContentFrame" Grid.Column="1" NavigationUIVisibility="Hidden" Background="{StaticResource AppBackground}" />
+        <Grid Grid.Column="1">
+            <Frame x:Name="ContentFrame" NavigationUIVisibility="Hidden" Background="{StaticResource AppBackground}"
+                   Navigated="ContentFrame_Navigated" />
+            <Button x:Name="BackButton" Content="&#8592;  Kembali" Style="{StaticResource SmallOutlineButton}"
+                    HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,20,0,0"
+                    Visibility="Collapsed" Click="BackButton_Click" Panel.ZIndex="1" />
+        </Grid>
 
         <!--  Modal overlay: dialogs render here, inside the main window, instead of as separate OS windows  -->
         <Border x:Name="ModalOverlay" Grid.Column="0" Grid.ColumnSpan="2" Background="#99000000"
