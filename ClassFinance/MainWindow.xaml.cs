@@ -12,8 +12,9 @@ namespace ClassFinance
 {
     public partial class MainWindow : Window
     {
-        private readonly Stack<Page> _backStack = new();
-        private bool _isNavigatingBack;
+        // 1. Simplified state: We only need the current page and the current user
+        private Page _currentPage;
+        private User _currentUser;
 
         public MainWindow()
         {
@@ -25,67 +26,78 @@ namespace ClassFinance
         {
             SidebarColumn.Width = new GridLength(0);
             SidebarBorder.Visibility = Visibility.Collapsed;
-            _backStack.Clear();
-            ContentFrame.Navigate(new LoginPage(this));
+
+            _currentUser = null;
+            _currentPage = new LoginPage(this);
+
+            ContentFrame.Navigate(_currentPage);
             ClearNavigationHistory();
             UpdateBackButton();
         }
 
         public void ShowShell(User user)
         {
+            // Save the logged-in user so we can pass it to the Dashboard later
+            _currentUser = user;
+
             SidebarColumn.Width = new GridLength(230);
             SidebarBorder.Visibility = Visibility.Visible;
             SidebarUserText.Text = $"{user.Name} \u2022 {user.Role}";
             BuildNav(user);
-            _backStack.Clear();
-            NavigateTo(new DashboardPage(user, this), recordHistory: false);
+
+            _currentPage = new DashboardPage(user, this);
+
+            ContentFrame.Navigate(_currentPage);
             ClearNavigationHistory();
             UpdateBackButton();
         }
 
         public void NavigateTo(Page page, bool recordHistory = true)
         {
-            if (recordHistory && !_isNavigatingBack && ContentFrame.Content is Page current && current is not LoginPage)
-                _backStack.Push(current);
-
-            ContentFrame.Navigate(page);
-            _isNavigatingBack = false;
+            _currentPage = page;
+            ContentFrame.Navigate(_currentPage);
             UpdateBackButton();
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            var previous = PopSafePreviousPage();
-            if (previous == null) return;
+            // 2. Always navigate straight back to the Dashboard when clicked
+            if (_currentUser != null)
+            {
+                NavigateTo(new DashboardPage(_currentUser, this));
+            }
+        }
 
-            _isNavigatingBack = true;
-            ContentFrame.Navigate(previous);
+        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
+        {
             UpdateBackButton();
         }
 
-        private Page PopSafePreviousPage()
-        {
-            while (_backStack.Count > 0)
-            {
-                var previous = _backStack.Pop();
-                if (previous is not LoginPage)
-                    return previous;
-            }
-
-            return null;
-        }
-
-        private void ContentFrame_Navigated(object sender, NavigationEventArgs e) => UpdateBackButton();
-
         private void UpdateBackButton()
         {
-            var canGoBack = SidebarBorder.Visibility == Visibility.Visible &&
-                            _backStack.Any(page => page is not LoginPage);
-            BackButton.Visibility = canGoBack ? Visibility.Visible : Visibility.Collapsed;
+            if (BackButton == null) return;
+
+            // Hide if the sidebar is gone (e.g. login layout)
+            if (SidebarBorder.Visibility == Visibility.Collapsed)
+            {
+                BackButton.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            // 3. Hide if we are already on the Dashboard page
+            if (_currentPage is DashboardPage)
+            {
+                BackButton.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            // Otherwise, show the button
+            BackButton.Visibility = Visibility.Visible;
         }
 
         private void ClearNavigationHistory()
         {
+            // Clears the built-in frame history so the native mouse back-buttons don't mess up our custom logic
             while (ContentFrame.CanGoBack)
                 ContentFrame.RemoveBackEntry();
         }
