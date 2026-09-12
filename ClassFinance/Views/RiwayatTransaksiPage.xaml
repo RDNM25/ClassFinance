@@ -8,6 +8,7 @@
         <conv:TransaksiColorConverter x:Key="SignColor" />
         <conv:RupiahConverter x:Key="Rupiah" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:StatusToBrushConverter x:Key="StatusBrush" />
     </Page.Resources>
 
     <DockPanel Margin="32,28,32,28">
@@ -67,7 +68,7 @@
 
         <Border Style="{StaticResource Card}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
+                <StackPanel Margin="0,0,12,0">
                     <ItemsControl x:Name="TransaksiItems">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -114,23 +115,38 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <!--  Left: tagihan details  -->
-                                        <StackPanel Grid.Column="0">
+                                        <!--  Left: tagihan details and new payment data  -->
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Tagihan.Name}" FontWeight="Bold" FontSize="15" />
-                                            <TextBlock FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,3,0,0">
+                                            <TextBlock FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,3,0,4">
                                                 <Run Text="{Binding Tagihan.CreatedDate, StringFormat='dd MMM yyyy'}" />
                                                 <Run Text=" &#8226; " />
                                                 <Run Text="{Binding Tagihan.Amount, Converter={StaticResource Rupiah}}" />
                                             </TextBlock>
+
+                                            <!-- New Data: Sisa and Dibayar -->
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                                <TextBlock FontSize="11" Foreground="{StaticResource TextGray}">
+                                                    <Run Text="Sisa: "/>
+                                                    <Run Text="{Binding AmountDue, Converter={StaticResource Rupiah}}"/>
+                                                    <Run Text=" (Dibayar: "/>
+                                                    <Run Text="{Binding AmountPaid, Converter={StaticResource Rupiah}}"/>
+                                                    <Run Text=")"/>
+                                                </TextBlock>
+                                            </StackPanel>
+
+                                            <!-- New Data: Status -->
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Status: " FontSize="11" Foreground="{StaticResource TextGray}" />
+                                                <TextBlock Text="{Binding Status}" Foreground="{Binding Status, Converter={StaticResource StatusBrush}}"
+                                                           FontSize="11" FontWeight="Bold" />
+                                            </StackPanel>
                                         </StackPanel>
 
-                                        <!--  Right: what this student paid, blank if they haven't paid  -->
-                                        <TextBlock Grid.Column="1" Text="{Binding AmountPaidDisplay}" FontWeight="Bold"
-                                                   Foreground="{StaticResource PrimaryRed}" VerticalAlignment="Center" Margin="0,0,12,0" />
-                                        <Border Grid.Column="2" Width="24" Height="24" CornerRadius="12" Background="#2E7D32"
+                                        <!--  Right: Checkmark if Lunas  -->
+                                        <Border Grid.Column="1" Width="24" Height="24" CornerRadius="12" Background="#2E7D32"
                                                 VerticalAlignment="Center" ToolTip="Lunas"
                                                 Visibility="{Binding IsLunas, Converter={StaticResource BoolToVis}}">
                                             <TextBlock Text="&#10003;" Foreground="White" FontSize="13" FontWeight="Bold"

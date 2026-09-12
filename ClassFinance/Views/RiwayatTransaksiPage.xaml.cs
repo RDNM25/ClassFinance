@@ -23,6 +23,8 @@ namespace ClassFinance.Views
         public bool HasPaid { get; set; }
         public bool IsLunas { get; set; }
         public decimal AmountPaid { get; set; }
+        public decimal AmountDue { get; set; }
+        public StatusTagihan Status { get; set; }
         // Display the amount if they have paid anything (even partially)
         public string AmountPaidDisplay => AmountPaid > 0 ? $"Rp {AmountPaid:N0}" : string.Empty;
     }
@@ -132,7 +134,9 @@ namespace ClassFinance.Views
                         Tagihan = t,
                         HasPaid = hasPaid,
                         IsLunas = isLunas,
-                        AmountPaid = entry?.JumlahDibayar ?? 0
+                        AmountPaid = entry?.JumlahDibayar ?? 0,
+                        AmountDue = entry?.AmountDue ?? t.Amount,
+                        Status = entry?.Status ?? StatusTagihan.BelumBayar
                     };
                 })
                 .ToList();

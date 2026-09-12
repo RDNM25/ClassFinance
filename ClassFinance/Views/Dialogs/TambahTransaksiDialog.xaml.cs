@@ -39,24 +39,32 @@ namespace ClassFinance.Views.Dialogs
                 return;
             }
 
-            // --- NEW BALANCE CHECK LOGIC ---
             // Calculate current balance
-            var riwayat = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
+            var kelas = DataStore.Instance.KelasList.First(k => k.Id == _kelasId);
+            var riwayat = kelas.GetRiwayatTransaksi();
             var totalEarned = riwayat.Where(t => t.Type == JenisTransaksi.Masuk).Sum(t => t.Amount);
             var totalSpent = riwayat.Where(t => t.Type == JenisTransaksi.Keluar).Sum(t => t.Amount);
             var saldoSekarang = totalEarned - totalSpent;
 
             // Prevent overdraft
-            if (amount > saldoSekarang)
+            if (KeluarRadio.IsChecked == true && amount > saldoSekarang)
             {
-                decimal kurangAmount = amount - saldoSekarang;
-                ErrorText.Text = $"Uang kas tidak cukup, kurang Rp {kurangAmount:N0}";
+                ErrorText.Text = $"Uang kas tidak cukup, kurang Rp {amount - saldoSekarang:N0}";
                 ErrorText.Visibility = Visibility.Visible;
-                return;
+                return; // <-- CRITICAL: Added return to stop the save process
             }
-            // -------------------------------
 
-            _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue);
+            // Hide error if valid
+            ErrorText.Visibility = Visibility.Collapsed;
+
+            if (KeluarRadio.IsChecked == true)
+            {
+                _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue);
+            }
+            else
+            {
+            _bendahara.TambahPemasukan(_kelasId, description, amount, dateValue);
+            }
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();
@@ -65,6 +73,5 @@ namespace ClassFinance.Views.Dialogs
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             _mainWindow.CloseModal();
-        }
-    }
+        }    }
 }
