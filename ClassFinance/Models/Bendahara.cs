@@ -28,13 +28,13 @@ namespace ClassFinance.Models
         {
             var tagihan = DataStore.Instance.BuatTagihan(kelasId, name, amount);
 
-            // FIX: When a new bill is created, automatically apply any existing student SaldoTitipan toward it
+            // Automatically apply any existing student SaldoTitipan toward the newly created bill without adding extra cash
             var siswaList = DataStore.Instance.Users.OfType<Siswa>().Where(s => s.KelasId == kelasId).ToList();
             foreach (var siswa in siswaList)
             {
                 if (siswa.SaldoTitipan > 0)
                 {
-                    ProsesSaldoTitipanBerikutnya(siswa.Id);
+                    ProsesSaldoTitipanBerikutnya(siswa.Id, siswa.SaldoTitipan);
                 }
             }
 
@@ -68,18 +68,18 @@ namespace ClassFinance.Models
                 $"Pengembalian dana lebih (refund) untuk {siswa.Name}", null, Name, siswaId: siswa.Id);
         }
 
-        // Save overpayment to the student's balance for next time and automatically apply it
+        // Save overpayment to the student's balance and automatically apply it without inflating total cash
         public void SimpanKelebihan(int siswaId, decimal amount)
         {
             var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
             siswa.SaldoTitipan += amount;
 
-            // Automatically check and apply stored balance to future bills
-            ProsesSaldoTitipanBerikutnya(siswaId);
+            // Automatically check and apply stored balance to future bills with 0 cash added
+            ProsesSaldoTitipanBerikutnya(siswaId, amount);
         }
 
-        // Automatically apply stored balance to subsequent bills
-        public void ProsesSaldoTitipanBerikutnya(int siswaId)
+        // Automatically apply stored balance to subsequent bills with 0 additional cash added to the total kas
+        public void ProsesSaldoTitipanBerikutnya(int siswaId, decimal storedAmountContext = 0)
         {
             var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
 
@@ -94,23 +94,37 @@ namespace ClassFinance.Models
 
                 if (siswa.SaldoTitipan >= ts.AmountDue)
                 {
-                    // Enough to cover the remaining bill completely
                     decimal amountToPay = ts.AmountDue;
                     siswa.SaldoTitipan -= amountToPay;
-                    CatatPembayaran(ts.Id, amountToPay, "Saldo Titipan");
+
+                    // Update bill status to Lunas
+                    ts.JumlahDibayar += amountToPay;
+                    ts.AmountDue = 0;
+                    ts.UpdateStatus();
+
+                    // Record transaction with 0 amount added to kas, displaying the savings reference text
+                    DataStore.Instance.TambahTransaksi(
+                        siswa.KelasId, JenisTransaksi.Masuk, 0, DateTime.Now,
+                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id);
                 }
                 else
                 {
-                    // Not enough: pay as much as possible, deplete stored amount, and log as pemasukan
                     decimal amountToPay = siswa.SaldoTitipan;
                     siswa.SaldoTitipan = 0;
-                    CatatPembayaran(ts.Id, amountToPay, "Saldo Titipan");
+
+                    ts.JumlahDibayar += amountToPay;
+                    ts.AmountDue = Math.Max(0, ts.AmountDue - amountToPay);
+                    ts.UpdateStatus();
+
+                    DataStore.Instance.TambahTransaksi(
+                        siswa.KelasId, JenisTransaksi.Masuk, 0, DateTime.Now,
+                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id);
                     break;
                 }
             }
         }
 
-        // Allow student to use their saved balance to pay a future bill
+        // Allow student to use their saved balance to pay a future bill with 0 additional cash added
         public Transaksi BayarTagihanDariSaldo(int tagihanSiswaId, int siswaId, decimal amount)
         {
             var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
@@ -118,11 +132,16 @@ namespace ClassFinance.Models
             if (siswa.SaldoTitipan < amount)
                 throw new InvalidOperationException("Saldo titipan tidak mencukupi.");
 
-            // Deduct from their saved balance[cite: 7]
             siswa.SaldoTitipan -= amount;
 
-            // Record the payment normally[cite: 7]
-            return CatatPembayaran(tagihanSiswaId, amount, "Saldo Titipan");
+            var ts = DataStore.Instance.TagihanSiswaList.First(t => t.Id == tagihanSiswaId);
+            ts.JumlahDibayar += amount;
+            ts.AmountDue = Math.Max(0, ts.AmountDue - amount);
+            ts.UpdateStatus();
+
+            return DataStore.Instance.TambahTransaksi(
+                siswa.KelasId, JenisTransaksi.Masuk, 0, DateTime.Now,
+                $"Pembayaran dari {siswa.Name} (dari simpanan)", tagihanSiswaId, Name, siswaId: siswa.Id);
         }
 
         public string GenerateLaporan(int kelasId, string periode, string format)
@@ -133,7 +152,7 @@ namespace ClassFinance.Models
 
         public void BackupDatabase()
         {
-            // Placeholder hook for a future export-to-file / cloud backup routine.[cite: 7]
+            // Placeholder hook for a future export-to-file / cloud backup routine.
         }
     }
 }
