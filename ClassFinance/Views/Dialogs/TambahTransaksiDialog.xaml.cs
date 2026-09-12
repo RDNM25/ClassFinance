@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using ClassFinance.Models;
-using ClassFinance.Services;
 
 namespace ClassFinance.Views.Dialogs
 {
@@ -27,7 +26,13 @@ namespace ClassFinance.Views.Dialogs
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             var description = DescriptionBox.Text.Trim();
-            var dateValue = DatePickerInput.SelectedDate ?? DateTime.Now;
+            // DatePicker only stores a date (no time-of-day -- WPF normalizes it to midnight
+            // internally), so combine whichever day was picked with the actual current time.
+            // Otherwise every new entry would sort as "00:00 today", landing below any other
+            // same-day transaction that has a real time, instead of at the top where a
+            // just-added entry belongs.
+            var pickedDate = (DatePickerInput.SelectedDate ?? DateTime.Now).Date;
+            var dateValue = pickedDate + DateTime.Now.TimeOfDay;
 
             if (string.IsNullOrWhiteSpace(description) ||
                 !decimal.TryParse(AmountBox.Text.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) ||
@@ -38,32 +43,10 @@ namespace ClassFinance.Views.Dialogs
                 return;
             }
 
-            // Calculate current balance
-            var kelas = DataStore.Instance.KelasList.First(k => k.Id == _kelasId);
-            var riwayat = kelas.GetRiwayatTransaksi();
-            var totalEarned = riwayat.Where(t => t.Type == JenisTransaksi.Masuk).Sum(t => t.Amount);
-            var totalSpent = riwayat.Where(t => t.Type == JenisTransaksi.Keluar).Sum(t => t.Amount);
-            var saldoSekarang = totalEarned - totalSpent;
-
-            // Prevent overdraft
-            if (KeluarRadio.IsChecked == true && amount > saldoSekarang)
-            {
-                ErrorText.Text = $"Uang kas tidak cukup, kurang Rp {amount - saldoSekarang:N0}";
-                ErrorText.Visibility = Visibility.Visible;
-                return;
-            }
-
-            // Hide error if valid
-            ErrorText.Visibility = Visibility.Collapsed;
-
-            if (KeluarRadio.IsChecked == true)
-            {
-                _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue);
-            }
+            if (MasukRadio.IsChecked == true)
+                _bendahara.TambahPemasukan(_kelasId, description, amount, dateValue);
             else
-            {
-            _bendahara.TambahPemasukan(_kelasId, description, amount, dateValue);
-            }
+                _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue);
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();
@@ -72,5 +55,6 @@ namespace ClassFinance.Views.Dialogs
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             _mainWindow.CloseModal();
-        }    }
+        }
+    }
 }
