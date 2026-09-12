@@ -42,7 +42,7 @@ namespace ClassFinance.Services
         }
 
         public Transaksi TambahTransaksi(int kelasId, JenisTransaksi type, decimal amount, DateTime date,
-            string description, int? tagihanSiswaId, string createdBy, string proofFile = null, int? siswaId = null)
+            string description, int? tagihanSiswaId, string createdBy, string proofFile = null, int? siswaId = null, bool affectsKas = true)
         {
             var t = new Transaksi
             {
@@ -55,7 +55,8 @@ namespace ClassFinance.Services
                 TagihanSiswaId = tagihanSiswaId,
                 CreatedBy = createdBy,
                 ProofFile = proofFile,
-                SiswaId = siswaId
+                SiswaId = siswaId,
+                AffectsKas = affectsKas
             };
             TransaksiList.Add(t);
             return t;

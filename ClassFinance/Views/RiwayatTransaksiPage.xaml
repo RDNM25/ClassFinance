@@ -131,8 +131,8 @@
                                         <TextBlock Grid.Column="1" Text="{Binding AmountPaidDisplay}" FontWeight="Bold"
                                                    Foreground="{StaticResource PrimaryRed}" VerticalAlignment="Center" Margin="0,0,12,0" />
                                         <Border Grid.Column="2" Width="24" Height="24" CornerRadius="12" Background="#2E7D32"
-                                                VerticalAlignment="Center" ToolTip="Sudah dibayar"
-                                                Visibility="{Binding HasPaid, Converter={StaticResource BoolToVis}}">
+                                                VerticalAlignment="Center" ToolTip="Lunas"
+                                                Visibility="{Binding IsLunas, Converter={StaticResource BoolToVis}}">
                                             <TextBlock Text="&#10003;" Foreground="White" FontSize="13" FontWeight="Bold"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>

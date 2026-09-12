@@ -84,8 +84,8 @@ namespace ClassFinance.Views
         {
             var all = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
 
-            var totalEarned = all.Where(t => t.Type == JenisTransaksi.Masuk).Sum(t => t.Amount);
-            var totalSpent = all.Where(t => t.Type == JenisTransaksi.Keluar).Sum(t => t.Amount);
+            var totalEarned = all.Where(t => t.Type == JenisTransaksi.Masuk && t.AffectsKas).Sum(t => t.Amount);
+            var totalSpent = all.Where(t => t.Type == JenisTransaksi.Keluar && t.AffectsKas).Sum(t => t.Amount);
             TotalKasText.Text = $"Rp {(totalEarned - totalSpent):N0}";
             TotalEarnedText.Text = $"Rp {totalEarned:N0}";
             TotalSpentText.Text = $"Rp {totalSpent:N0}";

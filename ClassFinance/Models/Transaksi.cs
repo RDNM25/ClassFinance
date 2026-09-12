@@ -20,5 +20,14 @@ namespace ClassFinance.Models
         public int? SiswaId { get; set; }
         public string ProofFile { get; set; }
         public string CreatedBy { get; set; }
+
+        /// <summary>
+        /// True (default) if this transaction's Amount should count toward the class's
+        /// cash total. False for bookkeeping-only entries -- e.g. applying a student's
+        /// previously-recorded SaldoTitipan to a new bill: the cash was already counted
+        /// once when the original overpayment came in, so re-counting it here would
+        /// double the total kas even though the amount is real and worth displaying.
+        /// </summary>
+        public bool AffectsKas { get; set; } = true;
     }
 }

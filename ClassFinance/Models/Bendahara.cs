@@ -102,10 +102,12 @@ namespace ClassFinance.Models
                     ts.AmountDue = 0;
                     ts.UpdateStatus();
 
-                    // Record transaction with 0 amount added to kas, displaying the savings reference text
+                    // Record the real amount applied (so history shows what actually happened),
+                    // but exclude it from kas totals -- that cash was already counted once
+                    // when the original overpayment came in.
                     DataStore.Instance.TambahTransaksi(
-                        siswa.KelasId, JenisTransaksi.Masuk, 0, DateTime.Now,
-                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id);
+                        siswa.KelasId, JenisTransaksi.Masuk, amountToPay, DateTime.Now,
+                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id, affectsKas: false);
                 }
                 else
                 {
@@ -117,8 +119,8 @@ namespace ClassFinance.Models
                     ts.UpdateStatus();
 
                     DataStore.Instance.TambahTransaksi(
-                        siswa.KelasId, JenisTransaksi.Masuk, 0, DateTime.Now,
-                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id);
+                        siswa.KelasId, JenisTransaksi.Masuk, amountToPay, DateTime.Now,
+                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id, affectsKas: false);
                     break;
                 }
             }
@@ -140,8 +142,8 @@ namespace ClassFinance.Models
             ts.UpdateStatus();
 
             return DataStore.Instance.TambahTransaksi(
-                siswa.KelasId, JenisTransaksi.Masuk, 0, DateTime.Now,
-                $"Pembayaran dari {siswa.Name} (dari simpanan)", tagihanSiswaId, Name, siswaId: siswa.Id);
+                siswa.KelasId, JenisTransaksi.Masuk, amount, DateTime.Now,
+                $"Pembayaran dari {siswa.Name} (dari simpanan)", tagihanSiswaId, Name, siswaId: siswa.Id, affectsKas: false);
         }
 
         public string GenerateLaporan(int kelasId, string periode, string format)

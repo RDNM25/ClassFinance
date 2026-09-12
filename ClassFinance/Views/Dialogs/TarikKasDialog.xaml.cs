@@ -38,11 +38,10 @@ namespace ClassFinance.Views.Dialogs
             }
 
             //  BALANCE CHECK LOGIC 
-            // Calculate current balance
-            var riwayat = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
-            var totalEarned = riwayat.Where(t => t.Type == JenisTransaksi.Masuk).Sum(t => t.Amount);
-            var totalSpent = riwayat.Where(t => t.Type == JenisTransaksi.Keluar).Sum(t => t.Amount);
-            var saldoSekarang = totalEarned - totalSpent;
+            // Calculate current balance (HitungSaldo already excludes bookkeeping-only
+            // entries like applying stored student balance to a bill, so this matches
+            // what the rest of the app shows as the real cash total).
+            var saldoSekarang = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).HitungSaldo();
 
             // Prevent overdraft
             if (amount > saldoSekarang)

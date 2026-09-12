@@ -12,7 +12,7 @@ namespace ClassFinance.Models
 
         public decimal HitungSaldo() =>
             DataStore.Instance.TransaksiList
-                .Where(t => t.KelasId == Id)
+                .Where(t => t.KelasId == Id && t.AffectsKas)
                 .Sum(t => t.Type == JenisTransaksi.Masuk ? t.Amount : -t.Amount);
 
         public List<Transaksi> GetRiwayatTransaksi() =>
