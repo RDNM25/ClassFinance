@@ -110,7 +110,11 @@
                     <ItemsControl x:Name="TagihanPaymentItems" Visibility="Collapsed">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource ListRow}">
+                                <!-- Cursor, MouseLeftButtonUp, and Tag to make the row clickable -->
+                                <Border Style="{StaticResource ListRow}" 
+                                        Cursor="Hand" 
+                                        MouseLeftButtonUp="TagihanPaymentRow_Click" 
+                                        Tag="{Binding Tagihan.Id}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />

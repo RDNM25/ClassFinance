@@ -14,7 +14,6 @@ namespace ClassFinance.Views
         public string SiswaName { get; set; }
     }
 
-    /// <summary>Wraps a Tagihan with a computed flag for whether every student has paid it off.</summary>
     public class TagihanDisplayItem
     {
         public Tagihan Tagihan { get; set; }
@@ -27,12 +26,15 @@ namespace ClassFinance.Views
         private readonly MainWindow _mainWindow;
         private readonly int _kelasId;
         private Tagihan _selectedTagihan;
+        private int? _initialTagihanId; // Added to store the target highlight ID
 
-        public TagihanPage(User currentUser, MainWindow mainWindow)
+        // Added initialTagihanId to the constructor
+        public TagihanPage(User currentUser, MainWindow mainWindow, int? initialTagihanId = null)
         {
             InitializeComponent();
             _currentUser = currentUser;
             _mainWindow = mainWindow;
+            _initialTagihanId = initialTagihanId;
             _kelasId = currentUser switch
             {
                 Siswa s => s.KelasId,
@@ -46,7 +48,6 @@ namespace ClassFinance.Views
 
         private void Refresh()
         {
-            // Prevent executing before XAML controls are fully initialized
             if (TagihanItems == null) return;
 
             var query = DataStore.Instance.TagihanList.Where(t => t.KelasId == _kelasId)
@@ -61,7 +62,6 @@ namespace ClassFinance.Views
                     };
                 });
 
-            // Apply left-hand filter based on ComboBox selection
             if (TagihanFilterComboBox?.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag is string filterTag)
             {
                 query = filterTag switch
@@ -73,26 +73,42 @@ namespace ClassFinance.Views
             }
 
             var tagihanList = query.ToList();
-
             TagihanItems.ItemsSource = tagihanList;
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
 
-            if (_selectedTagihan != null) ApplyFilter();
+            // Automatically highlight and open the requested tagihan
+            if (_initialTagihanId.HasValue)
+            {
+                var target = tagihanList.FirstOrDefault(x => x.Tagihan.Id == _initialTagihanId.Value);
+                if (target != null)
+                {
+                    TagihanItems.SelectedItem = target;
+                    TagihanItems.ScrollIntoView(target); // Scrolls to it automatically
+                }
+                _initialTagihanId = null; // Clear so it doesn't re-trigger on random refreshes
+            }
+            else if (_selectedTagihan != null)
+            {
+                // Re-select previously selected item after a refresh
+                TagihanItems.SelectedItem = tagihanList.FirstOrDefault(x => x.Tagihan.Id == _selectedTagihan.Id);
+                ApplyFilter();
+            }
         }
 
         private void TagihanFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (TagihanItems != null)
-            {
-                Refresh();
-            }
+            if (TagihanItems != null) Refresh();
         }
 
-        private void ShowDetail(Tagihan tagihan)
+        // Changed from Click to SelectionChanged
+        private void TagihanItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _selectedTagihan = tagihan;
-            DetailTitle.Text = $"Status pembayaran \u2014 {tagihan.Name}";
-            ApplyFilter();
+            if (TagihanItems.SelectedItem is TagihanDisplayItem displayItem)
+            {
+                _selectedTagihan = displayItem.Tagihan;
+                DetailTitle.Text = $"Status pembayaran \u2014 {_selectedTagihan.Name}";
+                ApplyFilter();
+            }
         }
 
         private void StatusFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -112,7 +128,6 @@ namespace ClassFinance.Views
                     SiswaName = DataStore.Instance.Users.OfType<Siswa>().FirstOrDefault(s => s.Id == ts.SiswaId)?.Name ?? "?"
                 });
 
-            // Get selected filter tag from ComboBoxItem
             if (StatusFilterComboBox?.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag is string filterTag)
             {
                 query = filterTag switch
@@ -120,17 +135,11 @@ namespace ClassFinance.Views
                     "Lunas" => query.Where(x => x.Entry.Status == StatusTagihan.Lunas),
                     "BelumLunas" => query.Where(x => x.Entry.Status == StatusTagihan.BelumBayar),
                     "Sebagian" => query.Where(x => x.Entry.Status == StatusTagihan.Sebagian),
-                    _ => query // "Semua" or default fallback
+                    _ => query
                 };
             }
 
             DetailItems.ItemsSource = query.ToList();
-        }
-
-        private void TagihanRow_Click(object sender, MouseButtonEventArgs e)
-        {
-            if (sender is FrameworkElement fe && fe.Tag is Tagihan tagihan)
-                ShowDetail(tagihan);
         }
 
         private void BuatTagihanButton_Click(object sender, RoutedEventArgs e)
@@ -163,17 +172,8 @@ namespace ClassFinance.Views
 
             if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display && display.Entry.Status != StatusTagihan.Lunas)
             {
-                // 1. Fetch the student to see if they have saved balance (Saldo Titipan)
                 var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == display.Entry.SiswaId);
-
-                // 2. Open the manual payment dialog, passing along the student and the tagihan
-                var dialog = new BayarManualDialog(
-                    bendahara,
-                    siswa,
-                    display.Entry,
-                    _mainWindow,
-                    onSaved: () => Refresh()); // Refresh the UI when the dialog finishes
-
+                var dialog = new BayarManualDialog(bendahara, siswa, display.Entry, _mainWindow, onSaved: () => Refresh());
                 _mainWindow.ShowModal(dialog);
             }
         }

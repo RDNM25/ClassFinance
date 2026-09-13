@@ -46,17 +46,46 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <!-- Left items control remains standard for listing bills -->
-                        <ItemsControl x:Name="TagihanItems">
-                            <ItemsControl.ItemTemplate>
+                        <!-- Replaced ItemsControl with ListBox for selection highlighting -->
+                        <ListBox x:Name="TagihanItems" BorderThickness="0" Background="Transparent"
+                                 HorizontalContentAlignment="Stretch" SelectionChanged="TagihanItems_SelectionChanged"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+                            <!-- Remove default ListBox styling so it looks exactly like your old list -->
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Margin" Value="0,0,0,8"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <ContentPresenter />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+
+                            <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource ListRow}" Cursor="Hand" MouseLeftButtonUp="TagihanRow_Click" Tag="{Binding Tagihan}">
-                                        <Grid>
+                                    <Grid Cursor="Hand">
+                                        <Border Style="{StaticResource ListRow}" />
+
+                                        <Border x:Name="SelectionOverlay" Background="{StaticResource PrimaryRedLight}" BorderBrush="{StaticResource PrimaryRed}" 
+                                                BorderThickness="1.5" CornerRadius="12" Opacity="0" IsHitTestVisible="False" />
+
+                                        <!-- The Card Content -->
+                                        <Grid Margin="16">
+                                            <!-- Added margin to mimic standard border padding if needed -->
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <StackPanel Grid.Column="0">
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Tagihan.Name}" FontWeight="Bold" FontSize="15" />
                                                 <TextBlock Text="{Binding Tagihan.CreatedDate, StringFormat='dd MMM yyyy'}"
                                                            FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,3,0,0" />
@@ -70,10 +99,34 @@
                                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
                                         </Grid>
-                                    </Border>
+                                    </Grid>
+
+                                    <!-- Animation Triggers -->
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="SelectionOverlay" 
+                                                                         Storyboard.TargetProperty="Opacity" 
+                                                                         To="1" Duration="0:0:0.2" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="SelectionOverlay" 
+                                                                         Storyboard.TargetProperty="Opacity" 
+                                                                         To="0" Duration="0:0:0.2" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
                                 </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                         <TextBlock x:Name="EmptyText" Text="Belum ada tagihan." Foreground="{StaticResource TextGray}"
                                    HorizontalAlignment="Center" Margin="0,30,0,0" Visibility="Collapsed" />
                     </StackPanel>

@@ -1,8 +1,9 @@
-using System.Windows;
-using System.Windows.Controls;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views.Dialogs;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace ClassFinance.Views
 {
@@ -108,6 +109,18 @@ namespace ClassFinance.Views
 
             EmptyText.Text = "Belum ada transaksi.";
             EmptyText.Visibility = filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void TagihanPaymentRow_Click(object sender, MouseButtonEventArgs e)
+        {
+            // If the user clicks a row, grab the Tagihan.Id from the Border's Tag
+            if (sender is FrameworkElement fe && fe.Tag is int tagihanId)
+            {
+                // Navigate to the TagihanPage and pass the specific ID to highlight
+                // *Note: Adjust "MainFrame.Content" to match whatever navigation system your MainWindow uses.
+                _mainWindow.NavigateTo(new TagihanPage(_currentUser, _mainWindow, tagihanId));
+
+            }
         }
 
         /// <summary>
