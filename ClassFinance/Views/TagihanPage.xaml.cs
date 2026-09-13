@@ -46,8 +46,11 @@ namespace ClassFinance.Views
 
         private void Refresh()
         {
-            var tagihanList = DataStore.Instance.TagihanList.Where(t => t.KelasId == _kelasId)
-                .OrderByDescending(t => t.Id) // Id increments on creation, so this puts the newest tagihan first
+            // Prevent executing before XAML controls are fully initialized
+            if (TagihanItems == null) return;
+
+            var query = DataStore.Instance.TagihanList.Where(t => t.KelasId == _kelasId)
+                .OrderByDescending(t => t.Id)
                 .Select(t =>
                 {
                     var entries = DataStore.Instance.TagihanSiswaList.Where(ts => ts.TagihanId == t.Id).ToList();
@@ -56,14 +59,33 @@ namespace ClassFinance.Views
                         Tagihan = t,
                         IsFullyPaid = entries.Any() && entries.All(ts => ts.Status == StatusTagihan.Lunas)
                     };
-                })
-                .ToList();
+                });
+
+            // Apply left-hand filter based on ComboBox selection
+            if (TagihanFilterComboBox?.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag is string filterTag)
+            {
+                query = filterTag switch
+                {
+                    "Selesai" => query.Where(x => x.IsFullyPaid),
+                    "BelumSelesai" => query.Where(x => !x.IsFullyPaid),
+                    _ => query
+                };
+            }
+
+            var tagihanList = query.ToList();
 
             TagihanItems.ItemsSource = tagihanList;
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
 
-            if (_selectedTagihan != null) ShowDetail(_selectedTagihan);
-            ApplyFilter();
+            if (_selectedTagihan != null) ApplyFilter();
+        }
+
+        private void TagihanFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (TagihanItems != null)
+            {
+                Refresh();
+            }
         }
 
         private void ShowDetail(Tagihan tagihan)

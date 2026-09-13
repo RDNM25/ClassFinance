@@ -21,14 +21,25 @@
             <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" SharedSizeGroup="TagihanHeaderRow" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+
                 <TextBlock Grid.Column="0" Text="TAGIHAN" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
                 <Button Grid.Column="1" x:Name="BuatTagihanButton" Content="+ BUAT TAGIHAN"
                         Style="{StaticResource PrimaryButton}" Click="BuatTagihanButton_Click" />
+
+                <!-- Filter ComboBox for Tagihan Status -->
+                <ComboBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="TagihanFilterComboBox" Style="{StaticResource RoundedComboBox}"
+                          Margin="0,12,0,0" HorizontalAlignment="Left" Width="200"
+                          SelectionChanged="TagihanFilterComboBox_SelectionChanged">
+                    <ComboBoxItem Content="Semua Tagihan" IsSelected="True" Tag="Semua" />
+                    <ComboBoxItem Content="Selesai (Lunas)" Tag="Selesai" />
+                    <ComboBoxItem Content="Belum Selesai" Tag="BelumSelesai" />
+                </ComboBox>
             </Grid>
 
             <Border Style="{StaticResource Card}">
