@@ -125,26 +125,6 @@ namespace ClassFinance.Models
             }
         }
 
-        // Allow student to use their saved balance to pay a future bill with 0 additional cash added
-        public Transaksi BayarTagihanDariSaldo(int tagihanSiswaId, int siswaId, decimal amount)
-        {
-            var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
-
-            if (siswa.SaldoTitipan < amount)
-                throw new InvalidOperationException("Saldo titipan tidak mencukupi.");
-
-            siswa.SaldoTitipan -= amount;
-
-            var ts = DataStore.Instance.TagihanSiswaList.First(t => t.Id == tagihanSiswaId);
-            ts.JumlahDibayar += amount;
-            ts.AmountDue = Math.Max(0, ts.AmountDue - amount);
-            ts.UpdateStatus();
-
-            return DataStore.Instance.TambahTransaksi(
-                siswa.KelasId, JenisTransaksi.Masuk, amount, DateTime.Now,
-                $"Pembayaran dari {siswa.Name} (dari simpanan)", tagihanSiswaId, Name, siswaId: siswa.Id, affectsKas: false);
-        }
-
         public string GenerateLaporan(int kelasId, string periode, string format)
         {
             var kelas = DataStore.Instance.KelasList.First(k => k.Id == kelasId);
