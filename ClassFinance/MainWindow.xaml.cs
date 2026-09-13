@@ -47,6 +47,7 @@ namespace ClassFinance
             ContentFrame.Navigate(_currentPage);
             ClearNavigationHistory();
             UpdateBackButton();
+            UpdateNavHighlight();
         }
 
         public void NavigateTo(Page page, bool recordHistory = true)
@@ -54,6 +55,7 @@ namespace ClassFinance
             _currentPage = page;
             ContentFrame.Navigate(_currentPage);
             UpdateBackButton();
+            UpdateNavHighlight();
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
@@ -102,21 +104,39 @@ namespace ClassFinance
         {
             NavPanel.Children.Clear();
 
-            AddNavButton("\uD83D\uDCCA  Dashboard", () => NavigateTo(new DashboardPage(user, this)));
-            AddNavButton("\uD83D\uDC65  Data Siswa", () => NavigateTo(new SiswaPage(user, this)));
-            AddNavButton("\uD83D\uDCC4  Riwayat Transaksi", () => NavigateTo(new RiwayatTransaksiPage(user, this)));
-            AddNavButton("\uD83D\uDCCC  Tagihan", () => NavigateTo(new TagihanPage(user, this)));
+            // Separate the icon and text into two distinct strings
+            AddNavButton("\uD83D\uDCCA", "Dashboard", typeof(DashboardPage), () => NavigateTo(new DashboardPage(user, this)));
+            AddNavButton("\uD83D\uDC65", "Data Siswa", typeof(SiswaPage), () => NavigateTo(new SiswaPage(user, this)));
+            AddNavButton("\uD83D\uDCC4", "Riwayat Transaksi", typeof(RiwayatTransaksiPage), () => NavigateTo(new RiwayatTransaksiPage(user, this)));
+            AddNavButton("\uD83D\uDCCC", "Tagihan", typeof(TagihanPage), () => NavigateTo(new TagihanPage(user, this)));
+
+            UpdateNavHighlight();
         }
 
-        private void AddNavButton(string text, System.Action onClick)
+        private void AddNavButton(string icon, string text, System.Type pageType, System.Action onClick)
         {
             var button = new Button
             {
-                Content = text,
+                // Pass the strings as an array to bind them separately in XAML
+                Content = new string[] { icon, text },
+                Tag = pageType,
                 Style = (Style)FindResource("SidebarButton")
             };
             button.Click += (s, e) => onClick();
             NavPanel.Children.Add(button);
+        }
+
+        /// <summary>Applies SidebarButtonActive to whichever nav button matches the current page's type.</summary>
+        private void UpdateNavHighlight()
+        {
+            foreach (var child in NavPanel.Children)
+            {
+                if (child is Button button && button.Tag is System.Type pageType)
+                {
+                    bool isActive = _currentPage != null && _currentPage.GetType() == pageType;
+                    button.Style = (Style)FindResource(isActive ? "SidebarButtonActive" : "SidebarButton");
+                }
+            }
         }
 
         private void LogoutButton_Click(object sender, RoutedEventArgs e)

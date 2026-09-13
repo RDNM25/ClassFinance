@@ -13,7 +13,6 @@
 
     <!--  Primary (filled red) button  -->
     <Style x:Key="PrimaryButton" TargetType="Button">
-        <Setter Property="Background" Value="{StaticResource PrimaryRed}" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="14" />
@@ -23,12 +22,30 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="24" Padding="{TemplateBinding Padding}">
+                    <Border x:Name="border" CornerRadius="24" Padding="{TemplateBinding Padding}">
+                        <Border.Background>
+                            <SolidColorBrush x:Name="bgBrush" Color="#E53935" />
+                        </Border.Background>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryRedDark}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#C62828" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#E53935" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="border" Property="Background" Value="#BDBDBD" />
@@ -114,7 +131,6 @@
 
     <!--  Outline (white with red border) button  -->
     <Style x:Key="OutlineButton" TargetType="Button">
-        <Setter Property="Background" Value="White" />
         <Setter Property="Foreground" Value="{StaticResource PrimaryRed}" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="FontSize" Value="13" />
@@ -123,12 +139,30 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{StaticResource PrimaryRed}" BorderThickness="1.5" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                    <Border x:Name="border" BorderBrush="{StaticResource PrimaryRed}" BorderThickness="1.5" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                        <Border.Background>
+                            <SolidColorBrush x:Name="bgBrush" Color="White" />
+                        </Border.Background>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryRedLight}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#FFEBEE" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="White" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -143,22 +177,53 @@
     </Style>
 
     <!--  Sidebar nav button  -->
+    <!--  Sidebar nav button  -->
     <Style x:Key="SidebarButton" TargetType="Button">
-        <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
         <Setter Property="Padding" Value="18,12" />
         <Setter Property="Cursor" Value="Hand" />
+
+        <!-- Define how the separated icon and text are rendered -->
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding [0]}" Margin="0,0,12,0" />
+                        <TextBlock Text="{Binding [1]}" />
+                    </StackPanel>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}" Margin="8,3">
+                    <Border x:Name="border" CornerRadius="8" Padding="{TemplateBinding Padding}" Margin="8,3">
+                        <Border.Background>
+                            <SolidColorBrush x:Name="bgBrush" Color="#00D32F2F" />
+                        </Border.Background>
                         <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="#D32F2F" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#D32F2F" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#00D32F2F" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -166,9 +231,59 @@
         </Setter>
     </Style>
 
-    <Style x:Key="SidebarButtonActive" TargetType="Button" BasedOn="{StaticResource SidebarButton}">
-        <Setter Property="Background" Value="#D32F2F" />
+    <!-- Active Sidebar button (No background, Text underlined) -->
+    <Style x:Key="SidebarButtonActive" TargetType="Button">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="FontSize" Value="14" />
         <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="18,12" />
+        <Setter Property="Cursor" Value="Hand" />
+
+        <Setter Property="ContentTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <!-- Explicitly set FontWeight="Normal" to prevent icon distortion -->
+                        <TextBlock Text="{Binding [0]}" Margin="0,0,12,0" FontWeight="Normal" />
+                        <TextBlock Text="{Binding [1]}" TextDecorations="Underline" />
+                    </StackPanel>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" CornerRadius="8" Padding="{TemplateBinding Padding}" Margin="8,3">
+                        <Border.Background>
+                            <SolidColorBrush x:Name="bgBrush" Color="#00D32F2F" />
+                        </Border.Background>
+                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#D32F2F" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#00D32F2F" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!--  Text box style  -->
@@ -303,11 +418,11 @@
 
                         <Popup x:Name="popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"
                                AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
-                            <Border Background="White" CornerRadius="12" Padding="4"
+                            <Border Background="White" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="12" Padding="4"
                                     MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
-                                    MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    MaxHeight="{TemplateBinding MaxDropDownHeight}" Margin="0,6,0,0">
                                 <Border.Effect>
-                                    <DropShadowEffect BlurRadius="18" Opacity="0.18" ShadowDepth="3" Color="Black" />
+                                    <DropShadowEffect ShadowDepth="1" Direction="270" BlurRadius="10" Color="Black" Opacity="0.2"/>
                                 </Border.Effect>
                                 <ScrollViewer SnapsToDevicePixels="True">
                                     <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />

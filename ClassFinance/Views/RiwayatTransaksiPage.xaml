@@ -24,7 +24,7 @@
             <TextBlock x:Name="TitleText" Grid.Column="0" Text="RIWAYAT TRANSAKSI" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
 
             <ComboBox x:Name="FilterCombo" Grid.Column="2" Width="160" Margin="0,0,12,0" VerticalAlignment="Center"
-                      Style="{StaticResource RoundedComboBox}" SelectedIndex="0">
+                      Style="{StaticResource RoundedComboBox}" SelectedIndex="0" >
                 <ComboBoxItem Content="Semua" />
                 <ComboBoxItem Content="Kas Masuk" />
                 <ComboBoxItem Content="Kas Keluar" />
