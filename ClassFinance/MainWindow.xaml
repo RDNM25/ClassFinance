@@ -39,7 +39,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Button x:Name="BackButton" Grid.Row="0" Content="&#8592;" ToolTip="Kembali"
+            <Button x:Name="BackButton" Grid.Row="0" Content="&#8592;"
                     Width="32" Height="32" FontSize="18" FontWeight="Bold"
                     Foreground="{StaticResource PrimaryRed}" Background="White"
                     HorizontalAlignment="Left" Margin="16,10,0,0" Padding="0"

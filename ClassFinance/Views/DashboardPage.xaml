@@ -40,14 +40,14 @@
 
                 <Border Grid.Column="2" Style="{StaticResource Card}">
                     <StackPanel>
-                        <TextBlock Text="Total Siswa" Foreground="{StaticResource TextGray}" FontSize="13" />
+                        <TextBlock Text="Total Murid" Foreground="{StaticResource TextGray}" FontSize="13" />
                         <TextBlock x:Name="TotalSiswaText" Text="0" FontSize="30" FontWeight="Bold" Foreground="{StaticResource TextDark}" Margin="0,6,0,0" />
                     </StackPanel>
                 </Border>
 
                 <Border Grid.Column="4" Style="{StaticResource Card}">
                     <StackPanel>
-                        <TextBlock Text="Tagihan Belum Lunas" Foreground="{StaticResource TextGray}" FontSize="13" />
+                        <TextBlock Text="Murid Yang Belum Lunas" Foreground="{StaticResource TextGray}" FontSize="13" />
                         <TextBlock x:Name="BelumLunasText" Text="0" FontSize="30" FontWeight="Bold" Foreground="{StaticResource PrimaryRed}" Margin="0,6,0,0" />
                     </StackPanel>
                 </Border>

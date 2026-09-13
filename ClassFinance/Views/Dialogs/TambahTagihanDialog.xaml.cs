@@ -25,6 +25,7 @@ namespace ClassFinance.Views.Dialogs
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             var name = NameBox.Text.Trim();
+            bool isIuran = IsIuranCheckBox.IsChecked == true;
 
             if (string.IsNullOrWhiteSpace(name) ||
                 !decimal.TryParse(AmountBox.Text.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) ||
@@ -35,7 +36,7 @@ namespace ClassFinance.Views.Dialogs
                 return;
             }
 
-            _bendahara.BuatTagihan(_kelasId, name, amount);
+            _bendahara.BuatTagihan(_kelasId, name, amount, isIuran);
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();
