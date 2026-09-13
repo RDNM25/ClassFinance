@@ -63,23 +63,46 @@ namespace ClassFinance.Views
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
 
             if (_selectedTagihan != null) ShowDetail(_selectedTagihan);
+            ApplyFilter();
         }
 
         private void ShowDetail(Tagihan tagihan)
         {
             _selectedTagihan = tagihan;
             DetailTitle.Text = $"Status pembayaran \u2014 {tagihan.Name}";
+            ApplyFilter();
+        }
 
-            var entries = DataStore.Instance.TagihanSiswaList
-                .Where(ts => ts.TagihanId == tagihan.Id)
+        private void StatusFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ApplyFilter();
+        }
+
+        private void ApplyFilter()
+        {
+            if (_selectedTagihan == null) return;
+
+            var query = DataStore.Instance.TagihanSiswaList
+                .Where(ts => ts.TagihanId == _selectedTagihan.Id)
                 .Select(ts => new TagihanSiswaDisplay
                 {
                     Entry = ts,
                     SiswaName = DataStore.Instance.Users.OfType<Siswa>().FirstOrDefault(s => s.Id == ts.SiswaId)?.Name ?? "?"
-                })
-                .ToList();
+                });
 
-            DetailItems.ItemsSource = entries;
+            // Get selected filter tag from ComboBoxItem
+            if (StatusFilterComboBox?.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag is string filterTag)
+            {
+                query = filterTag switch
+                {
+                    "Lunas" => query.Where(x => x.Entry.Status == StatusTagihan.Lunas),
+                    "BelumLunas" => query.Where(x => x.Entry.Status == StatusTagihan.BelumBayar),
+                    "Sebagian" => query.Where(x => x.Entry.Status == StatusTagihan.Sebagian),
+                    _ => query // "Semua" or default fallback
+                };
+            }
+
+            DetailItems.ItemsSource = query.ToList();
         }
 
         private void TagihanRow_Click(object sender, MouseButtonEventArgs e)

@@ -72,13 +72,20 @@
 
         <!--  Right: detail of selected tagihan  -->
         <DockPanel Grid.Column="2" Margin="30,0,10,0">
-            <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" SharedSizeGroup="TagihanHeaderRow" />
-                </Grid.RowDefinitions>
+            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
                 <TextBlock x:Name="DetailTitle" Text="status pembayaran"
                            FontSize="16" FontWeight="Bold" VerticalAlignment="Top" TextWrapping="Wrap" Margin="27,19,18,0" TextAlignment="Right" />
-            </Grid>
+
+                <!-- Filter ComboBox for Student Payment Status -->
+                <ComboBox x:Name="StatusFilterComboBox" Style="{StaticResource RoundedComboBox}"
+                          Margin="27,12,0,0" HorizontalAlignment="Right" Width="180"
+                          SelectionChanged="StatusFilterComboBox_SelectionChanged">
+                    <ComboBoxItem Content="Semua Status" IsSelected="True" Tag="Semua" />
+                    <ComboBoxItem Content="Lunas" Tag="Lunas" />
+                    <ComboBoxItem Content="Belum Lunas" Tag="BelumLunas" />
+                    <ComboBoxItem Content="Sebagian" Tag="Sebagian" />
+                </ComboBox>
+            </StackPanel>
 
             <Border Style="{StaticResource Card}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -99,27 +106,27 @@
 
                                             <StackPanel Orientation="Horizontal" Margin="0,2,0,4">
                                                 <TextBlock FontSize="11" Foreground="{StaticResource TextGray}">
-                                <Run Text="Sisa: "/>
-                                <Run Text="{Binding Entry.AmountDue, Converter={StaticResource Rupiah}}"/>
-                                <Run Text=" (Dibayar: "/>
-                                <Run Text="{Binding Entry.JumlahDibayar, Converter={StaticResource Rupiah}}"/>
-                                <Run Text=")"/>
+                                                    <Run Text="Sisa: "/>
+                                                    <Run Text="{Binding Entry.AmountDue, Converter={StaticResource Rupiah}}"/>
+                                                    <Run Text=" (Dibayar: "/>
+                                                    <Run Text="{Binding Entry.JumlahDibayar, Converter={StaticResource Rupiah}}"/>
+                                                    <Run Text=")"/>
                                                 </TextBlock>
                                             </StackPanel>
 
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="Status: " FontSize="11" Foreground="{StaticResource TextGray}" />
                                                 <TextBlock Text="{Binding Entry.Status}" Foreground="{Binding Entry.Status, Converter={StaticResource StatusBrush}}"
-                                       FontSize="11" FontWeight="Bold" />
+                                                           FontSize="11" FontWeight="Bold" />
                                             </StackPanel>
                                         </StackPanel>
 
                                         <!-- Right Column: Stacked Action Buttons -->
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                             <Button Content="Tandai Lunas" Style="{StaticResource SmallOutlineButton}"
-                                Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,0,4" Width="100" />
+                                                    Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,0,4" Width="100" />
                                             <Button Content="Bayar Manual" Style="{StaticResource SmallOutlineButton}"
-                                Tag="{Binding}" Click="BayarManual_Click" Width="100" />
+                                                    Tag="{Binding}" Click="BayarManual_Click" Width="100" />
                                         </StackPanel>
                                     </Grid>
                                 </Border>
