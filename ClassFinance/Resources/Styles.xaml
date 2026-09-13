@@ -177,7 +177,6 @@
     </Style>
 
     <!--  Sidebar nav button  -->
-    <!--  Sidebar nav button  -->
     <Style x:Key="SidebarButton" TargetType="Button">
         <Setter Property="Foreground" Value="White" />
         <Setter Property="FontSize" Value="14" />
@@ -244,7 +243,6 @@
             <Setter.Value>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <!-- Explicitly set FontWeight="Normal" to prevent icon distortion -->
                         <TextBlock Text="{Binding [0]}" Margin="0,0,12,0" FontWeight="Normal" />
                         <TextBlock Text="{Binding [1]}" TextDecorations="Underline" />
                     </StackPanel>

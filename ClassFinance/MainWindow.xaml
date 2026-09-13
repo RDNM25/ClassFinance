@@ -23,7 +23,12 @@
                 </StackPanel>
 
                 <Button x:Name="LogoutButton" DockPanel.Dock="Bottom" Style="{StaticResource SidebarButton}"
-                        Content="⎋  Logout" Click="LogoutButton_Click" Margin="8,0,8,0" />
+                        Click="LogoutButton_Click" Margin="8,0,8,0" ContentTemplate="{x:Null}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⎋" Margin="0,0,12,0" FontWeight="Normal" />
+                        <TextBlock Text="Logout" />
+                    </StackPanel>
+                </Button>
             </DockPanel>
         </Border>
 
