@@ -7,6 +7,27 @@ using ClassFinance.Views.Dialogs;
 
 namespace ClassFinance.Views
 {
+    /// <summary>
+    /// Wraps a Siswa for the roster page with two computed figures: how much they've
+    /// paid in total, and how many tagihan they still haven't fully paid off. Unlike
+    /// the Dashboard's list, nobody is filtered out here -- this is the full roster.
+    /// </summary>
+    public class SiswaRosterItem
+    {
+        public Siswa Siswa { get; set; }
+        public decimal TotalDibayar { get; set; }
+        public int UnpaidCount { get; set; }
+        public int TotalTagihanCount { get; set; }
+        public bool HasUnpaid => UnpaidCount > 0;
+
+        // Guarded by TotalTagihanCount > 0: a student with zero tagihan assigned
+        // (e.g. just added, or the class has no tagihan yet at all) has UnpaidCount
+        // == 0 too, but that's "nothing to pay" -- not "paid everything" -- so it
+        // must not be reported as fully paid.
+        public bool IsFullyPaid => TotalTagihanCount > 0 && UnpaidCount == 0;
+        public bool HasNoTagihan => TotalTagihanCount == 0;
+    }
+
     public partial class SiswaPage : Page
     {
         private readonly User _currentUser;
@@ -31,17 +52,26 @@ namespace ClassFinance.Views
             Refresh();
         }
 
-        private void Refresh()
-        {
-            var siswaList = DataStore.Instance.Users.OfType<Siswa>().Where(s => s.KelasId == _kelasId).ToList();
-            SiswaItems.ItemsSource = siswaList;
-            EmptyText.Visibility = siswaList.Any() ? Visibility.Collapsed : Visibility.Visible;
-        }
+        private void Refresh() => ApplyFilter();
 
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             ApplyFilter();
+        }
+
+        private static SiswaRosterItem ToRosterItem(Siswa s)
+        {
+            var tagihanEntries = DataStore.Instance.TagihanSiswaList.Where(ts => ts.SiswaId == s.Id).ToList();
+            return new SiswaRosterItem
+            {
+                Siswa = s,
+                TotalDibayar = DataStore.Instance.TransaksiList
+                    .Where(t => t.Type == JenisTransaksi.Masuk && t.SiswaId == s.Id)
+                    .Sum(t => (decimal?)t.Amount) ?? 0,
+                UnpaidCount = tagihanEntries.Count(ts => ts.Status != StatusTagihan.Lunas),
+                TotalTagihanCount = tagihanEntries.Count
+            };
         }
 
         private void ApplyFilter()
@@ -53,17 +83,18 @@ namespace ClassFinance.Views
 
             var keyword = SearchBox.Text?.Trim().ToLower() ?? string.Empty;
 
-            var filtered = string.IsNullOrEmpty(keyword)
+            var filteredSiswa = string.IsNullOrEmpty(keyword)
                 ? allSiswa
                 : allSiswa.Where(s =>
                     (s.Name != null && s.Name.ToLower().Contains(keyword)) ||
                     (s.Nis != null && s.Nis.ToLower().Contains(keyword))
                   ).ToList();
 
-            SiswaItems.ItemsSource = filtered;
+            var rosterItems = filteredSiswa.Select(ToRosterItem).ToList();
+            SiswaItems.ItemsSource = rosterItems;
 
             // Handle empty state visibility
-            if (filtered.Count == 0)
+            if (rosterItems.Count == 0)
             {
                 EmptyText.Visibility = Visibility.Visible;
                 EmptyText.Text = allSiswa.Count == 0

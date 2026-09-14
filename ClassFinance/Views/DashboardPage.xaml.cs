@@ -9,12 +9,17 @@ using ClassFinance.Views.Dialogs;
 
 namespace ClassFinance.Views
 {
-    /// <summary>Small display-only wrapper so the student list can show a computed total next to each name.</summary>
+    /// <summary>Small display-only wrapper for the Dashboard's student list: shows every
+    /// student who isn't registered to any tagihan yet (name only, no count), plus every
+    /// student who owes on at least one tagihan (with how many). Students who are
+    /// registered and have paid everything off are left out entirely.</summary>
     public class SiswaDisplayItem
     {
         public string Name { get; set; }
         public string Nis { get; set; }
-        public decimal TotalDibayar { get; set; }
+        public int UnpaidCount { get; set; }
+        public int TotalTagihanCount { get; set; }
+        public bool IsRegistered => TotalTagihanCount > 0;
     }
 
     public partial class DashboardPage : Page
@@ -69,16 +74,27 @@ namespace ClassFinance.Views
                             siswaList.Any(s => s.Id == t.SiswaId));
             BelumLunasText.Text = belumLunas.ToString();
 
-            var displaySiswa = siswaList.Select(s => new SiswaDisplayItem
-            {
-                Name = s.Name,
-                Nis = s.Nis,
-                TotalDibayar = DataStore.Instance.TransaksiList
-                    .Where(t => t.Type == JenisTransaksi.Masuk && t.SiswaId == s.Id)
-                    .Sum(t => (decimal?)t.Amount) ?? 0
-            }).ToList();
+            var displaySiswa = siswaList
+                .Select(s =>
+                {
+                    var tagihanEntries = DataStore.Instance.TagihanSiswaList.Where(ts => ts.SiswaId == s.Id).ToList();
+                    return new SiswaDisplayItem
+                    {
+                        Name = s.Name,
+                        Nis = s.Nis,
+                        UnpaidCount = tagihanEntries.Count(ts => ts.Status != StatusTagihan.Lunas),
+                        TotalTagihanCount = tagihanEntries.Count
+                    };
+                })
+                // Keep: not registered to any tagihan yet (shown plain, no count) OR
+                // registered and still owes something. Excluded: registered and fully paid.
+                .Where(d => d.TotalTagihanCount == 0 || d.UnpaidCount > 0)
+                .ToList();
 
             SiswaItems.ItemsSource = displaySiswa;
+            NoSiswaText.Text = siswaList.Any()
+                ? "Semua siswa sudah melunasi tagihan mereka."
+                : "Belum ada siswa terdaftar.";
             NoSiswaText.Visibility = displaySiswa.Any() ? Visibility.Collapsed : Visibility.Visible;
 
             var recentTransaksi = kelas.GetRiwayatTransaksi().Take(5).ToList();

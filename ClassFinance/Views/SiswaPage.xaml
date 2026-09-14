@@ -1,7 +1,12 @@
 <Page x:Class="ClassFinance.Views.SiswaPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:conv="clr-namespace:ClassFinance.Converters"
       Title="Data Siswa" Background="{StaticResource AppBackground}">
+    <Page.Resources>
+        <conv:RupiahConverter x:Key="Rupiah" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+    </Page.Resources>
     <DockPanel Margin="32,28,32,28">
         <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
@@ -50,19 +55,30 @@
                                             </Grid.ColumnDefinitions>
 
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="15"
-                                           Cursor="Hand" MouseLeftButtonUp="SiswaName_Click" Tag="{Binding}" />
+                                                <TextBlock Text="{Binding Siswa.Name}" FontWeight="Bold" FontSize="15"
+                                           Cursor="Hand" MouseLeftButtonUp="SiswaName_Click" Tag="{Binding Siswa}" />
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Nis, StringFormat='NIS: {0}'}" FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,0,12,0" />
+                                                    <TextBlock Text="{Binding Siswa.Nis, StringFormat='NIS: {0}'}" FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,0,12,0" />
                                                     <TextBlock FontSize="12" Foreground="#2E7D32" FontWeight="SemiBold">
                                         <Run Text="Saldo Titipan: Rp "/>
-                                        <Run Text="{Binding SaldoTitipan, StringFormat={}{0:N0}}"/>
+                                        <Run Text="{Binding Siswa.SaldoTitipan, StringFormat={}{0:N0}}"/>
                                                     </TextBlock>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                    <TextBlock Text="{Binding TotalDibayar, Converter={StaticResource Rupiah}, StringFormat='Total dibayar: {0}'}"
+                                                               FontSize="12" Foreground="{StaticResource TextDark}" FontWeight="SemiBold" Margin="0,0,12,0" />
+                                                    <TextBlock Text="{Binding UnpaidCount, StringFormat='Belum bayar {0} tagihan'}"
+                                                               FontSize="12" Foreground="#F57C00" FontWeight="SemiBold"
+                                                               Visibility="{Binding HasUnpaid, Converter={StaticResource BoolToVis}}" />
+                                                    <TextBlock Text="Lunas semua tagihan" FontSize="12" Foreground="#2E7D32" FontWeight="SemiBold"
+                                                               Visibility="{Binding IsFullyPaid, Converter={StaticResource BoolToVis}}" />
+                                                    <TextBlock Text="Belum ada tagihan" FontSize="12" Foreground="{StaticResource TextGray}" FontWeight="SemiBold"
+                                                               Visibility="{Binding HasNoTagihan, Converter={StaticResource BoolToVis}}" />
                                                 </StackPanel>
                                             </StackPanel>
 
                                             <Button Grid.Column="1" Content="Hapus" Style="{StaticResource SmallOutlineButton}"
-                                    Tag="{Binding}" Click="Hapus_Click" />
+                                    Tag="{Binding Siswa}" Click="Hapus_Click" />
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
