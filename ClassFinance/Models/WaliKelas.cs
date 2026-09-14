@@ -15,14 +15,5 @@ namespace ClassFinance.Models
         }
 
         public override string GetDashboardTitle() => "Dashboard Wali Kelas";
-
-        public decimal LihatSaldoKas() =>
-            DataStore.Instance.KelasList.First(k => k.Id == KelasId).HitungSaldo();
-
-        public List<Transaksi> LihatRiwayatTransaksi() =>
-            DataStore.Instance.KelasList.First(k => k.Id == KelasId).GetRiwayatTransaksi();
-
-        public List<Siswa> KelolaDataSiswa() =>
-            DataStore.Instance.Users.OfType<Siswa>().Where(s => s.KelasId == KelasId).ToList();
     }
 }
