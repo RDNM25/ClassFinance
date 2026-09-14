@@ -11,16 +11,18 @@ namespace ClassFinance.Views.Dialogs
         private readonly Siswa _siswa;
         private readonly TagihanSiswa _tagihan;
         private readonly decimal _totalBayar;
+        private readonly DateTime _paymentDate;
         private readonly MainWindow _mainWindow;
         private readonly Action _onSaved;
 
-        public OpsiKelebihanBayarDialog(Bendahara bendahara, Siswa siswa, TagihanSiswa tagihan, decimal totalBayar, MainWindow mainWindow, Action onSaved)
+        public OpsiKelebihanBayarDialog(Bendahara bendahara, Siswa siswa, TagihanSiswa tagihan, decimal totalBayar, DateTime paymentDate, MainWindow mainWindow, Action onSaved)
         {
             InitializeComponent();
             _bendahara = bendahara;
             _siswa = siswa;
             _tagihan = tagihan;
             _totalBayar = totalBayar;
+            _paymentDate = paymentDate;
             _mainWindow = mainWindow;
             _onSaved = onSaved;
 
@@ -33,16 +35,16 @@ namespace ClassFinance.Views.Dialogs
             decimal kelebihan = _totalBayar - _tagihan.AmountDue;
 
             // Add that result (amountForKas) to the total kas by recording the payment for the exact due amount
-            _bendahara.CatatPembayaran(_tagihan.Id, _totalBayar, "Tunai");
+            _bendahara.CatatPembayaran(_tagihan.Id, _totalBayar, "Tunai", date: _paymentDate);
 
             // Handle the overpayment based on user selection
             if (SimpanRadio.IsChecked == true)
             {
-                _bendahara.SimpanKelebihan(_siswa.Id, kelebihan);
+                _bendahara.SimpanKelebihan(_siswa.Id, kelebihan, _paymentDate);
             }
             else if (KembalikanRadio.IsChecked == true)
             {
-                _bendahara.KembalikanDana(_siswa.KelasId, _siswa.Id, kelebihan);
+                _bendahara.KembalikanDana(_siswa.KelasId, _siswa.Id, kelebihan, _paymentDate);
             }
 
             _onSaved?.Invoke();

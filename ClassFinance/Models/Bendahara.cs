@@ -23,22 +23,17 @@ namespace ClassFinance.Models
             return DataStore.Instance.TambahTransaksi(kelasId, JenisTransaksi.Keluar, amount, date, category, null, Name);
         }
 
-        public Tagihan BuatTagihan(int kelasId, string name, decimal amount, bool isIuran = false)
+        public Tagihan BuatTagihan(int kelasId, string name, decimal amount, DateTime? createdDate = null)
         {
-            // Append "Iuran" to the name so it shows correctly in history and UI
-            var tagihanName = isIuran ? $"{name} Iuran" : name;
-            var tagihan = DataStore.Instance.BuatTagihan(kelasId, tagihanName, amount, isIuran);
+            var tagihan = DataStore.Instance.BuatTagihan(kelasId, name, amount, createdDate);
 
-            // Only apply stored balance (Saldo Titipan) if it is NOT an Iuran
-            if (!isIuran)
+            // Automatically apply any existing student SaldoTitipan toward the newly created bill without adding extra cash
+            var siswaList = DataStore.Instance.Users.OfType<Siswa>().Where(s => s.KelasId == kelasId).ToList();
+            foreach (var siswa in siswaList)
             {
-                var siswaList = DataStore.Instance.Users.OfType<Siswa>().Where(s => s.KelasId == kelasId).ToList();
-                foreach (var siswa in siswaList)
+                if (siswa.SaldoTitipan > 0)
                 {
-                    if (siswa.SaldoTitipan > 0)
-                    {
-                        ProsesSaldoTitipanBerikutnya(siswa.Id, siswa.SaldoTitipan);
-                    }
+                    ProsesSaldoTitipanBerikutnya(siswa.Id, siswa.SaldoTitipan, createdDate);
                 }
             }
 
@@ -46,17 +41,50 @@ namespace ClassFinance.Models
             return tagihan;
         }
 
-        public void ProsesSaldoTitipanBerikutnya(int siswaId, decimal storedAmountContext = 0)
+        public Transaksi CatatPembayaran(int tagihanSiswaId, decimal amount, string method, string proofFile = null, DateTime? date = null)
+        {
+            var ts = DataStore.Instance.TagihanSiswaList.First(t => t.Id == tagihanSiswaId);
+            var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == ts.SiswaId);
+
+            // TRACK PARTIAL PAYMENTS
+            ts.JumlahDibayar += amount;
+            ts.AmountDue = Math.Max(0, ts.AmountDue - amount);
+            ts.UpdateStatus();
+
+            return DataStore.Instance.TambahTransaksi(
+                siswa.KelasId, JenisTransaksi.Masuk, amount, date ?? DateTime.Now,
+                $"Pembayaran dari {siswa.Name}", tagihanSiswaId, Name, proofFile, siswaId: siswa.Id);
+        }
+
+        // Refund overpayment directly back to the student
+        public Transaksi KembalikanDana(int kelasId, int siswaId, decimal amount, DateTime? date = null)
         {
             var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
 
-            // Get unpaid bills, EXCLUDING Iuran because Iuran does not take from stored money.
+            // Record as an expense (Keluar) to represent physical cash being handed back
+            return DataStore.Instance.TambahTransaksi(
+                kelasId, JenisTransaksi.Keluar, amount, date ?? DateTime.Now,
+                $"Pengembalian dana lebih (refund) untuk {siswa.Name}", null, Name, siswaId: siswa.Id);
+        }
+
+        // Save overpayment to the student's balance and automatically apply it without inflating total cash
+        public void SimpanKelebihan(int siswaId, decimal amount, DateTime? date = null)
+        {
+            var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
+            siswa.SaldoTitipan += amount;
+
+            // Automatically check and apply stored balance to future bills with 0 cash added
+            ProsesSaldoTitipanBerikutnya(siswaId, amount, date);
+        }
+
+        // Automatically apply stored balance to subsequent bills with 0 additional cash added to the total kas
+        public void ProsesSaldoTitipanBerikutnya(int siswaId, decimal storedAmountContext = 0, DateTime? date = null)
+        {
+            var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
+            var effectiveDate = date ?? DateTime.Now;
+
             var unpaidBills = DataStore.Instance.TagihanSiswaList
                 .Where(ts => ts.SiswaId == siswaId && ts.Status != StatusTagihan.Lunas)
-                .Where(ts => {
-                    var t = DataStore.Instance.TagihanList.FirstOrDefault(x => x.Id == ts.TagihanId);
-                    return t != null && !t.IsIuran;
-                })
                 .OrderBy(ts => ts.Id)
                 .ToList();
 
@@ -69,12 +97,16 @@ namespace ClassFinance.Models
                     decimal amountToPay = ts.AmountDue;
                     siswa.SaldoTitipan -= amountToPay;
 
+                    // Update bill status to Lunas
                     ts.JumlahDibayar += amountToPay;
                     ts.AmountDue = 0;
                     ts.UpdateStatus();
 
+                    // Record the real amount applied (so history shows what actually happened),
+                    // but exclude it from kas totals -- that cash was already counted once
+                    // when the original overpayment came in.
                     DataStore.Instance.TambahTransaksi(
-                        siswa.KelasId, JenisTransaksi.Masuk, amountToPay, DateTime.Now,
+                        siswa.KelasId, JenisTransaksi.Masuk, amountToPay, effectiveDate,
                         $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id, affectsKas: false);
                 }
                 else
@@ -87,49 +119,13 @@ namespace ClassFinance.Models
                     ts.UpdateStatus();
 
                     DataStore.Instance.TambahTransaksi(
-                        siswa.KelasId, JenisTransaksi.Masuk, amountToPay, DateTime.Now,
+                        siswa.KelasId, JenisTransaksi.Masuk, amountToPay, effectiveDate,
                         $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id, affectsKas: false);
                     break;
                 }
             }
         }
 
-        public Transaksi CatatPembayaran(int tagihanSiswaId, decimal amount, string method, string proofFile = null)
-        {
-            var ts = DataStore.Instance.TagihanSiswaList.First(t => t.Id == tagihanSiswaId);
-            var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == ts.SiswaId);
-
-            // TRACK PARTIAL PAYMENTS
-            ts.JumlahDibayar += amount;
-            ts.AmountDue = Math.Max(0, ts.AmountDue - amount);
-            ts.UpdateStatus();
-
-            return DataStore.Instance.TambahTransaksi(
-                siswa.KelasId, JenisTransaksi.Masuk, amount, DateTime.Now,
-                $"Pembayaran dari {siswa.Name}", tagihanSiswaId, Name, proofFile, siswaId: siswa.Id);
-        }
-
-        // Refund overpayment directly back to the student
-        public Transaksi KembalikanDana(int kelasId, int siswaId, decimal amount)
-        {
-            var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
-
-            // Record as an expense (Keluar) to represent physical cash being handed back
-            return DataStore.Instance.TambahTransaksi(
-                kelasId, JenisTransaksi.Keluar, amount, DateTime.Now,
-                $"Pengembalian dana lebih (refund) untuk {siswa.Name}", null, Name, siswaId: siswa.Id);
-        }
-
-        // Save overpayment to the student's balance and automatically apply it without inflating total cash
-        public void SimpanKelebihan(int siswaId, decimal amount)
-        {
-            var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
-            siswa.SaldoTitipan += amount;
-
-            // Automatically check and apply stored balance to future bills with 0 cash added
-            ProsesSaldoTitipanBerikutnya(siswaId, amount);
-        }
-   
         public string GenerateLaporan(int kelasId, string periode, string format)
         {
             var kelas = DataStore.Instance.KelasList.First(k => k.Id == kelasId);

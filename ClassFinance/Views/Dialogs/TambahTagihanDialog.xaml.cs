@@ -20,12 +20,12 @@ namespace ClassFinance.Views.Dialogs
             _kelasId = kelasId;
             _mainWindow = mainWindow;
             _onSaved = onSaved;
+            DatePickerInput.SelectedDate = DateTime.Now;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             var name = NameBox.Text.Trim();
-            bool isIuran = IsIuranCheckBox.IsChecked == true;
 
             if (string.IsNullOrWhiteSpace(name) ||
                 !decimal.TryParse(AmountBox.Text.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) ||
@@ -36,7 +36,14 @@ namespace ClassFinance.Views.Dialogs
                 return;
             }
 
-            _bendahara.BuatTagihan(_kelasId, name, amount, isIuran);
+            // DatePicker only stores a date (no time-of-day -- WPF normalizes it to
+            // midnight internally), so combine whichever day was picked with the actual
+            // current time, otherwise a tagihan created "today" would sort as if it
+            // happened at 00:00, below anything else from today that has a real time.
+            var pickedDate = (DatePickerInput.SelectedDate ?? DateTime.Now).Date;
+            var createdDate = pickedDate + DateTime.Now.TimeOfDay;
+
+            _bendahara.BuatTagihan(_kelasId, name, amount, createdDate);
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();

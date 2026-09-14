@@ -60,7 +60,7 @@ namespace ClassFinance.Services
             return t;
         }
 
-        public Tagihan BuatTagihan(int kelasId, string name, decimal amount, bool isIuran = false)
+        public Tagihan BuatTagihan(int kelasId, string name, decimal amount, DateTime? createdDate = null)
         {
             var tagihan = new Tagihan
             {
@@ -68,8 +68,7 @@ namespace ClassFinance.Services
                 KelasId = kelasId,
                 Name = name,
                 Amount = amount,
-                CreatedDate = DateTime.Now,
-                IsIuran = isIuran
+                CreatedDate = createdDate ?? DateTime.Now
             };
             TagihanList.Add(tagihan);
             tagihan.GenerateTagihanSiswa(this);
