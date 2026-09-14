@@ -1,9 +1,8 @@
+using System.Windows;
+using System.Windows.Controls;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views.Dialogs;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace ClassFinance.Views
 {
@@ -106,21 +105,10 @@ namespace ClassFinance.Views
             }).ToList();
             TransaksiItems.Visibility = Visibility.Visible;
             TagihanPaymentItems.Visibility = Visibility.Collapsed;
+            TotalOwedCard.Visibility = Visibility.Collapsed;
 
             EmptyText.Text = "Belum ada transaksi.";
             EmptyText.Visibility = filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
-        }
-
-        private void TagihanPaymentRow_Click(object sender, MouseButtonEventArgs e)
-        {
-            // If the user clicks a row, grab the Tagihan.Id from the Border's Tag
-            if (sender is FrameworkElement fe && fe.Tag is int tagihanId)
-            {
-                // Navigate to the TagihanPage and pass the specific ID to highlight
-                // *Note: Adjust "MainFrame.Content" to match whatever navigation system your MainWindow uses.
-                _mainWindow.NavigateTo(new TagihanPage(_currentUser, _mainWindow, tagihanId));
-
-            }
         }
 
         /// <summary>
@@ -156,6 +144,12 @@ namespace ClassFinance.Views
             TagihanPaymentItems.ItemsSource = tagihanList;
             TagihanPaymentItems.Visibility = Visibility.Visible;
             TransaksiItems.Visibility = Visibility.Collapsed;
+
+            // Total still owed from tagihan specifically -- AmountDue is already 0 for
+            // Lunas entries, so this naturally only sums BelumBayar/Sebagian amounts.
+            var totalOwed = tagihanList.Sum(x => x.AmountDue);
+            TotalOwedText.Text = $"Rp {totalOwed:N0}";
+            TotalOwedCard.Visibility = Visibility.Visible;
 
             EmptyText.Text = "Belum ada tagihan.";
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;

@@ -66,6 +66,15 @@
             </Border>
         </Grid>
 
+        <!--  Per-student total owed across all tagihan (not general kas contributions) -->
+        <Border x:Name="TotalOwedCard" DockPanel.Dock="Top" Margin="0,0,0,20" Background="{StaticResource PrimaryRed}"
+                CornerRadius="16" Padding="20" Visibility="Collapsed">
+            <StackPanel>
+                <TextBlock Text="Total Tagihan Belum Dibayar" Foreground="#FFE0E0" FontSize="13" />
+                <TextBlock x:Name="TotalOwedText" Text="Rp 0" Foreground="White" FontSize="26" FontWeight="Bold" Margin="0,6,0,0" />
+            </StackPanel>
+        </Border>
+
         <Border Style="{StaticResource Card}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel Margin="0,0,12,0">
@@ -110,11 +119,7 @@
                     <ItemsControl x:Name="TagihanPaymentItems" Visibility="Collapsed">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <!-- Cursor, MouseLeftButtonUp, and Tag to make the row clickable -->
-                                <Border Style="{StaticResource ListRow}" 
-                                        Cursor="Hand" 
-                                        MouseLeftButtonUp="TagihanPaymentRow_Click" 
-                                        Tag="{Binding Tagihan.Id}">
+                                <Border Style="{StaticResource ListRow}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
