@@ -16,7 +16,6 @@
             <ColumnDefinition Width="1.2*" />
         </Grid.ColumnDefinitions>
 
-        <!--  Left: list of tagihan  -->
         <DockPanel Grid.Column="0" Grid.ColumnSpan="2">
             <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
                 <Grid.RowDefinitions>
@@ -32,7 +31,6 @@
                 <Button Grid.Column="1" x:Name="BuatTagihanButton" Content="+ BUAT TAGIHAN"
                         Style="{StaticResource PrimaryButton}" Click="BuatTagihanButton_Click" />
 
-                <!-- Filter ComboBox for Tagihan Status -->
                 <ComboBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="TagihanFilterComboBox" Style="{StaticResource RoundedComboBox}"
                           Margin="0,12,0,0" HorizontalAlignment="Left" Width="200"
                           SelectionChanged="TagihanFilterComboBox_SelectionChanged">
@@ -45,13 +43,11 @@
             <Border Style="{StaticResource Card}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <!-- Left items control remains standard for listing bills -->
-                        <!-- Replaced ItemsControl with ListBox for selection highlighting -->
+                       
                         <ListBox x:Name="TagihanItems" BorderThickness="0" Background="Transparent"
                                  HorizontalContentAlignment="Stretch" SelectionChanged="TagihanItems_SelectionChanged"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
-                            <!-- Remove default ListBox styling so it looks exactly like your old list -->
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="Padding" Value="0"/>
@@ -77,9 +73,7 @@
                                         <Border x:Name="SelectionOverlay" Background="{StaticResource PrimaryRedLight}" BorderBrush="{StaticResource PrimaryRed}" 
                                                 BorderThickness="1.5" CornerRadius="12" Opacity="0" IsHitTestVisible="False" />
 
-                                        <!-- The Card Content -->
                                         <Grid Margin="16">
-                                            <!-- Added margin to mimic standard border padding if needed -->
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
@@ -101,7 +95,6 @@
                                         </Grid>
                                     </Grid>
 
-                                    <!-- Animation Triggers -->
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
                                             <DataTrigger.EnterActions>
@@ -134,13 +127,11 @@
             </Border>
         </DockPanel>
 
-        <!--  Right: detail of selected tagihan  -->
         <DockPanel Grid.Column="2" Margin="30,0,10,0">
             <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
                 <TextBlock x:Name="DetailTitle" Text="status pembayaran"
                            FontSize="16" FontWeight="Bold" VerticalAlignment="Top" TextWrapping="Wrap" Margin="27,19,18,0" TextAlignment="Right" />
 
-                <!-- Filter ComboBox for Student Payment Status -->
                 <ComboBox x:Name="StatusFilterComboBox" Style="{StaticResource RoundedComboBox}"
                           Margin="27,12,0,0" HorizontalAlignment="Right" Width="180"
                           SelectionChanged="StatusFilterComboBox_SelectionChanged">
@@ -153,7 +144,6 @@
 
             <Border Style="{StaticResource Card}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <!-- Right items control updated with student details, partial payments, and buttons -->
                     <ItemsControl x:Name="DetailItems">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -164,7 +154,6 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <!-- Left Column: Student Name, Details, and Status -->
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
                                             <TextBlock Text="{Binding SiswaName}" FontWeight="Bold" FontSize="14" />
 
@@ -185,7 +174,6 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <!-- Right Column: Stacked Action Buttons -->
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                             <Button Content="Tandai Lunas" Style="{StaticResource SmallOutlineButton}"
                                                     Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,0,4" Width="100" />

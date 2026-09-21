@@ -26,9 +26,8 @@ namespace ClassFinance.Views
         private readonly MainWindow _mainWindow;
         private readonly int _kelasId;
         private Tagihan _selectedTagihan;
-        private int? _initialTagihanId; // Added to store the target highlight ID
+        private int? _initialTagihanId; 
 
-        // Added initialTagihanId to the constructor
         public TagihanPage(User currentUser, MainWindow mainWindow, int? initialTagihanId = null)
         {
             InitializeComponent();
@@ -76,20 +75,18 @@ namespace ClassFinance.Views
             TagihanItems.ItemsSource = tagihanList;
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
 
-            // Automatically highlight and open the requested tagihan
             if (_initialTagihanId.HasValue)
             {
                 var target = tagihanList.FirstOrDefault(x => x.Tagihan.Id == _initialTagihanId.Value);
                 if (target != null)
                 {
                     TagihanItems.SelectedItem = target;
-                    TagihanItems.ScrollIntoView(target); // Scrolls to it automatically
+                    TagihanItems.ScrollIntoView(target);
                 }
-                _initialTagihanId = null; // Clear so it doesn't re-trigger on random refreshes
+                _initialTagihanId = null;
             }
             else if (_selectedTagihan != null)
             {
-                // Re-select previously selected item after a refresh
                 TagihanItems.SelectedItem = tagihanList.FirstOrDefault(x => x.Tagihan.Id == _selectedTagihan.Id);
                 ApplyFilter();
             }
@@ -100,7 +97,6 @@ namespace ClassFinance.Views
             if (TagihanItems != null) Refresh();
         }
 
-        // Changed from Click to SelectionChanged
         private void TagihanItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TagihanItems.SelectedItem is TagihanDisplayItem displayItem)

@@ -34,7 +34,6 @@
                                   StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
                         </Canvas>
 
-                        <!-- Search Input Box -->
                         <TextBox x:Name="SearchBox" Grid.Column="1" BorderThickness="0" Background="Transparent" 
                          Padding="0,8,10,8" VerticalContentAlignment="Center"
                          FontSize="14" Tag="Cari nama atau NIS siswa..." 
