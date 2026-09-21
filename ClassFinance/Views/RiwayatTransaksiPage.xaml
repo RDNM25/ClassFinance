@@ -115,7 +115,8 @@
                     <ItemsControl x:Name="TagihanPaymentItems" Visibility="Collapsed">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource ListRow}">
+                                <Border Style="{StaticResource ListRow}" Cursor="Hand" Tag="{Binding Tagihan}"
+                                        MouseLeftButtonUp="TagihanPaymentRow_Click" ToolTip="Klik untuk membuka tagihan ini">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />

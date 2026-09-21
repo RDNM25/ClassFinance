@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views.Dialogs;
@@ -12,10 +13,6 @@ namespace ClassFinance.Views
         public string TagihanName { get; set; }
     }
 
-    /// <summary>
-    /// Per-student row: a class tagihan on the left, and what this specific student
-    /// paid toward it on the right (blank if they haven't paid at all).
-    /// </summary>
     public class TagihanPaymentDisplayItem
     {
         public Tagihan Tagihan { get; set; }
@@ -24,7 +21,6 @@ namespace ClassFinance.Views
         public decimal AmountPaid { get; set; }
         public decimal AmountDue { get; set; }
         public StatusTagihan Status { get; set; }
-        // Display the amount if they have paid anything (even partially)
         public string AmountPaidDisplay => AmountPaid > 0 ? $"Rp {AmountPaid:N0}" : string.Empty;
     }
 
@@ -80,7 +76,6 @@ namespace ClassFinance.Views
             RefreshTransaksi();
         }
 
-        /// <summary>Class-wide transaction history (no specific student selected).</summary>
         private void RefreshTransaksi()
         {
             var all = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
@@ -111,10 +106,6 @@ namespace ClassFinance.Views
             EmptyText.Visibility = filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        /// <summary>
-        /// Per-student view: every class tagihan on the left, with what this student
-        /// paid toward each one on the right.
-        /// </summary>
         private void RefreshTagihanStatus(Siswa siswa)
         {
             var tagihanList = DataStore.Instance.TagihanList
@@ -125,7 +116,6 @@ namespace ClassFinance.Views
                     var entry = DataStore.Instance.TagihanSiswaList
                         .FirstOrDefault(ts => ts.TagihanId == t.Id && ts.SiswaId == siswa.Id);
 
-                    // Use the new JumlahDibayar and Status properties to reflect partial/full payments
                     bool hasPaid = entry != null && entry.JumlahDibayar > 0;
                     bool isLunas = entry != null && entry.Status == StatusTagihan.Lunas;
 
@@ -145,8 +135,6 @@ namespace ClassFinance.Views
             TagihanPaymentItems.Visibility = Visibility.Visible;
             TransaksiItems.Visibility = Visibility.Collapsed;
 
-            // Total still owed from tagihan specifically -- AmountDue is already 0 for
-            // Lunas entries, so this naturally only sums BelumBayar/Sebagian amounts.
             var totalOwed = tagihanList.Sum(x => x.AmountDue);
             TotalOwedText.Text = $"Rp {totalOwed:N0}";
             TotalOwedCard.Visibility = Visibility.Visible;
@@ -167,6 +155,14 @@ namespace ClassFinance.Views
         {
             var dialog = new TambahTransaksiDialog((Bendahara)_currentUser, _kelasId, _mainWindow, Refresh);
             _mainWindow.ShowModal(dialog);
+        }
+
+        private void TagihanPaymentRow_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is FrameworkElement fe && fe.Tag is Tagihan tagihan)
+            {
+                _mainWindow.NavigateTo(new TagihanPage(_currentUser, _mainWindow, tagihan.Id));
+            }
         }
     }
 }
