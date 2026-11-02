@@ -13,10 +13,12 @@ namespace ClassFinance.Views
         public Siswa Siswa { get; set; }
         public decimal TotalDibayar { get; set; }
         public int UnpaidCount { get; set; }
+        public int ProsesCount { get; set; }
         public int TotalTagihanCount { get; set; }
         public bool HasUnpaid => UnpaidCount > 0;
+        public bool HasProses => ProsesCount > 0;
 
-        public bool IsFullyPaid => TotalTagihanCount > 0 && UnpaidCount == 0;
+        public bool IsFullyPaid => TotalTagihanCount > 0 && UnpaidCount == 0 && ProsesCount == 0;
         public bool HasNoTagihan => TotalTagihanCount == 0;
     }
 
@@ -61,7 +63,8 @@ namespace ClassFinance.Views
                 TotalDibayar = DataStore.Instance.TransaksiList
                     .Where(t => t.Type == JenisTransaksi.Masuk && t.SiswaId == s.Id)
                     .Sum(t => (decimal?)t.Amount) ?? 0,
-                UnpaidCount = tagihanEntries.Count(ts => ts.Status != StatusTagihan.Lunas),
+                UnpaidCount = tagihanEntries.Count(ts => ts.Status != StatusTagihan.Lunas && ts.Status != StatusTagihan.Proses),
+                ProsesCount = tagihanEntries.Count(ts => ts.Status == StatusTagihan.Proses),
                 TotalTagihanCount = tagihanEntries.Count
             };
         }

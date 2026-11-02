@@ -11,6 +11,10 @@ namespace ClassFinance.Views
     {
         public Transaksi Transaksi { get; set; }
         public string TagihanName { get; set; }
+        public bool CanMarkRefundPaid { get; set; }
+        public string RefundStatus => Transaksi != null && Transaksi.IsRefund
+            ? (Transaksi.IsPendingRefund ? "Proses" : "Lunas")
+            : string.Empty;
     }
 
     public class TagihanPaymentDisplayItem
@@ -96,7 +100,8 @@ namespace ClassFinance.Views
             TransaksiItems.ItemsSource = filtered.Select(t => new TransaksiDisplayItem
             {
                 Transaksi = t,
-                TagihanName = null
+                TagihanName = null,
+                CanMarkRefundPaid = _currentUser is Bendahara && t.IsPendingRefund
             }).ToList();
             TransaksiItems.Visibility = Visibility.Visible;
             TagihanPaymentItems.Visibility = Visibility.Collapsed;
@@ -155,6 +160,15 @@ namespace ClassFinance.Views
         {
             var dialog = new TambahTransaksiDialog((Bendahara)_currentUser, _kelasId, _mainWindow, Refresh);
             _mainWindow.ShowModal(dialog);
+        }
+
+        private void MarkRefundPaid_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is Bendahara && sender is FrameworkElement element && element.Tag is Transaksi transaksi)
+            {
+                ((Bendahara)_currentUser).TandaiRefundDibayar(transaksi.Id);
+                RefreshTransaksi();
+            }
         }
 
         private void TagihanPaymentRow_Click(object sender, MouseButtonEventArgs e)

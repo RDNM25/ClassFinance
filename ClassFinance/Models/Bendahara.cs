@@ -56,15 +56,36 @@ namespace ClassFinance.Models
                 $"Pembayaran dari {siswa.Name}", tagihanSiswaId, Name, proofFile, siswaId: siswa.Id);
         }
 
-        // Refund overpayment directly back to the student
-        public Transaksi KembalikanDana(int kelasId, int siswaId, decimal amount, DateTime? date = null)
+        // Record a refund as pending. It only reduces kas after the cash is paid out.
+        public Transaksi KembalikanDana(int kelasId, int siswaId, decimal amount, int tagihanSiswaId, DateTime? date = null)
         {
             var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
 
-            // Record as an expense (Keluar) to represent physical cash being handed back
-            return DataStore.Instance.TambahTransaksi(
+            var refund = DataStore.Instance.TambahTransaksi(
                 kelasId, JenisTransaksi.Keluar, amount, date ?? DateTime.Now,
-                $"Pengembalian dana lebih (refund) untuk {siswa.Name}", null, Name, siswaId: siswa.Id);
+                $"Pengembalian dana lebih (refund) untuk {siswa.Name}", tagihanSiswaId, Name,
+                siswaId: siswa.Id, affectsKas: false);
+            refund.IsRefund = true;
+            refund.IsPendingRefund = true;
+            var tagihan = DataStore.Instance.TagihanSiswaList.First(t => t.Id == tagihanSiswaId);
+            tagihan.Status = StatusTagihan.Proses;
+            return refund;
+        }
+
+        public void TandaiRefundDibayar(int transaksiId)
+        {
+            var refund = DataStore.Instance.TransaksiList.First(t => t.Id == transaksiId);
+            if (!refund.IsPendingRefund) return;
+
+            refund.IsPendingRefund = false;
+            refund.AffectsKas = true;
+
+            var tagihanId = refund.TagihanSiswaId;
+            if (tagihanId.HasValue && !DataStore.Instance.TransaksiList.Any(t =>
+                    t.IsPendingRefund && t.TagihanSiswaId == tagihanId.Value))
+            {
+                DataStore.Instance.TagihanSiswaList.FirstOrDefault(t => t.Id == tagihanId.Value)?.UpdateStatus();
+            }
         }
 
         // Save overpayment to the student's balance and automatically apply it without inflating total cash
@@ -84,7 +105,7 @@ namespace ClassFinance.Models
             var effectiveDate = date ?? DateTime.Now;
 
             var unpaidBills = DataStore.Instance.TagihanSiswaList
-                .Where(ts => ts.SiswaId == siswaId && ts.Status != StatusTagihan.Lunas)
+                .Where(ts => ts.SiswaId == siswaId && ts.Status != StatusTagihan.Lunas && ts.Status != StatusTagihan.Proses)
                 .OrderBy(ts => ts.Id)
                 .ToList();
 

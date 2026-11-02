@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using System.Windows.Navigation;
 using ClassFinance.Models;
 using ClassFinance.Services;
@@ -69,6 +70,15 @@ namespace ClassFinance
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
             UpdateBackButton();
+
+            if (e.Content is UIElement pageContent)
+            {
+                var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180))
+                {
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                };
+                pageContent.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+            }
         }
 
         private void UpdateBackButton()

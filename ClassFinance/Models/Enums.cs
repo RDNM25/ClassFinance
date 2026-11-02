@@ -17,6 +17,7 @@ namespace ClassFinance.Models
     {
         BelumBayar,
         Sebagian,
+        Proses,
         Lunas
     }
 }

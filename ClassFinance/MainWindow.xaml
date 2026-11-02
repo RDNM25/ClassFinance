@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Class Finance" Height="750" Width="1200" MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"
-        FontFamily="Segoe UI"
+        FontFamily="Segoe UI Variable Text"
         Background="{StaticResource AppBackground}">
     <Grid>
         <Grid.ColumnDefinitions>

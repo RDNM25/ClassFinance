@@ -87,11 +87,30 @@
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="{Binding Transaksi.Description}" FontWeight="Bold" FontSize="15" />
                                             <TextBlock Text="{Binding Transaksi.Date, StringFormat='dd MMM yyyy, HH:mm'}" FontSize="12" Foreground="{StaticResource TextGray}" />
+                                            <TextBlock Text="{Binding RefundStatus}" FontSize="11" Foreground="{StaticResource TextGray}" Margin="0,4,0,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <Trigger Property="Text" Value="">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </Trigger>
+                                                            <DataTrigger Binding="{Binding Transaksi.IsPendingRefund}" Value="True">
+                                                                <Setter Property="Foreground" Value="#F57C00" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                         </StackPanel>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Transaksi, Converter={StaticResource Sign}}"
                                                        Foreground="{Binding Transaksi, Converter={StaticResource SignColor}}"
                                                        FontWeight="Bold" FontSize="16" />
+                                            <Button Content="Tandai dibayar" Tag="{Binding Transaksi}"
+                                                    Style="{StaticResource OutlineButton}" FontSize="11" Padding="10,6" Margin="10,0,0,0"
+                                                    Visibility="{Binding CanMarkRefundPaid, Converter={StaticResource BoolToVis}}"
+                                                    Click="MarkRefundPaid_Click" />
                                             <TextBlock Text="{Binding TagihanName}" FontSize="12" Foreground="{StaticResource TextGray}"
                                                        Margin="10,0,0,0" VerticalAlignment="Center">
                                                 <TextBlock.Style>

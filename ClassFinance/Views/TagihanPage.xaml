@@ -139,6 +139,7 @@
                     <ComboBoxItem Content="Lunas" Tag="Lunas" />
                     <ComboBoxItem Content="Belum Lunas" Tag="BelumLunas" />
                     <ComboBoxItem Content="Sebagian" Tag="Sebagian" />
+                    <ComboBoxItem Content="Proses" Tag="Proses" />
                 </ComboBox>
             </StackPanel>
 
@@ -175,10 +176,15 @@
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <Button Content="Tandai refund lunas" Style="{StaticResource SmallOutlineButton}"
+                                                    Tag="{Binding}" Click="TandaiRefundLunas_Click" Margin="0,0,0,4" Width="130"
+                                                    Visibility="{Binding HasPendingRefund, Converter={StaticResource BoolToVis}}" />
                                             <Button Content="Tandai Lunas" Style="{StaticResource SmallOutlineButton}"
-                                                    Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,0,4" Width="100" />
+                                                    Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,0,4" Width="100"
+                                                    Visibility="{Binding CanMakePayment, Converter={StaticResource BoolToVis}}" />
                                             <Button Content="Bayar Manual" Style="{StaticResource SmallOutlineButton}"
-                                                    Tag="{Binding}" Click="BayarManual_Click" Width="100" />
+                                                    Tag="{Binding}" Click="BayarManual_Click" Width="100"
+                                                    Visibility="{Binding CanMakePayment, Converter={StaticResource BoolToVis}}" />
                                         </StackPanel>
                                     </Grid>
                                 </Border>

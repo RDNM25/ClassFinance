@@ -44,7 +44,7 @@ namespace ClassFinance.Views.Dialogs
             }
             else if (KembalikanRadio.IsChecked == true)
             {
-                _bendahara.KembalikanDana(_siswa.KelasId, _siswa.Id, kelebihan, _paymentDate);
+                _bendahara.KembalikanDana(_siswa.KelasId, _siswa.Id, kelebihan, _tagihan.Id, _paymentDate);
             }
 
             _onSaved?.Invoke();

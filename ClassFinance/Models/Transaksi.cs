@@ -29,5 +29,10 @@ namespace ClassFinance.Models
         /// double the total kas even though the amount is real and worth displaying.
         /// </summary>
         public bool AffectsKas { get; set; } = true;
+
+        public bool IsRefund { get; set; }
+
+        /// <summary>True while a refund has been recorded but has not yet been paid out.</summary>
+        public bool IsPendingRefund { get; set; }
     }
 }

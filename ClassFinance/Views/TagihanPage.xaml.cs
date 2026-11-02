@@ -10,6 +10,8 @@ namespace ClassFinance.Views
     {
         public TagihanSiswa Entry { get; set; }
         public string SiswaName { get; set; }
+        public bool CanMakePayment { get; set; }
+        public bool HasPendingRefund { get; set; }
     }
 
     public class TagihanDisplayItem
@@ -119,7 +121,10 @@ namespace ClassFinance.Views
                 .Select(ts => new TagihanSiswaDisplay
                 {
                     Entry = ts,
-                    SiswaName = DataStore.Instance.Users.OfType<Siswa>().FirstOrDefault(s => s.Id == ts.SiswaId)?.Name ?? "?"
+                    SiswaName = DataStore.Instance.Users.OfType<Siswa>().FirstOrDefault(s => s.Id == ts.SiswaId)?.Name ?? "?",
+                    CanMakePayment = ts.Status != StatusTagihan.Lunas && ts.Status != StatusTagihan.Proses,
+                    HasPendingRefund = _currentUser is Bendahara && DataStore.Instance.TransaksiList.Any(t =>
+                        t.TagihanSiswaId == ts.Id && t.IsPendingRefund)
                 });
 
             if (StatusFilterComboBox?.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag is string filterTag)
@@ -129,6 +134,7 @@ namespace ClassFinance.Views
                     "Lunas" => query.Where(x => x.Entry.Status == StatusTagihan.Lunas),
                     "BelumLunas" => query.Where(x => x.Entry.Status == StatusTagihan.BelumBayar),
                     "Sebagian" => query.Where(x => x.Entry.Status == StatusTagihan.Sebagian),
+                    "Proses" => query.Where(x => x.Entry.Status == StatusTagihan.Proses),
                     _ => query
                 };
             }
@@ -150,12 +156,30 @@ namespace ClassFinance.Views
                 return;
             }
 
-            if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display && display.Entry.Status != StatusTagihan.Lunas)
+            if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display &&
+                display.Entry.Status != StatusTagihan.Lunas && display.Entry.Status != StatusTagihan.Proses)
             {
                 bendahara.CatatPembayaran(display.Entry.Id, display.Entry.AmountDue, "Tunai");
                 Refresh();
             }
         }
+
+        private void TandaiRefundLunas_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is not Bendahara bendahara ||
+                sender is not Button button || button.Tag is not TagihanSiswaDisplay display)
+                return;
+
+            var pendingRefunds = DataStore.Instance.TransaksiList
+                .Where(t => t.TagihanSiswaId == display.Entry.Id && t.IsPendingRefund)
+                .ToList();
+
+            foreach (var refund in pendingRefunds)
+                bendahara.TandaiRefundDibayar(refund.Id);
+
+            Refresh();
+        }
+
         private void BayarManual_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser is not Bendahara bendahara)
@@ -164,7 +188,8 @@ namespace ClassFinance.Views
                 return;
             }
 
-            if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display && display.Entry.Status != StatusTagihan.Lunas)
+            if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display &&
+                display.Entry.Status != StatusTagihan.Lunas && display.Entry.Status != StatusTagihan.Proses)
             {
                 var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == display.Entry.SiswaId);
                 var dialog = new BayarManualDialog(bendahara, siswa, display.Entry, _mainWindow, onSaved: () => Refresh());
