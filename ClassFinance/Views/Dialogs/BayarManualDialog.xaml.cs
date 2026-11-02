@@ -25,6 +25,7 @@ namespace ClassFinance.Views.Dialogs
 
             SiswaNameText.Text = $"Siswa: {_siswa.Name}";
             AmountDueText.Text = $"Sisa Tagihan: Rp {_tagihan.AmountDue:N0}";
+            DatePickerInput.SelectedDate = DateTime.Now;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -36,17 +37,25 @@ namespace ClassFinance.Views.Dialogs
                 return;
             }
 
+            // DatePicker only stores a date (no time-of-day), so combine whichever day
+            // was picked with the actual current time -- otherwise a payment made
+            // "today" would sort as if it happened at 00:00.
+            var pickedDate = (DatePickerInput.SelectedDate ?? DateTime.Now).Date;
+            var paymentDate = pickedDate + DateTime.Now.TimeOfDay;
+
             if (amount > _tagihan.AmountDue)
             {
-                // Overpayment logic: Close this and open the OpsiKelebihanBayar dialog
+                // Overpayment logic: Close this and open the OpsiKelebihanBayar dialog,
+                // carrying the chosen date along so both dialogs record the same payment
+                // at the same date instead of asking for it twice.
                 _mainWindow.CloseModal();
-                var overpaymentDialog = new OpsiKelebihanBayarDialog(_bendahara, _siswa, _tagihan, amount, _mainWindow, _onSaved);
+                var overpaymentDialog = new OpsiKelebihanBayarDialog(_bendahara, _siswa, _tagihan, amount, paymentDate, _mainWindow, _onSaved);
                 _mainWindow.ShowModal(overpaymentDialog);
             }
             else
             {
                 // Normal or partial payment logic
-                _bendahara.CatatPembayaran(_tagihan.Id, amount, "Tunai");
+                _bendahara.CatatPembayaran(_tagihan.Id, amount, "Tunai", date: paymentDate);
                 _onSaved?.Invoke();
                 _mainWindow.CloseModal();
             }

@@ -7,24 +7,18 @@ using ClassFinance.Views.Dialogs;
 
 namespace ClassFinance.Views
 {
-    /// <summary>
-    /// Wraps a Siswa for the roster page with two computed figures: how much they've
-    /// paid in total, and how many tagihan they still haven't fully paid off. Unlike
-    /// the Dashboard's list, nobody is filtered out here -- this is the full roster.
-    /// </summary>
+  
     public class SiswaRosterItem
     {
         public Siswa Siswa { get; set; }
         public decimal TotalDibayar { get; set; }
         public int UnpaidCount { get; set; }
+        public int ProsesCount { get; set; }
         public int TotalTagihanCount { get; set; }
         public bool HasUnpaid => UnpaidCount > 0;
+        public bool HasProses => ProsesCount > 0;
 
-        // Guarded by TotalTagihanCount > 0: a student with zero tagihan assigned
-        // (e.g. just added, or the class has no tagihan yet at all) has UnpaidCount
-        // == 0 too, but that's "nothing to pay" -- not "paid everything" -- so it
-        // must not be reported as fully paid.
-        public bool IsFullyPaid => TotalTagihanCount > 0 && UnpaidCount == 0;
+        public bool IsFullyPaid => TotalTagihanCount > 0 && UnpaidCount == 0 && ProsesCount == 0;
         public bool HasNoTagihan => TotalTagihanCount == 0;
     }
 
@@ -69,7 +63,8 @@ namespace ClassFinance.Views
                 TotalDibayar = DataStore.Instance.TransaksiList
                     .Where(t => t.Type == JenisTransaksi.Masuk && t.SiswaId == s.Id)
                     .Sum(t => (decimal?)t.Amount) ?? 0,
-                UnpaidCount = tagihanEntries.Count(ts => ts.Status != StatusTagihan.Lunas),
+                UnpaidCount = tagihanEntries.Count(ts => ts.Status != StatusTagihan.Lunas && ts.Status != StatusTagihan.Proses),
+                ProsesCount = tagihanEntries.Count(ts => ts.Status == StatusTagihan.Proses),
                 TotalTagihanCount = tagihanEntries.Count
             };
         }
@@ -93,7 +88,6 @@ namespace ClassFinance.Views
             var rosterItems = filteredSiswa.Select(ToRosterItem).ToList();
             SiswaItems.ItemsSource = rosterItems;
 
-            // Handle empty state visibility
             if (rosterItems.Count == 0)
             {
                 EmptyText.Visibility = Visibility.Visible;

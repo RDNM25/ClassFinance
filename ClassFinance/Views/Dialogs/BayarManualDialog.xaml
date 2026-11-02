@@ -11,6 +11,9 @@
             <TextBlock Text="Nominal yang dibayar (Rp)" FontSize="12" Foreground="#666" Margin="0,0,0,4"/>
             <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,8" />
 
+            <TextBlock Text="Tanggal Pembayaran" FontSize="12" Foreground="#666" Margin="0,0,0,4"/>
+            <DatePicker x:Name="DatePickerInput" Margin="0,0,0,8" />
+
             <TextBlock x:Name="ErrorText" Foreground="Red" FontSize="12" Visibility="Collapsed" Margin="0,0,0,16"/>
 
             <Grid Margin="0,16,0,0">

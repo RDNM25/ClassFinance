@@ -13,7 +13,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="DATA SISWA" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="0" Text="Data Siswa" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
             <Button x:Name="TambahButton" Grid.Column="1" Content="+ TAMBAH SISWA"
                     Style="{StaticResource PrimaryButton}" Click="TambahButton_Click" />
         </Grid>
@@ -34,7 +34,6 @@
                                   StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
                         </Canvas>
 
-                        <!-- Search Input Box -->
                         <TextBox x:Name="SearchBox" Grid.Column="1" BorderThickness="0" Background="Transparent" 
                          Padding="0,8,10,8" VerticalContentAlignment="Center"
                          FontSize="14" Tag="Cari nama atau NIS siswa..." 
@@ -70,6 +69,9 @@
                                                     <TextBlock Text="{Binding UnpaidCount, StringFormat='Belum bayar {0} tagihan'}"
                                                                FontSize="12" Foreground="#F57C00" FontWeight="SemiBold"
                                                                Visibility="{Binding HasUnpaid, Converter={StaticResource BoolToVis}}" />
+                                                    <TextBlock Text="{Binding ProsesCount, StringFormat='Proses {0} tagihan'}"
+                                                               FontSize="12" Foreground="#F57C00" FontWeight="SemiBold" Margin="0,0,12,0"
+                                                               Visibility="{Binding HasProses, Converter={StaticResource BoolToVis}}" />
                                                     <TextBlock Text="Lunas semua tagihan" FontSize="12" Foreground="#2E7D32" FontWeight="SemiBold"
                                                                Visibility="{Binding IsFullyPaid, Converter={StaticResource BoolToVis}}" />
                                                     <TextBlock Text="Belum ada tagihan" FontSize="12" Foreground="{StaticResource TextGray}" FontWeight="SemiBold"

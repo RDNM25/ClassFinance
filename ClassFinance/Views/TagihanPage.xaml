@@ -7,6 +7,23 @@
         <conv:RupiahConverter x:Key="Rupiah" />
         <conv:StatusToBrushConverter x:Key="StatusBrush" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <Style x:Key="TagihanActionButton" TargetType="Button" BasedOn="{StaticResource SmallOutlineButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="actionBorder" Background="White" BorderBrush="{StaticResource PrimaryRed}"
+                                BorderThickness="1.5" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="actionBorder" Property="Background" Value="{StaticResource PrimaryRedLight}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <Grid Margin="32,28,32,28" Grid.IsSharedSizeScope="True">
@@ -16,7 +33,6 @@
             <ColumnDefinition Width="1.2*" />
         </Grid.ColumnDefinitions>
 
-        <!--  Left: list of tagihan  -->
         <DockPanel Grid.Column="0" Grid.ColumnSpan="2">
             <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
                 <Grid.RowDefinitions>
@@ -28,11 +44,10 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="TAGIHAN" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="0" Text="Tagihan" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
                 <Button Grid.Column="1" x:Name="BuatTagihanButton" Content="+ BUAT TAGIHAN"
                         Style="{StaticResource PrimaryButton}" Click="BuatTagihanButton_Click" />
 
-                <!-- Filter ComboBox for Tagihan Status -->
                 <ComboBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" x:Name="TagihanFilterComboBox" Style="{StaticResource RoundedComboBox}"
                           Margin="0,12,0,0" HorizontalAlignment="Left" Width="200"
                           SelectionChanged="TagihanFilterComboBox_SelectionChanged">
@@ -45,13 +60,11 @@
             <Border Style="{StaticResource Card}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <!-- Left items control remains standard for listing bills -->
-                        <!-- Replaced ItemsControl with ListBox for selection highlighting -->
+                       
                         <ListBox x:Name="TagihanItems" BorderThickness="0" Background="Transparent"
                                  HorizontalContentAlignment="Stretch" SelectionChanged="TagihanItems_SelectionChanged"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
-                            <!-- Remove default ListBox styling so it looks exactly like your old list -->
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="ListBoxItem">
                                     <Setter Property="Padding" Value="0"/>
@@ -77,11 +90,10 @@
                                         <Border x:Name="SelectionOverlay" Background="{StaticResource PrimaryRedLight}" BorderBrush="{StaticResource PrimaryRed}" 
                                                 BorderThickness="1.5" CornerRadius="12" Opacity="0" IsHitTestVisible="False" />
 
-                                        <!-- The Card Content -->
                                         <Grid Margin="16">
-                                            <!-- Added margin to mimic standard border padding if needed -->
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
@@ -98,10 +110,15 @@
                                                 <TextBlock Text="&#10003;" Foreground="White" FontSize="13" FontWeight="Bold"
                                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
+                                            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
+                                                <Button Content="•••" Style="{StaticResource OverflowDotsButton}"
+                                                        Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}"
+                                                        PreviewMouseDown="ActionMenuButton_PreviewMouseDown"
+                                                        Click="ShowTagihanActions_Click" />
+                                            </StackPanel>
                                         </Grid>
                                     </Grid>
 
-                                    <!-- Animation Triggers -->
                                     <DataTemplate.Triggers>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
                                             <DataTrigger.EnterActions>
@@ -134,13 +151,11 @@
             </Border>
         </DockPanel>
 
-        <!--  Right: detail of selected tagihan  -->
         <DockPanel Grid.Column="2" Margin="30,0,10,0">
             <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
                 <TextBlock x:Name="DetailTitle" Text="status pembayaran"
                            FontSize="16" FontWeight="Bold" VerticalAlignment="Top" TextWrapping="Wrap" Margin="27,19,18,0" TextAlignment="Right" />
 
-                <!-- Filter ComboBox for Student Payment Status -->
                 <ComboBox x:Name="StatusFilterComboBox" Style="{StaticResource RoundedComboBox}"
                           Margin="27,12,0,0" HorizontalAlignment="Right" Width="180"
                           SelectionChanged="StatusFilterComboBox_SelectionChanged">
@@ -148,12 +163,12 @@
                     <ComboBoxItem Content="Lunas" Tag="Lunas" />
                     <ComboBoxItem Content="Belum Lunas" Tag="BelumLunas" />
                     <ComboBoxItem Content="Sebagian" Tag="Sebagian" />
+                    <ComboBoxItem Content="Proses" Tag="Proses" />
                 </ComboBox>
             </StackPanel>
 
             <Border Style="{StaticResource Card}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <!-- Right items control updated with student details, partial payments, and buttons -->
                     <ItemsControl x:Name="DetailItems">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -164,7 +179,6 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <!-- Left Column: Student Name, Details, and Status -->
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
                                             <TextBlock Text="{Binding SiswaName}" FontWeight="Bold" FontSize="14" />
 
@@ -183,14 +197,45 @@
                                                 <TextBlock Text="{Binding Entry.Status}" Foreground="{Binding Entry.Status, Converter={StaticResource StatusBrush}}"
                                                            FontSize="11" FontWeight="Bold" />
                                             </StackPanel>
+
+                                            <ItemsControl ItemsSource="{Binding Transactions}" Margin="0,6,0,0">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Background="#F5F5F7" CornerRadius="8" Padding="8" Margin="0,2,0,0">
+                                                            <Grid>
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                </Grid.ColumnDefinitions>
+                                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding Transaction.Description}" FontSize="11" Foreground="{StaticResource TextDark}" />
+                                                                    <TextBlock Text="{Binding Transaction.Date, StringFormat='dd MMM yyyy, HH:mm'}" FontSize="10" Foreground="{StaticResource TextGray}" />
+                                                                </StackPanel>
+                                                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                                    <TextBlock Text="{Binding Transaction.Amount, Converter={StaticResource Rupiah}}"
+                                                                               FontSize="11" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                                                    <Button Content="•••" Style="{StaticResource OverflowDotsButton}"
+                                                                            Visibility="{Binding CanShowActions, Converter={StaticResource BoolToVis}}"
+                                                                            PreviewMouseDown="ActionMenuButton_PreviewMouseDown"
+                                                                            Click="ShowPaymentActions_Click" />
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
                                         </StackPanel>
 
-                                        <!-- Right Column: Stacked Action Buttons -->
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <Button Content="Tandai refund lunas" Style="{StaticResource SmallOutlineButton}"
+                                                    Tag="{Binding}" Click="TandaiRefundLunas_Click" Margin="0,0,0,4" Width="130"
+                                                    Visibility="{Binding HasPendingRefund, Converter={StaticResource BoolToVis}}" />
                                             <Button Content="Tandai Lunas" Style="{StaticResource SmallOutlineButton}"
-                                                    Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,0,4" Width="100" />
+                                                    Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,0,4" Width="100"
+                                                    Visibility="{Binding CanMakePayment, Converter={StaticResource BoolToVis}}" />
                                             <Button Content="Bayar Manual" Style="{StaticResource SmallOutlineButton}"
-                                                    Tag="{Binding}" Click="BayarManual_Click" Width="100" />
+                                                    Tag="{Binding}" Click="BayarManual_Click" Width="100"
+                                                    Visibility="{Binding CanMakePayment, Converter={StaticResource BoolToVis}}" />
                                         </StackPanel>
                                     </Grid>
                                 </Border>

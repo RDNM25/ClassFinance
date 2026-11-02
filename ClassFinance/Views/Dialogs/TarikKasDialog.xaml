@@ -10,7 +10,10 @@
         <TextBox x:Name="DescriptionBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
 
         <TextBlock Text="Jumlah (Rp)" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
-        <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,10" />
+        <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
+
+        <TextBlock Text="Tanggal" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
+        <DatePicker x:Name="DatePickerInput" Margin="0,0,0,10" />
 
         <TextBlock x:Name="ErrorText" Foreground="{StaticResource PrimaryRed}" FontSize="12" Margin="2,0,0,10"
                    Visibility="Collapsed" TextWrapping="Wrap" />

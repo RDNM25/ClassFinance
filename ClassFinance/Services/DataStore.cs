@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Collections.ObjectModel;
 using ClassFinance.Models;
 
@@ -8,7 +10,7 @@ namespace ClassFinance.Services
     /// In-memory "database" for the app (acts as the Model layer's data access point).
     /// Replace with EF Core / SQLite later without touching the Views.
     /// </summary>
-    public sealed class DataStore
+    public sealed class DataStore : INotifyPropertyChanged
     {
         private static readonly Lazy<DataStore> _instance = new(() => new DataStore());
         public static DataStore Instance => _instance.Value;
@@ -19,6 +21,9 @@ namespace ClassFinance.Services
         public ObservableCollection<TagihanSiswa> TagihanSiswaList { get; } = new();
         public ObservableCollection<Transaksi> TransaksiList { get; } = new();
         public ObservableCollection<Notifikasi> NotifikasiList { get; } = new();
+
+        public int TransactionRevision { get; private set; }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         private int _userId = 1;
         private int _kelasId = 1;
@@ -36,7 +41,14 @@ namespace ClassFinance.Services
 
         private DataStore()
         {
+            TransaksiList.CollectionChanged += TransaksiList_CollectionChanged;
             Seed();
+        }
+
+        private void TransaksiList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            TransactionRevision++;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TransactionRevision)));
         }
 
         public Transaksi TambahTransaksi(int kelasId, JenisTransaksi type, decimal amount, DateTime date,
@@ -60,7 +72,7 @@ namespace ClassFinance.Services
             return t;
         }
 
-        public Tagihan BuatTagihan(int kelasId, string name, decimal amount, bool isIuran = false)
+        public Tagihan BuatTagihan(int kelasId, string name, decimal amount, DateTime? createdDate = null)
         {
             var tagihan = new Tagihan
             {
@@ -68,8 +80,7 @@ namespace ClassFinance.Services
                 KelasId = kelasId,
                 Name = name,
                 Amount = amount,
-                CreatedDate = DateTime.Now,
-                IsIuran = isIuran
+                CreatedDate = createdDate ?? DateTime.Now
             };
             TagihanList.Add(tagihan);
             tagihan.GenerateTagihanSiswa(this);

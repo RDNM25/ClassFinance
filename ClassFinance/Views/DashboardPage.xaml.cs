@@ -35,7 +35,7 @@ namespace ClassFinance.Views
             _mainWindow = mainWindow;
             _kelasId = ResolveKelasId(currentUser);
 
-            TitleText.Text = "UANG KAS";
+            TitleText.Text = "Uang Kas";
             SubtitleText.Text = $"Selamat datang, {currentUser.Name} ({RoleLabel(currentUser.Role)})";
 
             // Only Bendahara can withdraw cash or add students

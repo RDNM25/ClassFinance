@@ -22,6 +22,7 @@ namespace ClassFinance.Views.Dialogs
             _kelasId = kelasId;
             _mainWindow = mainWindow;
             _onSaved = onSaved;
+            DatePickerInput.SelectedDate = DateTime.Now;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -53,7 +54,13 @@ namespace ClassFinance.Views.Dialogs
             }
             // -------------------------------
 
-            _bendahara.TambahPengeluaran(_kelasId, description, amount, DateTime.Now);
+            // DatePicker only stores a date (no time-of-day), so combine whichever day
+            // was picked with the actual current time -- otherwise a withdrawal made
+            // "today" would sort as if it happened at 00:00.
+            var pickedDate = (DatePickerInput.SelectedDate ?? DateTime.Now).Date;
+            var dateValue = pickedDate + DateTime.Now.TimeOfDay;
+
+            _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue);
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();

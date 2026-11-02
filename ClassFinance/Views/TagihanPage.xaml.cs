@@ -1,7 +1,6 @@
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views.Dialogs;
@@ -12,12 +11,24 @@ namespace ClassFinance.Views
     {
         public TagihanSiswa Entry { get; set; }
         public string SiswaName { get; set; }
+        public bool CanMakePayment { get; set; }
+        public bool HasPendingRefund { get; set; }
+        public List<TagihanTransactionDisplay> Transactions { get; set; }
+    }
+
+    public class TagihanTransactionDisplay
+    {
+        public Transaksi Transaction { get; set; }
+        public bool CanEdit { get; set; }
+        public bool CanDelete { get; set; }
+        public bool CanShowActions => CanEdit || CanDelete;
     }
 
     public class TagihanDisplayItem
     {
         public Tagihan Tagihan { get; set; }
         public bool IsFullyPaid { get; set; }
+        public bool CanManage { get; set; }
     }
 
     public partial class TagihanPage : Page
@@ -26,9 +37,10 @@ namespace ClassFinance.Views
         private readonly MainWindow _mainWindow;
         private readonly int _kelasId;
         private Tagihan _selectedTagihan;
-        private int? _initialTagihanId; // Added to store the target highlight ID
+        private int? _initialTagihanId; 
+        private ContextMenu _openActionMenu;
+        private Button _pendingActionMenuToggle;
 
-        // Added initialTagihanId to the constructor
         public TagihanPage(User currentUser, MainWindow mainWindow, int? initialTagihanId = null)
         {
             InitializeComponent();
@@ -58,7 +70,8 @@ namespace ClassFinance.Views
                     return new TagihanDisplayItem
                     {
                         Tagihan = t,
-                        IsFullyPaid = entries.Any() && entries.All(ts => ts.Status == StatusTagihan.Lunas)
+                        IsFullyPaid = entries.Any() && entries.All(ts => ts.Status == StatusTagihan.Lunas),
+                        CanManage = _currentUser is Bendahara
                     };
                 });
 
@@ -76,20 +89,18 @@ namespace ClassFinance.Views
             TagihanItems.ItemsSource = tagihanList;
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
 
-            // Automatically highlight and open the requested tagihan
             if (_initialTagihanId.HasValue)
             {
                 var target = tagihanList.FirstOrDefault(x => x.Tagihan.Id == _initialTagihanId.Value);
                 if (target != null)
                 {
                     TagihanItems.SelectedItem = target;
-                    TagihanItems.ScrollIntoView(target); // Scrolls to it automatically
+                    TagihanItems.ScrollIntoView(target);
                 }
-                _initialTagihanId = null; // Clear so it doesn't re-trigger on random refreshes
+                _initialTagihanId = null;
             }
             else if (_selectedTagihan != null)
             {
-                // Re-select previously selected item after a refresh
                 TagihanItems.SelectedItem = tagihanList.FirstOrDefault(x => x.Tagihan.Id == _selectedTagihan.Id);
                 ApplyFilter();
             }
@@ -100,7 +111,6 @@ namespace ClassFinance.Views
             if (TagihanItems != null) Refresh();
         }
 
-        // Changed from Click to SelectionChanged
         private void TagihanItems_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (TagihanItems.SelectedItem is TagihanDisplayItem displayItem)
@@ -125,7 +135,20 @@ namespace ClassFinance.Views
                 .Select(ts => new TagihanSiswaDisplay
                 {
                     Entry = ts,
-                    SiswaName = DataStore.Instance.Users.OfType<Siswa>().FirstOrDefault(s => s.Id == ts.SiswaId)?.Name ?? "?"
+                    SiswaName = DataStore.Instance.Users.OfType<Siswa>().FirstOrDefault(s => s.Id == ts.SiswaId)?.Name ?? "?",
+                    CanMakePayment = ts.Status != StatusTagihan.Lunas && ts.Status != StatusTagihan.Proses,
+                    HasPendingRefund = _currentUser is Bendahara && DataStore.Instance.TransaksiList.Any(t =>
+                        t.TagihanSiswaId == ts.Id && t.IsPendingRefund),
+                    Transactions = DataStore.Instance.TransaksiList
+                        .Where(t => t.TagihanSiswaId == ts.Id)
+                        .OrderByDescending(t => t.Date)
+                        .Select(t => new TagihanTransactionDisplay
+                        {
+                            Transaction = t,
+                            CanEdit = CanEditTransaction(t),
+                            CanDelete = CanDeleteTransaction(t)
+                        })
+                        .ToList()
                 });
 
             if (StatusFilterComboBox?.SelectedItem is ComboBoxItem selectedItem && selectedItem.Tag is string filterTag)
@@ -135,6 +158,7 @@ namespace ClassFinance.Views
                     "Lunas" => query.Where(x => x.Entry.Status == StatusTagihan.Lunas),
                     "BelumLunas" => query.Where(x => x.Entry.Status == StatusTagihan.BelumBayar),
                     "Sebagian" => query.Where(x => x.Entry.Status == StatusTagihan.Sebagian),
+                    "Proses" => query.Where(x => x.Entry.Status == StatusTagihan.Proses),
                     _ => query
                 };
             }
@@ -148,6 +172,36 @@ namespace ClassFinance.Views
             _mainWindow.ShowModal(dialog);
         }
 
+        private void EditTagihan_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is Bendahara bendahara && sender is FrameworkElement element && element.Tag is TagihanDisplayItem display)
+                _mainWindow.ShowModal(new EditTagihanDialog(bendahara, display.Tagihan, _mainWindow, Refresh));
+        }
+
+        private void DeleteTagihan_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is not Bendahara bendahara || sender is not FrameworkElement element || element.Tag is not TagihanDisplayItem display)
+                return;
+
+            if (MessageBox.Show($"Hapus tagihan '{display.Tagihan.Name}'? Tagihan yang memiliki transaksi pembayaran tidak dapat dihapus.",
+                    "Hapus tagihan", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                bendahara.HapusTagihan(display.Tagihan.Id);
+                _selectedTagihan = null;
+                TagihanItems.SelectedItem = null;
+                DetailItems.ItemsSource = null;
+                DetailTitle.Text = "Status pembayaran";
+                Refresh();
+            }
+            catch (InvalidOperationException exception)
+            {
+                MessageBox.Show(exception.Message, "Tagihan tidak dapat dihapus", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
         private void TandaiLunas_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser is not Bendahara bendahara)
@@ -156,12 +210,172 @@ namespace ClassFinance.Views
                 return;
             }
 
-            if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display && display.Entry.Status != StatusTagihan.Lunas)
+            if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display &&
+                display.Entry.Status != StatusTagihan.Lunas && display.Entry.Status != StatusTagihan.Proses)
             {
                 bendahara.CatatPembayaran(display.Entry.Id, display.Entry.AmountDue, "Tunai");
                 Refresh();
             }
         }
+
+        private void TandaiRefundLunas_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is not Bendahara bendahara ||
+                sender is not Button button || button.Tag is not TagihanSiswaDisplay display)
+                return;
+
+            var pendingRefunds = DataStore.Instance.TransaksiList
+                .Where(t => t.TagihanSiswaId == display.Entry.Id && t.IsPendingRefund)
+                .ToList();
+
+            foreach (var refund in pendingRefunds)
+                bendahara.TandaiRefundDibayar(refund.Id);
+
+            Refresh();
+        }
+
+        private bool CanEditTransaction(Transaksi transaksi)
+        {
+            if (_currentUser is not Bendahara || transaksi.Type != JenisTransaksi.Masuk || transaksi.IsRefund)
+                return false;
+            if (DataStore.Instance.TransaksiList.Any(t => t.IsRefund && t.TagihanSiswaId == transaksi.TagihanSiswaId))
+                return false;
+
+            var tagihan = DataStore.Instance.TagihanList.FirstOrDefault(t => t.Id == _selectedTagihan?.Id);
+            return tagihan != null && DataStore.Instance.TransaksiList
+                .Where(t => t.TagihanSiswaId == transaksi.TagihanSiswaId && t.Type == JenisTransaksi.Masuk)
+                .Sum(t => t.Amount) <= tagihan.Amount;
+        }
+
+        private bool CanDeleteTransaction(Transaksi transaksi)
+        {
+            if (_currentUser is not Bendahara) return false;
+            if (transaksi.Type != JenisTransaksi.Masuk) return true;
+            if (DataStore.Instance.TransaksiList.Any(t => t.IsRefund && t.TagihanSiswaId == transaksi.TagihanSiswaId))
+                return false;
+
+            var tagihan = DataStore.Instance.TagihanList.FirstOrDefault(t => t.Id == _selectedTagihan?.Id);
+            return tagihan != null && DataStore.Instance.TransaksiList
+                .Where(t => t.TagihanSiswaId == transaksi.TagihanSiswaId && t.Type == JenisTransaksi.Masuk)
+                .Sum(t => t.Amount) <= tagihan.Amount;
+        }
+
+        private void EditPayment_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is Bendahara bendahara && sender is FrameworkElement element && element.Tag is Transaksi transaksi)
+                _mainWindow.ShowModal(new EditPembayaranDialog(bendahara, transaksi, _mainWindow, Refresh));
+        }
+
+        private void DeletePayment_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is not Bendahara bendahara || sender is not FrameworkElement element || element.Tag is not Transaksi transaksi)
+                return;
+
+            if (MessageBox.Show($"Hapus transaksi ini sebesar Rp {transaksi.Amount:N0}? Total kas akan disesuaikan.",
+                    "Hapus transaksi", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                return;
+
+            try
+            {
+                bendahara.HapusTransaksi(transaksi.Id);
+                Refresh();
+            }
+            catch (InvalidOperationException exception)
+            {
+                MessageBox.Show(exception.Message, "Transaksi tidak dapat dihapus", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void ShowTagihanActions_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button button || button.DataContext is not TagihanDisplayItem bill)
+                return;
+
+            if (CloseOpenMenuIfSameButton(button))
+            {
+                return;
+            }
+
+            var menu = CreatePopupActionMenu();
+            menu.Items.Add(CreateBillMenuItem("Ubah tagihan", bill, EditTagihan_Click));
+            menu.Items.Add(CreateBillMenuItem("Hapus tagihan", bill, DeleteTagihan_Click));
+            OpenActionMenu(button, menu);
+        }
+
+        private void ShowPaymentActions_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button button || button.DataContext is not TagihanTransactionDisplay payment)
+                return;
+
+            if (CloseOpenMenuIfSameButton(button))
+            {
+                return;
+            }
+
+            var menu = CreatePopupActionMenu();
+            if (payment.CanEdit)
+                menu.Items.Add(CreatePaymentMenuItem("Ubah nominal", payment.Transaction, EditPayment_Click));
+            if (payment.CanDelete)
+                menu.Items.Add(CreatePaymentMenuItem("Hapus transaksi", payment.Transaction, DeletePayment_Click));
+            OpenActionMenu(button, menu);
+        }
+
+        private static MenuItem CreateBillMenuItem(string header, TagihanDisplayItem bill, RoutedEventHandler onClick)
+        {
+            var item = new MenuItem { Header = header, Tag = bill };
+            item.Click += onClick;
+            return item;
+        }
+
+        private static MenuItem CreatePaymentMenuItem(string header, Transaksi transaction, RoutedEventHandler onClick)
+        {
+            var item = new MenuItem { Header = header, Tag = transaction };
+            item.Click += onClick;
+            return item;
+        }
+
+        private ContextMenu CreatePopupActionMenu() => new()
+        {
+            Style = (Style)FindResource("PopupActionMenu"),
+            Placement = PlacementMode.Bottom
+        };
+
+        private bool CloseOpenMenuIfSameButton(Button button)
+        {
+            bool togglingCurrent = ReferenceEquals(_pendingActionMenuToggle, button) ||
+                ReferenceEquals(_openActionMenu?.PlacementTarget, button);
+            _pendingActionMenuToggle = null;
+            if (!togglingCurrent)
+                return false;
+
+            if (_openActionMenu != null)
+                _openActionMenu.IsOpen = false;
+            _openActionMenu = null;
+            return true;
+        }
+
+        private void ActionMenuButton_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            _pendingActionMenuToggle = sender is Button button &&
+                ReferenceEquals(_openActionMenu?.PlacementTarget, button) ? button : null;
+        }
+
+        private void OpenActionMenu(Button button, ContextMenu menu)
+        {
+            if (_openActionMenu?.IsOpen == true)
+                _openActionMenu.IsOpen = false;
+
+            menu.PlacementTarget = button;
+            menu.Closed += (_, _) =>
+            {
+                if (ReferenceEquals(_pendingActionMenuToggle, button)) return;
+                if (ReferenceEquals(_openActionMenu, menu))
+                    _openActionMenu = null;
+            };
+            _openActionMenu = menu;
+            menu.IsOpen = menu.Items.Count > 0;
+        }
+
         private void BayarManual_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser is not Bendahara bendahara)
@@ -170,7 +384,8 @@ namespace ClassFinance.Views
                 return;
             }
 
-            if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display && display.Entry.Status != StatusTagihan.Lunas)
+            if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display &&
+                display.Entry.Status != StatusTagihan.Lunas && display.Entry.Status != StatusTagihan.Proses)
             {
                 var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == display.Entry.SiswaId);
                 var dialog = new BayarManualDialog(bendahara, siswa, display.Entry, _mainWindow, onSaved: () => Refresh());

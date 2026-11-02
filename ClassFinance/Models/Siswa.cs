@@ -1,4 +1,5 @@
 using ClassFinance.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,6 +10,7 @@ namespace ClassFinance.Models
     {
         public string Nis { get; set; }
         public int KelasId { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         // Tracks excess payments saved for future bills
         public decimal SaldoTitipan { get; set; }
@@ -20,17 +22,5 @@ namespace ClassFinance.Models
         }
 
         public override string GetDashboardTitle() => "Dashboard Siswa";
-
-        public List<TagihanSiswa> LihatTagihan() =>
-            DataStore.Instance.TagihanSiswaList.Where(t => t.SiswaId == Id).ToList();
-
-        public List<Transaksi> LihatRiwayatPembayaran() =>
-            DataStore.Instance.TransaksiList
-                .Where(t => t.SiswaId == Id)
-                .OrderByDescending(t => t.Date)
-                .ToList();
-
-        public decimal LihatSaldoKas() =>
-            DataStore.Instance.KelasList.First(k => k.Id == KelasId).HitungSaldo();
     }
 }

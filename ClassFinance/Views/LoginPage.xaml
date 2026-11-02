@@ -30,7 +30,7 @@
                     <TextBlock x:Name="ErrorText" Foreground="{StaticResource PrimaryRed}" FontSize="12"
                                Margin="4,0,0,12" Visibility="Collapsed" TextWrapping="Wrap" />
 
-                    <Button Content="LOGIN" Style="{StaticResource PrimaryButton}" Click="LoginButton_Click" Margin="0,6,0,4" />
+                    <Button Content="Login" Style="{StaticResource PrimaryButton}" Click="LoginButton_Click" Margin="0,6,0,4" />
                 </StackPanel>
             </StackPanel>
         </Border>

@@ -19,6 +19,7 @@ namespace ClassFinance.Converters
                 return s switch
                 {
                     StatusTagihan.Lunas => Green,
+                    StatusTagihan.Proses => Amber,
                     StatusTagihan.Sebagian => Amber,
                     _ => Red
                 };

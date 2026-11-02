@@ -2,6 +2,7 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:conv="clr-namespace:ClassFinance.Converters"
+      xmlns:services="clr-namespace:ClassFinance.Services"
       Title="Riwayat Transaksi" Background="{StaticResource AppBackground}">
     <Page.Resources>
         <conv:TransaksiSignConverter x:Key="Sign" />
@@ -9,10 +10,49 @@
         <conv:RupiahConverter x:Key="Rupiah" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <conv:StatusToBrushConverter x:Key="StatusBrush" />
+        <conv:HasTransactionDateConverter x:Key="TransactionDateHighlight" />
+        <Style x:Key="HistoryCalendarDayButtonStyle" TargetType="CalendarDayButton"
+               BasedOn="{StaticResource CalendarDayButtonBaseStyle}">
+            <Style.Triggers>
+                <DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource TransactionDateHighlight}">
+                            <Binding />
+                            <Binding Source="{x:Static services:DataStore.Instance}" Path="TransactionRevision" />
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="Background" Value="#FFFFE0B2" />
+                    <Setter Property="BorderBrush" Value="#F57C00" />
+                    <Setter Property="BorderThickness" Value="1" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="HistoryCalendarStyle" TargetType="Calendar" BasedOn="{StaticResource CalendarBaseStyle}">
+            <Setter Property="CalendarDayButtonStyle" Value="{StaticResource HistoryCalendarDayButtonStyle}" />
+        </Style>
+        <Style x:Key="HistoryActionButton" TargetType="Button" BasedOn="{StaticResource OutlineButton}">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Padding" Value="10,5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="actionBorder" Background="White" BorderBrush="{StaticResource PrimaryRed}"
+                                BorderThickness="1.5" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="actionBorder" Property="Background" Value="{StaticResource PrimaryRedLight}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <DockPanel Margin="32,28,32,28">
-        <!--  Header  -->
         <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -21,7 +61,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock x:Name="TitleText" Grid.Column="0" Text="RIWAYAT TRANSAKSI" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+            <TextBlock x:Name="TitleText" Grid.Column="0" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" ><Run Text="R"/><Run Language="en-id" Text="iwayat"/><Run Text=" T"/><Run Language="en-id" Text="ransaksi"/></TextBlock>
 
             <ComboBox x:Name="FilterCombo" Grid.Column="2" Width="160" Margin="0,0,12,0" VerticalAlignment="Center"
                       Style="{StaticResource RoundedComboBox}" SelectedIndex="0" >
@@ -30,11 +70,19 @@
                 <ComboBoxItem Content="Kas Keluar" />
             </ComboBox>
 
-            <Button x:Name="TambahButton" Grid.Column="3" Content="+ TAMBAH TRANSAKSI"
+            <Button x:Name="TambahButton" Grid.Column="3" Content="+ Tambah Transaksi"
                     Style="{StaticResource PrimaryButton}" Click="TambahButton_Click" />
         </Grid>
 
-        <!--  Summary cards: hidden in the per-student tagihan view  -->
+        <StackPanel x:Name="DateFilterPanel" DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,16">
+            <TextBlock Text="Tanggal" VerticalAlignment="Center" Foreground="{StaticResource TextGray}" Margin="0,0,8,0" />
+            <DatePicker x:Name="DateFilterPicker" Width="190" Height="42" Margin="0,0,12,0"
+                        CalendarStyle="{StaticResource HistoryCalendarStyle}"
+                        SelectedDateChanged="DateFilter_Changed" />
+            <Button Content="Reset Filter" Style="{StaticResource OutlineButton}" Padding="12,8"
+                    Click="ClearDateFilter_Click" />
+        </StackPanel>
+
         <Grid x:Name="SummaryRow" DockPanel.Dock="Top" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
@@ -66,7 +114,6 @@
             </Border>
         </Grid>
 
-        <!--  Per-student total owed across all tagihan (not general kas contributions) -->
         <Border x:Name="TotalOwedCard" DockPanel.Dock="Top" Margin="0,0,0,20" Background="{StaticResource PrimaryRed}"
                 CornerRadius="16" Padding="20" Visibility="Collapsed">
             <StackPanel>
@@ -90,12 +137,42 @@
                                         <StackPanel Grid.Column="0">
                                             <TextBlock Text="{Binding Transaksi.Description}" FontWeight="Bold" FontSize="15" />
                                             <TextBlock Text="{Binding Transaksi.Date, StringFormat='dd MMM yyyy, HH:mm'}" FontSize="12" Foreground="{StaticResource TextGray}" />
+                                            <TextBlock Text="{Binding RefundStatus}" FontSize="11" Foreground="{StaticResource TextGray}" Margin="0,4,0,0">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <Trigger Property="Text" Value="">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </Trigger>
+                                                            <DataTrigger Binding="{Binding Transaksi.IsPendingRefund}" Value="True">
+                                                                <Setter Property="Foreground" Value="#F57C00" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Transaksi, Converter={StaticResource Sign}}"
+                                        <Grid Grid.Column="1" VerticalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Transaksi, Converter={StaticResource Sign}}"
                                                        Foreground="{Binding Transaksi, Converter={StaticResource SignColor}}"
-                                                       FontWeight="Bold" FontSize="16" />
-                                            <TextBlock Text="{Binding TagihanName}" FontSize="12" Foreground="{StaticResource TextGray}"
+                                                       FontWeight="Bold" FontSize="16" VerticalAlignment="Center" />
+                                            <Button Grid.Column="1" Content="•••"
+                                                    Style="{StaticResource OverflowDotsButton}" Margin="10,0,0,0"
+                                                    Visibility="{Binding CanShowActions, Converter={StaticResource BoolToVis}}"
+                                                    PreviewMouseDown="TransactionMenuButton_PreviewMouseDown"
+                                                    Click="ShowTransactionActions_Click" />
+                                            <Button Grid.Column="2" Content="Tandai dibayar" Tag="{Binding Transaksi}"
+                                                    Style="{StaticResource HistoryActionButton}" Margin="10,0,0,0"
+                                                    Visibility="{Binding CanMarkRefundPaid, Converter={StaticResource BoolToVis}}"
+                                                    Click="MarkRefundPaid_Click" />
+                                            <TextBlock Grid.Column="3" Text="{Binding TagihanName}" FontSize="12" Foreground="{StaticResource TextGray}"
                                                        Margin="10,0,0,0" VerticalAlignment="Center">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
@@ -108,25 +185,24 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                             </TextBlock>
-                                        </StackPanel>
+                                        </Grid>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <!--  Per-student view: tagihan details on the left, what this student paid on the right  -->
                     <ItemsControl x:Name="TagihanPaymentItems" Visibility="Collapsed">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource ListRow}">
+                                <Border Style="{StaticResource ListRow}" Cursor="Hand" Tag="{Binding Tagihan}"
+                                        MouseLeftButtonUp="TagihanPaymentRow_Click" ToolTip="Klik untuk membuka tagihan ini">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <!--  Left: tagihan details and new payment data  -->
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Tagihan.Name}" FontWeight="Bold" FontSize="15" />
                                             <TextBlock FontSize="12" Foreground="{StaticResource TextGray}" Margin="0,3,0,4">
@@ -135,7 +211,6 @@
                                                 <Run Text="{Binding Tagihan.Amount, Converter={StaticResource Rupiah}}" />
                                             </TextBlock>
 
-                                            <!-- New Data: Sisa and Dibayar -->
                                             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                                 <TextBlock FontSize="11" Foreground="{StaticResource TextGray}">
                                                     <Run Text="Sisa: "/>
@@ -146,7 +221,6 @@
                                                 </TextBlock>
                                             </StackPanel>
 
-                                            <!-- New Data: Status -->
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="Status: " FontSize="11" Foreground="{StaticResource TextGray}" />
                                                 <TextBlock Text="{Binding Status}" Foreground="{Binding Status, Converter={StaticResource StatusBrush}}"
@@ -154,7 +228,6 @@
                                             </StackPanel>
                                         </StackPanel>
 
-                                        <!--  Right: Checkmark if Lunas  -->
                                         <Border Grid.Column="1" Width="24" Height="24" CornerRadius="12" Background="#2E7D32"
                                                 VerticalAlignment="Center" ToolTip="Lunas"
                                                 Visibility="{Binding IsLunas, Converter={StaticResource BoolToVis}}">

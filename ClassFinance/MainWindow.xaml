@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Class Finance" Height="750" Width="1200" MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"
-        FontFamily="Segoe UI"
+        FontFamily="Segoe UI Variable Text"
         Background="{StaticResource AppBackground}">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -16,7 +16,7 @@
             <DockPanel LastChildFill="False" Margin="0,20,0,20">
                 <StackPanel DockPanel.Dock="Top">
                     <Image Source="/Assets/logo.png" Width="100" Height="100" Stretch="Uniform" Margin="20,0,0,10" HorizontalAlignment="Left" />
-                    <TextBlock Text="CLASS FINANCE" Foreground="White" FontWeight="Bold" FontSize="15" Margin="20,4,0,2" />
+                    <TextBlock Text="Class Finance" Foreground="White" FontWeight="Bold" FontSize="15" Margin="20,4,0,2" />
                     <TextBlock x:Name="SidebarUserText" Text="" Foreground="#FFCDD2" FontSize="12" Margin="20,0,0,20" />
 
                     <StackPanel x:Name="NavPanel" Margin="0,10,0,0" />
