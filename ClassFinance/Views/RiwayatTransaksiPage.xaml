@@ -2,6 +2,7 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:conv="clr-namespace:ClassFinance.Converters"
+      xmlns:services="clr-namespace:ClassFinance.Services"
       Title="Riwayat Transaksi" Background="{StaticResource AppBackground}">
     <Page.Resources>
         <conv:TransaksiSignConverter x:Key="Sign" />
@@ -9,6 +10,26 @@
         <conv:RupiahConverter x:Key="Rupiah" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <conv:StatusToBrushConverter x:Key="StatusBrush" />
+        <conv:HasTransactionDateConverter x:Key="TransactionDateHighlight" />
+        <Style x:Key="HistoryCalendarDayButtonStyle" TargetType="CalendarDayButton"
+               BasedOn="{StaticResource CalendarDayButtonBaseStyle}">
+            <Style.Triggers>
+                <DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource TransactionDateHighlight}">
+                            <Binding />
+                            <Binding Source="{x:Static services:DataStore.Instance}" Path="TransactionRevision" />
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="Background" Value="#FFFFE0B2" />
+                    <Setter Property="BorderBrush" Value="#F57C00" />
+                    <Setter Property="BorderThickness" Value="1" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="HistoryCalendarStyle" TargetType="Calendar" BasedOn="{StaticResource CalendarBaseStyle}">
+            <Setter Property="CalendarDayButtonStyle" Value="{StaticResource HistoryCalendarDayButtonStyle}" />
+        </Style>
     </Page.Resources>
 
     <DockPanel Margin="32,28,32,28">
@@ -20,7 +41,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock x:Name="TitleText" Grid.Column="0" Text="RIWAYAT TRANSAKSI" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+            <TextBlock x:Name="TitleText" Grid.Column="0" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" ><Run Text="R"/><Run Language="en-id" Text="iwayat"/><Run Text=" T"/><Run Language="en-id" Text="ransaksi"/></TextBlock>
 
             <ComboBox x:Name="FilterCombo" Grid.Column="2" Width="160" Margin="0,0,12,0" VerticalAlignment="Center"
                       Style="{StaticResource RoundedComboBox}" SelectedIndex="0" >
@@ -29,9 +50,18 @@
                 <ComboBoxItem Content="Kas Keluar" />
             </ComboBox>
 
-            <Button x:Name="TambahButton" Grid.Column="3" Content="+ TAMBAH TRANSAKSI"
+            <Button x:Name="TambahButton" Grid.Column="3" Content="+ Tambah Transaksi"
                     Style="{StaticResource PrimaryButton}" Click="TambahButton_Click" />
         </Grid>
+
+        <StackPanel x:Name="DateFilterPanel" DockPanel.Dock="Top" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,16">
+            <TextBlock Text="Tanggal" VerticalAlignment="Center" Foreground="{StaticResource TextGray}" Margin="0,0,8,0" />
+            <DatePicker x:Name="DateFilterPicker" Width="190" Height="42" Margin="0,0,12,0"
+                        CalendarStyle="{StaticResource HistoryCalendarStyle}"
+                        SelectedDateChanged="DateFilter_Changed" />
+            <Button Content="Reset Filter" Style="{StaticResource OutlineButton}" Padding="12,8"
+                    Click="ClearDateFilter_Click" />
+        </StackPanel>
 
         <Grid x:Name="SummaryRow" DockPanel.Dock="Top" Margin="0,0,0,20">
             <Grid.ColumnDefinitions>

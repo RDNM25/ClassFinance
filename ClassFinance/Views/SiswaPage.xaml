@@ -13,7 +13,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" Text="DATA SISWA" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+            <TextBlock Grid.Column="0" Text="Data Siswa" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
             <Button x:Name="TambahButton" Grid.Column="1" Content="+ TAMBAH SISWA"
                     Style="{StaticResource PrimaryButton}" Click="TambahButton_Click" />
         </Grid>

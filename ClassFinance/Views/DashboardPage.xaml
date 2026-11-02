@@ -14,7 +14,7 @@
 
             <!--  Header  -->
             <StackPanel Margin="0,0,0,22">
-                <TextBlock x:Name="TitleText" Text="UANG KAS" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextDark}" />
+                <TextBlock x:Name="TitleText" Text="Uang Kas" FontSize="26" FontWeight="Bold" Foreground="{StaticResource TextDark}" />
                 <TextBlock x:Name="SubtitleText" Text="Selamat datang kembali!" FontSize="14" Foreground="{StaticResource TextGray}" Margin="0,4,0,0" />
             </StackPanel>
 
@@ -33,7 +33,7 @@
                     <StackPanel>
                         <TextBlock Text="Total Saldo" Foreground="#FFE0E0" FontSize="13" />
                         <TextBlock x:Name="SaldoText" Text="Rp 0" Foreground="White" FontSize="30" FontWeight="Bold" Margin="0,6,0,16" />
-                        <Button x:Name="TarikKasButton" Content="TARIK KAS" HorizontalAlignment="Left"
+                        <Button x:Name="TarikKasButton" Content="Tarik Kas" HorizontalAlignment="Left"
                            Style="{StaticResource PopButton}" Click="TarikKasButton_Click" />
                     </StackPanel>
                 </Border>
@@ -69,7 +69,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="DATA SISWA" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
+                            <TextBlock Text="Data Siswa" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
                             <Button x:Name="TambahSiswaButton" Grid.Column="1" Content="+ TAMBAH SISWA"
                                     Style="{StaticResource SmallOutlineButton}" Click="TambahSiswaButton_Click" />
                         </Grid>
@@ -111,7 +111,7 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="TRANSAKSI TERBARU" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
+                            <TextBlock Text="Transaksi Terbaru" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
                             <Button x:Name="LihatSemuaButton" Grid.Column="1" Content="Lihat semua &#8594;"
                                     Style="{StaticResource SmallOutlineButton}"
                                     FontWeight="Bold" Cursor="Hand" Click="LihatSemuaButton_Click" />

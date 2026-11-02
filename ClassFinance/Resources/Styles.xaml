@@ -434,6 +434,79 @@
     </Style>
 
     <!--  Date input and calendar  -->
+    <Style x:Key="CalendarDayButtonBaseStyle" TargetType="CalendarDayButton">
+        <Setter Property="MinWidth" Value="34" />
+        <Setter Property="MinHeight" Value="34" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Foreground" Value="{StaticResource TextDark}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CalendarDayButton">
+                    <Border x:Name="dayBorder" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="10">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="dayBorder" Property="Background" Value="{StaticResource PrimaryRedLight}" />
+                        </Trigger>
+                        <Trigger Property="IsToday" Value="True">
+                            <Setter TargetName="dayBorder" Property="BorderBrush" Value="{StaticResource PrimaryRed}" />
+                            <Setter TargetName="dayBorder" Property="BorderThickness" Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="dayBorder" Property="Background" Value="{StaticResource PrimaryRed}" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                        <Trigger Property="IsInactive" Value="True">
+                            <Setter Property="Foreground" Value="#BDBDC4" />
+                        </Trigger>
+                        <Trigger Property="IsBlackedOut" Value="True">
+                            <Setter Property="Foreground" Value="#C8C8CE" />
+                            <Setter Property="IsEnabled" Value="False" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="CalendarBaseStyle" TargetType="Calendar">
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="#E8E8ED" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{StaticResource TextDark}" />
+        <Setter Property="Padding" Value="8" />
+        <Setter Property="CalendarDayButtonStyle" Value="{StaticResource CalendarDayButtonBaseStyle}" />
+        <Setter Property="CalendarButtonStyle">
+            <Setter.Value>
+                <Style TargetType="CalendarButton">
+                    <Setter Property="Foreground" Value="{StaticResource TextDark}" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="MinHeight" Value="34" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="CalendarButton">
+                                <Border x:Name="headerBorder" Background="{TemplateBinding Background}" CornerRadius="8" Padding="4">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="headerBorder" Property="Background" Value="{StaticResource PrimaryRedLight}" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="DatePicker">
         <Setter Property="Background" Value="White" />
         <Setter Property="BorderBrush" Value="#D6D6DC" />
@@ -442,82 +515,7 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="MinHeight" Value="42" />
         <Setter Property="Padding" Value="12,8" />
-        <Setter Property="CalendarStyle">
-            <Setter.Value>
-                <Style TargetType="Calendar">
-                    <Setter Property="Background" Value="White" />
-                    <Setter Property="BorderBrush" Value="#E8E8ED" />
-                    <Setter Property="BorderThickness" Value="1" />
-                    <Setter Property="Foreground" Value="{StaticResource TextDark}" />
-                    <Setter Property="Padding" Value="8" />
-                    <Setter Property="CalendarDayButtonStyle">
-                        <Setter.Value>
-                            <Style TargetType="CalendarDayButton">
-                                <Setter Property="MinWidth" Value="34" />
-                                <Setter Property="MinHeight" Value="34" />
-                                <Setter Property="Margin" Value="2" />
-                                <Setter Property="Foreground" Value="{StaticResource TextDark}" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="CalendarDayButton">
-                                            <Border x:Name="dayBorder" Background="{TemplateBinding Background}" CornerRadius="10">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="dayBorder" Property="Background" Value="{StaticResource PrimaryRedLight}" />
-                                                </Trigger>
-                                                <Trigger Property="IsToday" Value="True">
-                                                    <Setter TargetName="dayBorder" Property="BorderBrush" Value="{StaticResource PrimaryRed}" />
-                                                    <Setter TargetName="dayBorder" Property="BorderThickness" Value="1" />
-                                                </Trigger>
-                                                <Trigger Property="IsSelected" Value="True">
-                                                    <Setter TargetName="dayBorder" Property="Background" Value="{StaticResource PrimaryRed}" />
-                                                    <Setter Property="Foreground" Value="White" />
-                                                </Trigger>
-                                                <Trigger Property="IsInactive" Value="True">
-                                                    <Setter Property="Foreground" Value="#BDBDC4" />
-                                                </Trigger>
-                                                <Trigger Property="IsBlackedOut" Value="True">
-                                                    <Setter Property="Foreground" Value="#C8C8CE" />
-                                                    <Setter Property="IsEnabled" Value="False" />
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="CalendarButtonStyle">
-                        <Setter.Value>
-                            <Style TargetType="CalendarButton">
-                                <Setter Property="Foreground" Value="{StaticResource TextDark}" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="FontWeight" Value="SemiBold" />
-                                <Setter Property="MinHeight" Value="34" />
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="CalendarButton">
-                                            <Border x:Name="headerBorder" Background="{TemplateBinding Background}" CornerRadius="8" Padding="4">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="headerBorder" Property="Background" Value="{StaticResource PrimaryRedLight}" />
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="CalendarStyle" Value="{StaticResource CalendarBaseStyle}" />
     </Style>
 
     <Style TargetType="DatePickerTextBox">
@@ -527,6 +525,28 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Padding" Value="4,0" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DatePickerTextBox">
+                    <Grid ClipToBounds="True">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"
+                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" />
+                        <TextBlock x:Name="watermark" Text="Select a date" Margin="{TemplateBinding Padding}"
+                                   VerticalAlignment="Center" Foreground="{StaticResource TextGray}"
+                                   IsHitTestVisible="False" Visibility="Collapsed" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Text" Value="" />
+                                <Condition Property="IsKeyboardFocused" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="watermark" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!--  Card container  -->

@@ -27,7 +27,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="TAGIHAN" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="0" Text="Tagihan" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
                 <Button Grid.Column="1" x:Name="BuatTagihanButton" Content="+ BUAT TAGIHAN"
                         Style="{StaticResource PrimaryButton}" Click="BuatTagihanButton_Click" />
 

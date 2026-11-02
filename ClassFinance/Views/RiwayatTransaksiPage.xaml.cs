@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ClassFinance.Models;
+using ClassFinance.Converters;
 using ClassFinance.Services;
 using ClassFinance.Views.Dialogs;
 
@@ -47,14 +48,16 @@ namespace ClassFinance.Views
                 WaliKelas w => w.KelasId,
                 _ => DataStore.Instance.KelasList.First().Id
             };
+            ((HasTransactionDateConverter)FindResource("TransactionDateHighlight")).KelasId = _kelasId;
 
             if (!string.IsNullOrEmpty(nis))
             {
                 var siswa = FindSiswaByNis(nis);
                 TitleText.Text = siswa != null
-                    ? $"STATUS TAGIHAN — {siswa.Name}"
-                    : "STATUS TAGIHAN";
+                    ? $"Status Tagihan — {siswa.Name}"
+                    : "Status Tagihan";
                 FilterCombo.Visibility = Visibility.Collapsed;
+                DateFilterPanel.Visibility = Visibility.Collapsed;
                 TambahButton.Visibility = Visibility.Collapsed;
                 SummaryRow.Visibility = Visibility.Collapsed;
             }
@@ -84,17 +87,22 @@ namespace ClassFinance.Views
         {
             var all = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
 
-            var totalEarned = all.Where(t => t.Type == JenisTransaksi.Masuk && t.AffectsKas).Sum(t => t.Amount);
-            var totalSpent = all.Where(t => t.Type == JenisTransaksi.Keluar && t.AffectsKas).Sum(t => t.Amount);
-            TotalKasText.Text = $"Rp {(totalEarned - totalSpent):N0}";
+            var dateFiltered = all.Where(t =>
+                (!DateFilterPicker.SelectedDate.HasValue || t.Date.Date == DateFilterPicker.SelectedDate.Value.Date)).ToList();
+
+            var totalEarned = dateFiltered.Where(t => t.Type == JenisTransaksi.Masuk && t.AffectsKas).Sum(t => t.Amount);
+            var totalSpent = dateFiltered.Where(t => t.Type == JenisTransaksi.Keluar && t.AffectsKas).Sum(t => t.Amount);
+            var currentKas = all.Where(t => t.AffectsKas)
+                .Sum(t => t.Type == JenisTransaksi.Masuk ? t.Amount : -t.Amount);
+            TotalKasText.Text = $"Rp {currentKas:N0}";
             TotalEarnedText.Text = $"Rp {totalEarned:N0}";
             TotalSpentText.Text = $"Rp {totalSpent:N0}";
 
             var filtered = FilterCombo.SelectedIndex switch
             {
-                1 => all.Where(t => t.Type == JenisTransaksi.Masuk).ToList(),
-                2 => all.Where(t => t.Type == JenisTransaksi.Keluar).ToList(),
-                _ => all
+                1 => dateFiltered.Where(t => t.Type == JenisTransaksi.Masuk).ToList(),
+                2 => dateFiltered.Where(t => t.Type == JenisTransaksi.Keluar).ToList(),
+                _ => dateFiltered
             };
 
             TransaksiItems.ItemsSource = filtered.Select(t => new TransaksiDisplayItem
@@ -155,6 +163,14 @@ namespace ClassFinance.Views
                     .FirstOrDefault(s => s.KelasId == _kelasId && s.Nis == nis);
 
         private void FilterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) => Refresh();
+
+        private void DateFilter_Changed(object sender, SelectionChangedEventArgs e) => RefreshTransaksi();
+
+        private void ClearDateFilter_Click(object sender, RoutedEventArgs e)
+        {
+            DateFilterPicker.SelectedDate = null;
+            RefreshTransaksi();
+        }
 
         private void TambahButton_Click(object sender, RoutedEventArgs e)
         {
