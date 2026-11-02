@@ -23,6 +23,128 @@ namespace ClassFinance.Models
             return DataStore.Instance.TambahTransaksi(kelasId, JenisTransaksi.Keluar, amount, date, category, null, Name);
         }
 
+        public void UbahNominalTransaksi(int transaksiId, decimal amount)
+        {
+            if (amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount));
+
+            var transaksi = DataStore.Instance.TransaksiList.First(t => t.Id == transaksiId);
+            if (transaksi.IsRefund)
+                throw new InvalidOperationException("Nominal refund harus dikelola melalui status refund.");
+
+            if (transaksi.Type == JenisTransaksi.Keluar)
+            {
+                transaksi.Amount = amount;
+                return;
+            }
+
+            if (transaksi.Type != JenisTransaksi.Masuk)
+                throw new InvalidOperationException("Jenis transaksi ini tidak dapat diubah.");
+
+            if (transaksi.TagihanSiswaId.HasValue)
+            {
+                var tagihanId = transaksi.TagihanSiswaId.Value;
+                if (DataStore.Instance.TransaksiList.Any(t => t.IsRefund && t.TagihanSiswaId == tagihanId))
+                    throw new InvalidOperationException("Pembayaran yang sudah memiliki refund tidak dapat diubah.");
+
+                var tagihanSiswa = DataStore.Instance.TagihanSiswaList.First(ts => ts.Id == tagihanId);
+                var tagihan = DataStore.Instance.TagihanList.First(t => t.Id == tagihanSiswa.TagihanId);
+                var totalAfterEdit = DataStore.Instance.TransaksiList
+                    .Where(t => t.TagihanSiswaId == tagihanId && t.Type == JenisTransaksi.Masuk)
+                    .Sum(t => t.Id == transaksiId ? amount : t.Amount);
+                if (totalAfterEdit > tagihan.Amount)
+                    throw new InvalidOperationException("Nominal baru tidak boleh membuat pembayaran melebihi tagihan.");
+
+                transaksi.Amount = amount;
+                tagihanSiswa.JumlahDibayar = totalAfterEdit;
+                tagihanSiswa.AmountDue = Math.Max(0, tagihan.Amount - totalAfterEdit);
+                tagihanSiswa.UpdateStatus();
+                return;
+            }
+
+            transaksi.Amount = amount;
+        }
+
+        public void HapusTransaksi(int transaksiId)
+        {
+            var transaksi = DataStore.Instance.TransaksiList.First(t => t.Id == transaksiId);
+            TagihanSiswa linkedEntry = null;
+            Tagihan linkedBill = null;
+
+            if (transaksi.Type == JenisTransaksi.Masuk && transaksi.TagihanSiswaId.HasValue)
+            {
+                var tagihanSiswaId = transaksi.TagihanSiswaId.Value;
+                if (DataStore.Instance.TransaksiList.Any(t => t.IsRefund && t.TagihanSiswaId == tagihanSiswaId))
+                    throw new InvalidOperationException("Pembayaran dengan refund terkait tidak dapat dihapus.");
+
+                linkedEntry = DataStore.Instance.TagihanSiswaList.First(ts => ts.Id == tagihanSiswaId);
+                linkedBill = DataStore.Instance.TagihanList.First(t => t.Id == linkedEntry.TagihanId);
+                var totalPayments = DataStore.Instance.TransaksiList
+                    .Where(t => t.TagihanSiswaId == tagihanSiswaId && t.Type == JenisTransaksi.Masuk)
+                    .Sum(t => t.Amount);
+                if (totalPayments > linkedBill.Amount)
+                    throw new InvalidOperationException("Pembayaran dengan saldo lebih tidak dapat dihapus.");
+            }
+
+            DataStore.Instance.TransaksiList.Remove(transaksi);
+
+            if (transaksi.IsRefund && transaksi.TagihanSiswaId.HasValue)
+            {
+                linkedEntry = DataStore.Instance.TagihanSiswaList.FirstOrDefault(ts => ts.Id == transaksi.TagihanSiswaId.Value);
+                linkedBill = linkedEntry == null ? null : DataStore.Instance.TagihanList.FirstOrDefault(t => t.Id == linkedEntry.TagihanId);
+            }
+
+            if (linkedEntry != null && linkedBill != null)
+            {
+                linkedEntry.JumlahDibayar = DataStore.Instance.TransaksiList
+                    .Where(t => t.TagihanSiswaId == linkedEntry.Id && t.Type == JenisTransaksi.Masuk)
+                    .Sum(t => t.Amount);
+                linkedEntry.AmountDue = Math.Max(0, linkedBill.Amount - linkedEntry.JumlahDibayar);
+
+                if (DataStore.Instance.TransaksiList.Any(t => t.IsPendingRefund && t.TagihanSiswaId == linkedEntry.Id))
+                    linkedEntry.Status = StatusTagihan.Proses;
+                else
+                    linkedEntry.UpdateStatus();
+            }
+        }
+
+        public void UbahTagihan(int tagihanId, string name, decimal amount)
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Nama tagihan wajib diisi.", nameof(name));
+            if (amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount));
+
+            var tagihan = DataStore.Instance.TagihanList.First(t => t.Id == tagihanId);
+            var entries = DataStore.Instance.TagihanSiswaList.Where(ts => ts.TagihanId == tagihanId).ToList();
+            if (entries.Any(ts => ts.JumlahDibayar > amount))
+                throw new InvalidOperationException("Jumlah tagihan tidak boleh lebih kecil dari pembayaran yang sudah diterima.");
+
+            tagihan.Name = name.Trim();
+            tagihan.Amount = amount;
+            foreach (var entry in entries)
+            {
+                entry.AmountDue = Math.Max(0, amount - entry.JumlahDibayar);
+                if (DataStore.Instance.TransaksiList.Any(t => t.IsPendingRefund && t.TagihanSiswaId == entry.Id))
+                    entry.Status = StatusTagihan.Proses;
+                else
+                    entry.UpdateStatus();
+            }
+        }
+
+        public void HapusTagihan(int tagihanId)
+        {
+            var tagihan = DataStore.Instance.TagihanList.First(t => t.Id == tagihanId);
+            var entryIds = DataStore.Instance.TagihanSiswaList
+                .Where(ts => ts.TagihanId == tagihanId)
+                .Select(ts => ts.Id)
+                .ToHashSet();
+
+            if (DataStore.Instance.TransaksiList.Any(t => t.TagihanSiswaId.HasValue && entryIds.Contains(t.TagihanSiswaId.Value)))
+                throw new InvalidOperationException("Tagihan dengan transaksi pembayaran terkait tidak dapat dihapus.");
+
+            foreach (var entry in DataStore.Instance.TagihanSiswaList.Where(ts => ts.TagihanId == tagihanId).ToList())
+                DataStore.Instance.TagihanSiswaList.Remove(entry);
+            DataStore.Instance.TagihanList.Remove(tagihan);
+        }
+
         public Tagihan BuatTagihan(int kelasId, string name, decimal amount, DateTime? createdDate = null)
         {
             var tagihan = DataStore.Instance.BuatTagihan(kelasId, name, amount, createdDate);

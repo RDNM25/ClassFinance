@@ -30,6 +30,26 @@
         <Style x:Key="HistoryCalendarStyle" TargetType="Calendar" BasedOn="{StaticResource CalendarBaseStyle}">
             <Setter Property="CalendarDayButtonStyle" Value="{StaticResource HistoryCalendarDayButtonStyle}" />
         </Style>
+        <Style x:Key="HistoryActionButton" TargetType="Button" BasedOn="{StaticResource OutlineButton}">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Padding" Value="10,5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="actionBorder" Background="White" BorderBrush="{StaticResource PrimaryRed}"
+                                BorderThickness="1.5" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="actionBorder" Property="Background" Value="{StaticResource PrimaryRedLight}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Page.Resources>
 
     <DockPanel Margin="32,28,32,28">
@@ -133,15 +153,26 @@
                                                 </TextBlock.Style>
                                             </TextBlock>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Transaksi, Converter={StaticResource Sign}}"
+                                        <Grid Grid.Column="1" VerticalAlignment="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Text="{Binding Transaksi, Converter={StaticResource Sign}}"
                                                        Foreground="{Binding Transaksi, Converter={StaticResource SignColor}}"
-                                                       FontWeight="Bold" FontSize="16" />
-                                            <Button Content="Tandai dibayar" Tag="{Binding Transaksi}"
-                                                    Style="{StaticResource OutlineButton}" FontSize="11" Padding="10,6" Margin="10,0,0,0"
+                                                       FontWeight="Bold" FontSize="16" VerticalAlignment="Center" />
+                                            <Button Grid.Column="1" Content="•••"
+                                                    Style="{StaticResource OverflowDotsButton}" Margin="10,0,0,0"
+                                                    Visibility="{Binding CanShowActions, Converter={StaticResource BoolToVis}}"
+                                                    PreviewMouseDown="TransactionMenuButton_PreviewMouseDown"
+                                                    Click="ShowTransactionActions_Click" />
+                                            <Button Grid.Column="2" Content="Tandai dibayar" Tag="{Binding Transaksi}"
+                                                    Style="{StaticResource HistoryActionButton}" Margin="10,0,0,0"
                                                     Visibility="{Binding CanMarkRefundPaid, Converter={StaticResource BoolToVis}}"
                                                     Click="MarkRefundPaid_Click" />
-                                            <TextBlock Text="{Binding TagihanName}" FontSize="12" Foreground="{StaticResource TextGray}"
+                                            <TextBlock Grid.Column="3" Text="{Binding TagihanName}" FontSize="12" Foreground="{StaticResource TextGray}"
                                                        Margin="10,0,0,0" VerticalAlignment="Center">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
@@ -154,7 +185,7 @@
                                                     </Style>
                                                 </TextBlock.Style>
                                             </TextBlock>
-                                        </StackPanel>
+                                        </Grid>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 using ClassFinance.Models;
 using ClassFinance.Converters;
 using ClassFinance.Services;
@@ -13,6 +14,9 @@ namespace ClassFinance.Views
         public Transaksi Transaksi { get; set; }
         public string TagihanName { get; set; }
         public bool CanMarkRefundPaid { get; set; }
+        public bool CanEditAmount { get; set; }
+        public bool CanDelete { get; set; }
+        public bool CanShowActions => CanEditAmount || CanDelete;
         public string RefundStatus => Transaksi != null && Transaksi.IsRefund
             ? (Transaksi.IsPendingRefund ? "Proses" : "Lunas")
             : string.Empty;
@@ -35,6 +39,8 @@ namespace ClassFinance.Views
         private readonly MainWindow _mainWindow;
         private readonly int _kelasId;
         private readonly string _nis;
+        private ContextMenu _openTransactionMenu;
+        private Button _pendingTransactionMenuToggle;
 
         public RiwayatTransaksiPage(User currentUser, MainWindow mainWindow, string nis = null)
         {
@@ -109,7 +115,9 @@ namespace ClassFinance.Views
             {
                 Transaksi = t,
                 TagihanName = null,
-                CanMarkRefundPaid = _currentUser is Bendahara && t.IsPendingRefund
+                CanMarkRefundPaid = _currentUser is Bendahara && t.IsPendingRefund,
+                CanEditAmount = CanEditTransactionAmount(t),
+                CanDelete = CanDeleteTransaction(t)
             }).ToList();
             TransaksiItems.Visibility = Visibility.Visible;
             TagihanPaymentItems.Visibility = Visibility.Collapsed;
@@ -122,7 +130,7 @@ namespace ClassFinance.Views
         private void RefreshTagihanStatus(Siswa siswa)
         {
             var tagihanList = DataStore.Instance.TagihanList
-                .Where(t => t.KelasId == _kelasId)
+                .Where(t => t.KelasId == _kelasId && t.CreatedDate >= siswa.CreatedDate)
                 .OrderByDescending(t => t.Id)
                 .Select(t =>
                 {
@@ -185,6 +193,127 @@ namespace ClassFinance.Views
                 ((Bendahara)_currentUser).TandaiRefundDibayar(transaksi.Id);
                 RefreshTransaksi();
             }
+        }
+
+        private bool CanEditTransactionAmount(Transaksi transaksi)
+        {
+            if (_currentUser is not Bendahara || transaksi.IsRefund)
+                return false;
+
+            if (transaksi.Type == JenisTransaksi.Keluar) return true;
+            if (transaksi.Type != JenisTransaksi.Masuk) return false;
+
+            if (!transaksi.TagihanSiswaId.HasValue) return true;
+
+            var tagihanSiswaId = transaksi.TagihanSiswaId.Value;
+            if (DataStore.Instance.TransaksiList.Any(t => t.IsRefund && t.TagihanSiswaId == tagihanSiswaId))
+                return false;
+
+            var entry = DataStore.Instance.TagihanSiswaList.FirstOrDefault(ts => ts.Id == tagihanSiswaId);
+            var tagihan = entry == null ? null : DataStore.Instance.TagihanList.FirstOrDefault(t => t.Id == entry.TagihanId);
+            return tagihan != null && DataStore.Instance.TransaksiList
+                .Where(t => t.TagihanSiswaId == tagihanSiswaId && t.Type == JenisTransaksi.Masuk)
+                .Sum(t => t.Amount) <= tagihan.Amount;
+        }
+
+        private bool CanDeleteTransaction(Transaksi transaksi)
+        {
+            if (_currentUser is not Bendahara) return false;
+            if (transaksi.Type != JenisTransaksi.Masuk || !transaksi.TagihanSiswaId.HasValue) return true;
+
+            var tagihanSiswaId = transaksi.TagihanSiswaId.Value;
+            if (DataStore.Instance.TransaksiList.Any(t => t.IsRefund && t.TagihanSiswaId == tagihanSiswaId))
+                return false;
+
+            var entry = DataStore.Instance.TagihanSiswaList.FirstOrDefault(ts => ts.Id == tagihanSiswaId);
+            var tagihan = entry == null ? null : DataStore.Instance.TagihanList.FirstOrDefault(t => t.Id == entry.TagihanId);
+            return tagihan != null && DataStore.Instance.TransaksiList
+                .Where(t => t.TagihanSiswaId == tagihanSiswaId && t.Type == JenisTransaksi.Masuk)
+                .Sum(t => t.Amount) <= tagihan.Amount;
+        }
+
+        private void EditTransactionAmount_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is Bendahara bendahara && sender is FrameworkElement element && element.Tag is Transaksi transaksi)
+            {
+                _mainWindow.ShowModal(new EditPembayaranDialog(bendahara, transaksi, _mainWindow, Refresh));
+            }
+        }
+
+        private void DeleteTransaction_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is not Bendahara bendahara || sender is not FrameworkElement element || element.Tag is not Transaksi transaksi)
+                return;
+
+            var result = MessageBox.Show(
+                $"Hapus transaksi ini sebesar Rp {transaksi.Amount:N0}? Total kas akan disesuaikan.",
+                "Hapus transaksi",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+            if (result != MessageBoxResult.Yes) return;
+
+            try
+            {
+                bendahara.HapusTransaksi(transaksi.Id);
+                Refresh();
+            }
+            catch (InvalidOperationException exception)
+            {
+                MessageBox.Show(exception.Message, "Transaksi tidak dapat dihapus", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+
+        private void ShowTransactionActions_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is not Button button || button.DataContext is not TransaksiDisplayItem item)
+                return;
+
+            bool togglingCurrent = ReferenceEquals(_pendingTransactionMenuToggle, button) ||
+                ReferenceEquals(_openTransactionMenu?.PlacementTarget, button);
+            _pendingTransactionMenuToggle = null;
+            if (togglingCurrent)
+            {
+                if (_openTransactionMenu != null)
+                    _openTransactionMenu.IsOpen = false;
+                _openTransactionMenu = null;
+                return;
+            }
+
+            if (_openTransactionMenu?.IsOpen == true)
+                _openTransactionMenu.IsOpen = false;
+
+            var menu = new ContextMenu
+            {
+                Style = (Style)FindResource("PopupActionMenu"),
+                Placement = PlacementMode.Bottom
+            };
+            if (item.CanEditAmount)
+                menu.Items.Add(CreateTransactionMenuItem("Ubah nominal", item.Transaksi, EditTransactionAmount_Click));
+            if (item.CanDelete)
+                menu.Items.Add(CreateTransactionMenuItem("Hapus", item.Transaksi, DeleteTransaction_Click));
+
+            menu.PlacementTarget = button;
+            menu.Closed += (_, _) =>
+            {
+                if (ReferenceEquals(_pendingTransactionMenuToggle, button)) return;
+                if (ReferenceEquals(_openTransactionMenu, menu))
+                    _openTransactionMenu = null;
+            };
+            _openTransactionMenu = menu;
+            menu.IsOpen = menu.Items.Count > 0;
+        }
+
+        private void TransactionMenuButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _pendingTransactionMenuToggle = sender is Button button &&
+                ReferenceEquals(_openTransactionMenu?.PlacementTarget, button) ? button : null;
+        }
+
+        private static MenuItem CreateTransactionMenuItem(string header, Transaksi transaksi, RoutedEventHandler onClick)
+        {
+            var item = new MenuItem { Header = header, Tag = transaksi };
+            item.Click += onClick;
+            return item;
         }
 
         private void TagihanPaymentRow_Click(object sender, MouseButtonEventArgs e)

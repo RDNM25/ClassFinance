@@ -1,4 +1,5 @@
 using ClassFinance.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,6 +10,7 @@ namespace ClassFinance.Models
     {
         public string Nis { get; set; }
         public int KelasId { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         // Tracks excess payments saved for future bills
         public decimal SaldoTitipan { get; set; }
