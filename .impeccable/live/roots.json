@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "appRoot": "D:\\ClassFinance_WPF_App",
+  "repoRoot": "D:\\ClassFinance_WPF_App",
+  "contextRoot": "D:\\ClassFinance_WPF_App",
+  "sessionRoot": "D:\\ClassFinance_WPF_App\\.impeccable\\live",
+  "productPath": "D:\\ClassFinance_WPF_App\\PRODUCT.md",
+  "designPath": "D:\\ClassFinance_WPF_App\\DESIGN.md",
+  "resolvedFrom": "fallback"
+}
