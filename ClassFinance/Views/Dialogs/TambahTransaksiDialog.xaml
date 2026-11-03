@@ -1,7 +1,7 @@
 <UserControl x:Class="ClassFinance.Views.Dialogs.TambahTransaksiDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Width="380">
+             Width="380" TextElement.Foreground="{DynamicResource TextDark}">
     <StackPanel Margin="26">
         <TextBlock Text="Tambah Transaksi" FontSize="18" FontWeight="Bold" Margin="0,0,0,16" />
 
@@ -10,16 +10,16 @@
             <RadioButton x:Name="KeluarRadio" Content="Kas Keluar" GroupName="Jenis" VerticalAlignment="Center" />
         </StackPanel>
 
-        <TextBlock Text="Keterangan" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
+        <TextBlock Text="Keterangan" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="2,0,0,4" />
         <TextBox x:Name="DescriptionBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
 
-        <TextBlock Text="Jumlah (Rp)" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
+        <TextBlock Text="Jumlah (Rp)" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="2,0,0,4" />
         <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
 
-        <TextBlock Text="Tanggal" FontSize="12" Foreground="{StaticResource TextGray}" Margin="2,0,0,4" />
+        <TextBlock Text="Tanggal" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="2,0,0,4" />
         <DatePicker x:Name="DatePickerInput" Margin="0,0,0,10" />
 
-        <TextBlock x:Name="ErrorText" Foreground="{StaticResource PrimaryRed}" FontSize="12" Margin="2,0,0,10"
+        <TextBlock x:Name="ErrorText" Foreground="{DynamicResource AccentText}" FontSize="12" Margin="2,0,0,10"
                    Visibility="Collapsed" TextWrapping="Wrap" />
 
         <Grid Margin="0,10,0,0">

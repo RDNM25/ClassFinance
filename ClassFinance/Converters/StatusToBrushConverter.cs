@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using ClassFinance.Models;
@@ -18,14 +19,17 @@ namespace ClassFinance.Converters
             {
                 return s switch
                 {
-                    StatusTagihan.Lunas => Green,
-                    StatusTagihan.Proses => Amber,
-                    StatusTagihan.Sebagian => Amber,
-                    _ => Red
+                    StatusTagihan.Lunas => ThemeBrush("StatusGreen", Green),
+                    StatusTagihan.Proses => ThemeBrush("StatusAmber", Amber),
+                    StatusTagihan.Sebagian => ThemeBrush("StatusAmber", Amber),
+                    _ => ThemeBrush("StatusRed", Red)
                 };
             }
-            return Red;
+            return ThemeBrush("StatusRed", Red);
         }
+
+        private static SolidColorBrush ThemeBrush(string key, SolidColorBrush fallback) =>
+            Application.Current?.TryFindResource(key) as SolidColorBrush ?? fallback;
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
             throw new NotSupportedException();

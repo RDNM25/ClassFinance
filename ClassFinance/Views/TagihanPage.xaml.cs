@@ -40,6 +40,8 @@ namespace ClassFinance.Views
         private int? _initialTagihanId; 
         private ContextMenu _openActionMenu;
         private Button _pendingActionMenuToggle;
+        private bool _responsiveLayoutInitialized;
+        private bool _isCompactLayout;
 
         public TagihanPage(User currentUser, MainWindow mainWindow, int? initialTagihanId = null)
         {
@@ -56,6 +58,49 @@ namespace ClassFinance.Views
 
             BuatTagihanButton.Visibility = currentUser is Bendahara ? Visibility.Visible : Visibility.Collapsed;
             Refresh();
+        }
+
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.NewSize.Width <= 0)
+                return;
+
+            var useCompactLayout = e.NewSize.Width < 840;
+            if (_responsiveLayoutInitialized && useCompactLayout == _isCompactLayout)
+                return;
+
+            _responsiveLayoutInitialized = true;
+            _isCompactLayout = useCompactLayout;
+            TagihanLayoutGrid.ColumnDefinitions.Clear();
+            TagihanLayoutGrid.RowDefinitions.Clear();
+
+            if (useCompactLayout)
+            {
+                TagihanLayoutGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                TagihanLayoutGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+                TagihanLayoutGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+
+                Grid.SetColumn(BillListPanel, 0);
+                Grid.SetColumnSpan(BillListPanel, 1);
+                Grid.SetRow(BillListPanel, 0);
+                Grid.SetColumn(PaymentDetailsPanel, 0);
+                Grid.SetRow(PaymentDetailsPanel, 1);
+                PaymentDetailsPanel.Margin = new Thickness(0, 24, 0, 0);
+            }
+            else
+            {
+                TagihanLayoutGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                TagihanLayoutGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(20) });
+                TagihanLayoutGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1.2, GridUnitType.Star) });
+                TagihanLayoutGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+
+                Grid.SetColumn(BillListPanel, 0);
+                Grid.SetColumnSpan(BillListPanel, 2);
+                Grid.SetRow(BillListPanel, 0);
+                Grid.SetColumn(PaymentDetailsPanel, 2);
+                Grid.SetRow(PaymentDetailsPanel, 0);
+                PaymentDetailsPanel.Margin = new Thickness(30, 0, 10, 0);
+            }
         }
 
         private void Refresh()
@@ -116,7 +161,7 @@ namespace ClassFinance.Views
             if (TagihanItems.SelectedItem is TagihanDisplayItem displayItem)
             {
                 _selectedTagihan = displayItem.Tagihan;
-                DetailTitle.Text = $"Status pembayaran \u2014 {_selectedTagihan.Name}";
+                DetailTitle.Text = $"Status Pembayaran \u2014 {_selectedTagihan.Name}";
                 ApplyFilter();
             }
         }

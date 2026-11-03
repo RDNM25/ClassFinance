@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 using ClassFinance.Models;
@@ -15,9 +16,14 @@ namespace ClassFinance.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is Transaksi t)
-                return t.Type == JenisTransaksi.Masuk ? Red : Gray;
-            return Gray;
+                return t.Type == JenisTransaksi.Masuk
+                    ? ThemeBrush("IncomeColor", Red)
+                    : ThemeBrush("ExpenseColor", Gray);
+            return ThemeBrush("ExpenseColor", Gray);
         }
+
+        private static SolidColorBrush ThemeBrush(string key, SolidColorBrush fallback) =>
+            Application.Current?.TryFindResource(key) as SolidColorBrush ?? fallback;
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
             throw new NotSupportedException();

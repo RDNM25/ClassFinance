@@ -27,6 +27,8 @@ namespace ClassFinance.Views
         private readonly User _currentUser;
         private readonly MainWindow _mainWindow;
         private readonly int _kelasId;
+        private bool _isCompactLayout;
+        private bool _responsiveLayoutInitialized;
 
         public DashboardPage(User currentUser, MainWindow mainWindow)
         {
@@ -102,6 +104,79 @@ namespace ClassFinance.Views
             NoTransaksiText.Visibility = recentTransaksi.Any() ? Visibility.Collapsed : Visibility.Visible;
         }
 
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (e.NewSize.Width <= 0)
+                return;
+
+            var useCompactLayout = e.NewSize.Width < 780;
+            if (_responsiveLayoutInitialized && useCompactLayout == _isCompactLayout)
+                return;
+
+            _responsiveLayoutInitialized = true;
+            _isCompactLayout = useCompactLayout;
+
+            SummaryCardsGrid.ColumnDefinitions.Clear();
+            SummaryCardsGrid.RowDefinitions.Clear();
+            DashboardSectionsGrid.ColumnDefinitions.Clear();
+            DashboardSectionsGrid.RowDefinitions.Clear();
+
+            if (useCompactLayout)
+            {
+                SummaryCardsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                for (var row = 0; row < 3; row++)
+                    SummaryCardsGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                Grid.SetColumn(BalanceCard, 0);
+                Grid.SetColumn(StudentCountCard, 0);
+                Grid.SetColumn(UnpaidCountCard, 0);
+                Grid.SetRow(BalanceCard, 0);
+                Grid.SetRow(StudentCountCard, 1);
+                Grid.SetRow(UnpaidCountCard, 2);
+                BalanceCard.Margin = new Thickness(0, 0, 0, 12);
+                StudentCountCard.Margin = new Thickness(0, 0, 0, 12);
+                UnpaidCountCard.Margin = new Thickness(0);
+
+                DashboardSectionsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                DashboardSectionsGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                DashboardSectionsGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                Grid.SetColumn(StudentsCard, 0);
+                Grid.SetColumn(RecentTransactionsCard, 0);
+                Grid.SetRow(StudentsCard, 0);
+                Grid.SetRow(RecentTransactionsCard, 1);
+                StudentsCard.Margin = new Thickness(0, 0, 0, 20);
+            }
+            else
+            {
+                SummaryCardsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                SummaryCardsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(18) });
+                SummaryCardsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                SummaryCardsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(18) });
+                SummaryCardsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                SummaryCardsGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                Grid.SetColumn(BalanceCard, 0);
+                Grid.SetColumn(StudentCountCard, 2);
+                Grid.SetColumn(UnpaidCountCard, 4);
+                Grid.SetRow(BalanceCard, 0);
+                Grid.SetRow(StudentCountCard, 0);
+                Grid.SetRow(UnpaidCountCard, 0);
+                BalanceCard.Margin = new Thickness(0);
+                StudentCountCard.Margin = new Thickness(0);
+                UnpaidCountCard.Margin = new Thickness(0);
+
+                DashboardSectionsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                DashboardSectionsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(20) });
+                DashboardSectionsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                DashboardSectionsGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                Grid.SetColumn(StudentsCard, 0);
+                Grid.SetColumn(RecentTransactionsCard, 2);
+                Grid.SetRow(StudentsCard, 0);
+                Grid.SetRow(RecentTransactionsCard, 0);
+                StudentsCard.Margin = new Thickness(0);
+            }
+        }
+
         private void TarikKasButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new TarikKasDialog((Bendahara)_currentUser, _kelasId, _mainWindow, Refresh);
@@ -121,7 +196,21 @@ namespace ClassFinance.Views
 
         private void SiswaRow_Click(object sender, MouseButtonEventArgs e)
         {
-            if (sender is FrameworkElement el && el.Tag is SiswaDisplayItem item)
+            OpenStudentHistory(sender);
+        }
+
+        private void SiswaRow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key is Key.Enter or Key.Space)
+            {
+                OpenStudentHistory(sender);
+                e.Handled = true;
+            }
+        }
+
+        private void OpenStudentHistory(object sender)
+        {
+            if (sender is FrameworkElement element && element.Tag is SiswaDisplayItem item)
                 _mainWindow.NavigateTo(new RiwayatTransaksiPage(_currentUser, _mainWindow, item.Nis));
         }
     }

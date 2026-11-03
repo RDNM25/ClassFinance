@@ -2,7 +2,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using System.Windows.Media;
 using System.Windows.Navigation;
+using System.IO;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views;
@@ -13,11 +15,101 @@ namespace ClassFinance
     {
         private Page _currentPage;
         private User _currentUser;
+        private bool _isDarkMode;
 
         public MainWindow()
         {
             InitializeComponent();
+            _isDarkMode = LoadDarkModePreference();
+            ApplyTheme();
             ShowLogin();
+        }
+
+        private static string ThemePreferencePath => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "ClassFinance", "dark-mode.pref");
+
+        private bool LoadDarkModePreference()
+        {
+            try
+            {
+                return File.Exists(ThemePreferencePath)
+                    && bool.TryParse(File.ReadAllText(ThemePreferencePath), out var enabled)
+                    && enabled;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
+        }
+
+        private void SaveDarkModePreference()
+        {
+            try
+            {
+                var directory = Path.GetDirectoryName(ThemePreferencePath);
+                Directory.CreateDirectory(directory);
+                File.WriteAllText(ThemePreferencePath, _isDarkMode.ToString());
+            }
+            catch (IOException)
+            {
+                // Keep the theme change for this session if the preference cannot be saved.
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // Keep the theme change for this session if the preference cannot be saved.
+            }
+        }
+
+        private void ThemeToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            _isDarkMode = !_isDarkMode;
+            ApplyTheme();
+            SaveDarkModePreference();
+        }
+
+        private void ApplyTheme()
+        {
+            SetThemeBrush("AppBackground", _isDarkMode ? Color.FromRgb(24, 24, 28) : Color.FromRgb(245, 245, 247));
+            SetThemeBrush("SurfaceBackground", _isDarkMode ? Color.FromRgb(36, 36, 42) : Color.FromRgb(255, 255, 255));
+            SetThemeBrush("SubtleBackground", _isDarkMode ? Color.FromRgb(46, 46, 53) : Color.FromRgb(245, 245, 247));
+            SetThemeBrush("CardBackground", _isDarkMode ? Color.FromRgb(43, 40, 48) : Color.FromRgb(234, 230, 239));
+            SetThemeBrush("SidebarBackground", _isDarkMode ? Color.FromRgb(36, 27, 31) : Color.FromRgb(183, 28, 28));
+            SetThemeBrush("TextDark", _isDarkMode ? Color.FromRgb(243, 244, 246) : Color.FromRgb(33, 33, 33));
+            SetThemeBrush("TextGray", _isDarkMode ? Color.FromRgb(180, 180, 190) : Color.FromRgb(95, 99, 104));
+            SetThemeBrush("BorderColor", _isDarkMode ? Color.FromRgb(66, 66, 75) : Color.FromRgb(224, 224, 224));
+            SetThemeBrush("PrimaryRedLight", _isDarkMode ? Color.FromRgb(70, 37, 42) : Color.FromRgb(255, 235, 238));
+            SetThemeBrush("AccentText", _isDarkMode ? Color.FromRgb(255, 77, 77) : Color.FromRgb(183, 28, 28));
+            SetThemeBrush("StatusGreen", _isDarkMode ? Color.FromRgb(129, 199, 132) : Color.FromRgb(27, 94, 32));
+            SetThemeBrush("StatusAmber", _isDarkMode ? Color.FromRgb(255, 183, 77) : Color.FromRgb(141, 75, 0));
+            SetThemeBrush("StatusRed", _isDarkMode ? Color.FromRgb(255, 114, 114) : Color.FromRgb(183, 28, 28));
+            SetThemeBrush("IncomeColor", _isDarkMode ? Color.FromRgb(255, 77, 77) : Color.FromRgb(198, 40, 40));
+            SetThemeBrush("ExpenseColor", _isDarkMode ? Color.FromRgb(196, 198, 207) : Color.FromRgb(84, 84, 84));
+            SetThemeBrush("ErrorColor", _isDarkMode ? Color.FromRgb(255, 77, 77) : Color.FromRgb(183, 28, 28));
+            SetThemeBrush("DisabledButtonBackground", _isDarkMode ? Color.FromRgb(69, 69, 76) : Color.FromRgb(226, 226, 226));
+            SetThemeBrush("DisabledButtonText", _isDarkMode ? Color.FromRgb(224, 224, 229) : Color.FromRgb(87, 87, 87));
+            SetThemeBrush("DisabledText", _isDarkMode ? Color.FromRgb(164, 164, 174) : Color.FromRgb(112, 112, 120));
+            SetThemeBrush("TransactionDateBackground", _isDarkMode ? Color.FromRgb(101, 68, 20) : Color.FromRgb(255, 224, 178));
+            SetThemeBrush("TransactionDateForeground", _isDarkMode ? Color.FromRgb(255, 224, 163) : Color.FromRgb(109, 60, 0));
+            SetThemeBrush("TransactionDateBorder", _isDarkMode ? Color.FromRgb(255, 194, 102) : Color.FromRgb(173, 92, 0));
+
+            ThemeToggleIcon.Text = _isDarkMode ? "☀" : "☾";
+            ThemeToggleText.Text = _isDarkMode ? "Mode Terang" : "Mode Gelap";
+        }
+
+        private static void SetThemeBrush(string resourceKey, Color color)
+        {
+            if (Application.Current.Resources[resourceKey] is SolidColorBrush brush && !brush.IsFrozen)
+            {
+                brush.Color = color;
+                return;
+            }
+
+            Application.Current.Resources[resourceKey] = new SolidColorBrush(color);
         }
 
         public void ShowLogin()

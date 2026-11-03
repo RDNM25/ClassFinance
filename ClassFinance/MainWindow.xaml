@@ -4,7 +4,8 @@
         Title="Class Finance" Height="750" Width="1200" MinHeight="600" MinWidth="900"
         WindowStartupLocation="CenterScreen"
         FontFamily="Segoe UI Variable Text"
-        Background="{StaticResource AppBackground}">
+        TextElement.Foreground="{DynamicResource TextDark}"
+        Background="{DynamicResource AppBackground}">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="SidebarColumn" Width="0" />
@@ -12,23 +13,32 @@
         </Grid.ColumnDefinitions>
 
         <!--  Sidebar (shown after login)  -->
-        <Border x:Name="SidebarBorder" Grid.Column="0" Background="{StaticResource SidebarBackground}" Visibility="Collapsed">
+        <Border x:Name="SidebarBorder" Grid.Column="0" Background="{DynamicResource SidebarBackground}" Visibility="Collapsed">
             <DockPanel LastChildFill="False" Margin="0,20,0,20">
                 <StackPanel DockPanel.Dock="Top">
                     <Image Source="/Assets/logo.png" Width="100" Height="100" Stretch="Uniform" Margin="20,0,0,10" HorizontalAlignment="Left" />
                     <TextBlock Text="Class Finance" Foreground="White" FontWeight="Bold" FontSize="15" Margin="20,4,0,2" />
-                    <TextBlock x:Name="SidebarUserText" Text="" Foreground="#FFCDD2" FontSize="12" Margin="20,0,0,20" />
+                    <TextBlock x:Name="SidebarUserText" Text="" Foreground="White" FontSize="12" Margin="20,0,0,20" />
 
                     <StackPanel x:Name="NavPanel" Margin="0,10,0,0" />
                 </StackPanel>
 
-                <Button x:Name="LogoutButton" DockPanel.Dock="Bottom" Style="{StaticResource SidebarButton}"
-                        Click="LogoutButton_Click" Margin="8,0,8,0" ContentTemplate="{x:Null}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="⎋" Margin="0,0,12,0" FontWeight="Normal" />
-                        <TextBlock Text="Logout" />
-                    </StackPanel>
-                </Button>
+                <StackPanel DockPanel.Dock="Bottom">
+                    <Button x:Name="ThemeToggleButton" Style="{StaticResource SidebarButton}"
+                            Click="ThemeToggleButton_Click" Margin="8,0,8,0" ContentTemplate="{x:Null}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="ThemeToggleIcon" Text="☾" Margin="0,0,12,0" />
+                            <TextBlock x:Name="ThemeToggleText" Text="Mode Gelap" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="LogoutButton" Style="{StaticResource SidebarButton}"
+                            Click="LogoutButton_Click" Margin="8,0,8,0" ContentTemplate="{x:Null}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⎋" Margin="0,0,12,0" FontWeight="Normal" />
+                            <TextBlock Text="Keluar" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
             </DockPanel>
         </Border>
 
@@ -41,7 +51,7 @@
 
             <Button x:Name="BackButton" Grid.Row="0" Content="&#8592;"
                     Width="32" Height="32" FontSize="18" FontWeight="Bold"
-                    Foreground="{StaticResource PrimaryRed}" Background="White"
+                    Foreground="{DynamicResource AccentText}" Background="{DynamicResource SurfaceBackground}"
                     HorizontalAlignment="Left" Margin="16,10,0,0" Padding="0"
                     Cursor="Hand" Visibility="Collapsed" Click="BackButton_Click">
                 <Button.Template>
@@ -49,11 +59,12 @@
                         <Border x:Name="border" Background="{TemplateBinding Background}"
                                 BorderBrush="{StaticResource PrimaryRed}" BorderThickness="1.5"
                                 CornerRadius="16" Width="32" Height="32">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryRedLight}" />
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource PrimaryRedLight}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -61,13 +72,13 @@
             </Button>
 
             <Frame x:Name="ContentFrame" Grid.Row="1" NavigationUIVisibility="Hidden"
-                   Background="{StaticResource AppBackground}" Navigated="ContentFrame_Navigated" />
+                   Background="{DynamicResource AppBackground}" Navigated="ContentFrame_Navigated" />
         </Grid>
 
         <!--  Modal overlay: dialogs render here, inside the main window, instead of as separate OS windows  -->
         <Border x:Name="ModalOverlay" Grid.Column="0" Grid.ColumnSpan="2" Background="#99000000"
                 Visibility="Collapsed" MouseLeftButtonDown="ModalOverlay_MouseLeftButtonDown">
-            <Border Background="White" CornerRadius="16" HorizontalAlignment="Center" VerticalAlignment="Center"
+            <Border Background="{DynamicResource SurfaceBackground}" CornerRadius="16" HorizontalAlignment="Center" VerticalAlignment="Center"
                     MaxWidth="460" Margin="20">
                 <Border.Effect>
                     <DropShadowEffect BlurRadius="30" Opacity="0.3" ShadowDepth="6" Color="Black" />
