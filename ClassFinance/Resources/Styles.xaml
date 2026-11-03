@@ -26,6 +26,99 @@
     <SolidColorBrush x:Key="TransactionDateBackground" Color="#FFFFE0B2" />
     <SolidColorBrush x:Key="TransactionDateForeground" Color="#6D3C00" />
     <SolidColorBrush x:Key="TransactionDateBorder" Color="#AD5C00" />
+    <SolidColorBrush x:Key="ActionButtonBackground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ActionButtonForeground" Color="#111111" />
+    <SolidColorBrush x:Key="ActionButtonBorder" Color="#D32F2F" />
+    <SolidColorBrush x:Key="ActionButtonHoverBackground" Color="#F3F4F6" />
+    <SolidColorBrush x:Key="ActionButtonPressedBackground" Color="#E5E7EB" />
+    <SolidColorBrush x:Key="CalendarNavBackground" Color="#F4F4F6" />
+    <SolidColorBrush x:Key="CalendarNavForeground" Color="#212121" />
+    <SolidColorBrush x:Key="CalendarNavBorder" Color="#C7C7D0" />
+    <SolidColorBrush x:Key="CalendarNavHoverBackground" Color="#FFEBEE" />
+    <SolidColorBrush x:Key="CalendarNavHoverForeground" Color="#212121" />
+    <SolidColorBrush x:Key="CalendarNavPressedBackground" Color="#FFCDD2" />
+    <SolidColorBrush x:Key="CalendarCurrentMonthBackground" Color="#FFEBEE" />
+    <SolidColorBrush x:Key="CalendarCurrentMonthBorder" Color="#B71C1C" />
+    <SolidColorBrush x:Key="CalendarSelectedMonthBackground" Color="#D32F2F" />
+    <SolidColorBrush x:Key="CalendarSelectedMonthForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="CalendarSelectedMonthBorder" Color="#8A1C1C" />
+    <SolidColorBrush x:Key="CalendarNavFocusBorder" Color="#212121" />
+    <SolidColorBrush x:Key="CalendarNavArrowBackground" Color="#F5F5F7" />
+    <SolidColorBrush x:Key="CalendarNavArrowForeground" Color="#212121" />
+    <SolidColorBrush x:Key="CalendarNavArrowBorder" Color="#E0E0E0" />
+    <SolidColorBrush x:Key="CalendarNavArrowHoverBackground" Color="#E5E7EB" />
+    <SolidColorBrush x:Key="CalendarNavArrowPressedBackground" Color="#D1D5DB" />
+    <SolidColorBrush x:Key="StudentAddBackground" Color="#D32F2F" />
+    <SolidColorBrush x:Key="StudentAddForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="StudentAddBorder" Color="#D32F2F" />
+    <SolidColorBrush x:Key="StudentAddHoverBackground" Color="#B71C1C" />
+    <SolidColorBrush x:Key="StudentAddPressedBackground" Color="#B71C1C" />
+    <Color x:Key="CardCornerTint">#FFF1F1</Color>
+    <Color x:Key="CardCornerMidTint">#FFF9F9</Color>
+    <Color x:Key="CardSurfaceTint">#FFFFFF</Color>
+    <RadialGradientBrush x:Key="CardCornerFade" Center="1,0" GradientOrigin="1,0" RadiusX="0.85" RadiusY="0.8">
+        <GradientStop Color="{DynamicResource CardCornerTint}" Offset="0" />
+        <GradientStop Color="{DynamicResource CardCornerMidTint}" Offset="0.5" />
+        <GradientStop Color="{DynamicResource CardSurfaceTint}" Offset="1" />
+    </RadialGradientBrush>
+
+    <ControlTemplate x:Key="CalendarNavigationButtonTemplate" TargetType="Button">
+        <Border x:Name="navBorder" Background="{TemplateBinding Background}"
+                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                CornerRadius="8">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                              TextElement.Foreground="{TemplateBinding Foreground}" />
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="navBorder" Property="Background" Value="{DynamicResource CalendarNavArrowHoverBackground}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="navBorder" Property="Background" Value="{DynamicResource CalendarNavArrowPressedBackground}" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter TargetName="navBorder" Property="BorderBrush" Value="{DynamicResource AccentText}" />
+                <Setter TargetName="navBorder" Property="BorderThickness" Value="2" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="navBorder" Property="Opacity" Value="0.55" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style x:Key="StudentAddButton" TargetType="Button">
+        <Setter Property="FocusVisualStyle" Value="{DynamicResource ThemeFocusVisual}" />
+        <Setter Property="Foreground" Value="{DynamicResource StudentAddForeground}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="16,10" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="BorderThickness" Value="1.5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="buttonBorder" Background="{DynamicResource StudentAddBackground}"
+                            BorderBrush="{DynamicResource StudentAddBorder}" BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="24" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="buttonBorder" Property="Background" Value="{DynamicResource StudentAddHoverBackground}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="buttonBorder" Property="Background" Value="{DynamicResource StudentAddPressedBackground}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="buttonBorder" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
+                            <Setter Property="Foreground" Value="{DynamicResource DisabledButtonText}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <Style x:Key="ThemeFocusVisual" TargetType="{x:Type Control}">
         <Setter Property="Template">
@@ -206,6 +299,46 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- High-contrast secondary action used on the balance card and history filter. -->
+    <Style x:Key="ThemeActionButton" TargetType="Button">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource ThemeFocusVisual}" />
+        <Setter Property="Foreground" Value="{DynamicResource ActionButtonForeground}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="16,10" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="BorderThickness" Value="1.5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{DynamicResource ActionButtonBackground}"
+                            BorderBrush="{DynamicResource ActionButtonBorder}" BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="20" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource ActionButtonHoverBackground}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource ActionButtonPressedBackground}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
+                            <Setter Property="Foreground" Value="{DynamicResource DisabledButtonText}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SmallThemeActionButton" TargetType="Button" BasedOn="{StaticResource ThemeActionButton}">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="10,5" />
     </Style>
 
     <!--  Small outline button (for row actions)  -->
@@ -602,6 +735,49 @@
         </Setter>
     </Style>
 
+    <Style x:Key="CalendarMonthButtonBaseStyle" TargetType="CalendarButton">
+        <Setter Property="Foreground" Value="{DynamicResource CalendarNavForeground}" />
+        <Setter Property="Background" Value="{DynamicResource CalendarNavBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CalendarNavBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="MinHeight" Value="34" />
+        <Setter Property="MinWidth" Value="34" />
+        <Setter Property="Margin" Value="3" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CalendarButton">
+                    <Border x:Name="monthBorder" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="8" Padding="4">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="monthBorder" Property="Background" Value="{DynamicResource CalendarNavHoverBackground}" />
+                            <Setter Property="Foreground" Value="{DynamicResource CalendarNavHoverForeground}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="monthBorder" Property="Background" Value="{DynamicResource CalendarNavPressedBackground}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="monthBorder" Property="BorderBrush" Value="{DynamicResource CalendarNavFocusBorder}" />
+                            <Setter TargetName="monthBorder" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="HasSelectedDays" Value="True">
+                <Setter Property="Background" Value="{DynamicResource CalendarCurrentMonthBackground}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource CalendarCurrentMonthBorder}" />
+                <Setter Property="BorderThickness" Value="2" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="CalendarBaseStyle" TargetType="Calendar">
         <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
@@ -609,31 +785,7 @@
         <Setter Property="Foreground" Value="{DynamicResource TextDark}" />
         <Setter Property="Padding" Value="8" />
         <Setter Property="CalendarDayButtonStyle" Value="{StaticResource CalendarDayButtonBaseStyle}" />
-        <Setter Property="CalendarButtonStyle">
-            <Setter.Value>
-                <Style TargetType="CalendarButton">
-                    <Setter Property="Foreground" Value="{DynamicResource TextDark}" />
-                    <Setter Property="Background" Value="Transparent" />
-                    <Setter Property="FontWeight" Value="SemiBold" />
-                    <Setter Property="MinHeight" Value="34" />
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="CalendarButton">
-                                <Border x:Name="headerBorder" Background="{TemplateBinding Background}" CornerRadius="8" Padding="4">
-                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                      TextElement.Foreground="{TemplateBinding Foreground}" />
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="headerBorder" Property="Background" Value="{DynamicResource PrimaryRedLight}" />
-                                    </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="CalendarButtonStyle" Value="{StaticResource CalendarMonthButtonBaseStyle}" />
     </Style>
 
     <Style TargetType="DatePicker">
@@ -681,7 +833,7 @@
 
     <!--  Card container  -->
     <Style x:Key="Card" TargetType="Border">
-        <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
+        <Setter Property="Background" Value="{StaticResource CardCornerFade}" />
         <Setter Property="CornerRadius" Value="14" />
         <Setter Property="Padding" Value="20" />
         <Setter Property="Effect">

@@ -49,7 +49,7 @@
                         <TextBlock Text="Total Saldo" Foreground="White" FontSize="13" />
                         <TextBlock x:Name="SaldoText" Text="Rp 0" Foreground="White" FontSize="30" FontWeight="Bold" Margin="0,6,0,16" />
                         <Button x:Name="TarikKasButton" Content="Tarik Kas" HorizontalAlignment="Left"
-                           Style="{StaticResource PopButton}" Click="TarikKasButton_Click" />
+                           Style="{StaticResource ThemeActionButton}" Click="TarikKasButton_Click" />
                     </StackPanel>
                 </Border>
 
@@ -86,7 +86,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Data Siswa" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
                             <Button x:Name="TambahSiswaButton" Grid.Column="1" Content="+ Tambah Siswa"
-                                    Style="{StaticResource SmallOutlineButton}" Click="TambahSiswaButton_Click" />
+                                    Style="{StaticResource SmallThemeActionButton}" Click="TambahSiswaButton_Click" />
                         </Grid>
 
                         <ItemsControl x:Name="SiswaItems">
@@ -131,7 +131,7 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Transaksi Terbaru" FontWeight="Bold" FontSize="15" VerticalAlignment="Center" />
                             <Button x:Name="LihatSemuaButton" Grid.Column="1" Content="Lihat semua &#8594;"
-                                    Style="{StaticResource SmallOutlineButton}"
+                                    Style="{StaticResource SmallThemeActionButton}"
                                     FontWeight="Bold" Cursor="Hand" Click="LihatSemuaButton_Click" />
                         </Grid>
 

@@ -96,6 +96,36 @@ namespace ClassFinance
             SetThemeBrush("TransactionDateBackground", _isDarkMode ? Color.FromRgb(101, 68, 20) : Color.FromRgb(255, 224, 178));
             SetThemeBrush("TransactionDateForeground", _isDarkMode ? Color.FromRgb(255, 224, 163) : Color.FromRgb(109, 60, 0));
             SetThemeBrush("TransactionDateBorder", _isDarkMode ? Color.FromRgb(255, 194, 102) : Color.FromRgb(173, 92, 0));
+            SetThemeBrush("ActionButtonBackground", Color.FromRgb(255, 255, 255));
+            SetThemeBrush("ActionButtonForeground", _isDarkMode ? Color.FromRgb(17, 17, 17) : Color.FromRgb(183, 28, 28));
+            SetThemeBrush("ActionButtonBorder", Color.FromRgb(211, 47, 47));
+            SetThemeBrush("ActionButtonHoverBackground", Color.FromRgb(243, 244, 246));
+            SetThemeBrush("ActionButtonPressedBackground", Color.FromRgb(229, 231, 235));
+            SetThemeBrush("CalendarNavBackground", _isDarkMode ? Color.FromRgb(58, 58, 67) : Color.FromRgb(244, 244, 246));
+            SetThemeBrush("CalendarNavForeground", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(33, 33, 33));
+            SetThemeBrush("CalendarNavBorder", _isDarkMode ? Color.FromRgb(112, 112, 125) : Color.FromRgb(199, 199, 208));
+            SetThemeBrush("CalendarNavHoverBackground", _isDarkMode ? Color.FromRgb(211, 47, 47) : Color.FromRgb(255, 235, 238));
+            SetThemeBrush("CalendarNavHoverForeground", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(33, 33, 33));
+            SetThemeBrush("CalendarNavPressedBackground", _isDarkMode ? Color.FromRgb(183, 28, 28) : Color.FromRgb(255, 205, 210));
+            SetThemeBrush("CalendarCurrentMonthBackground", _isDarkMode ? Color.FromRgb(70, 37, 42) : Color.FromRgb(255, 235, 238));
+            SetThemeBrush("CalendarCurrentMonthBorder", _isDarkMode ? Color.FromRgb(255, 77, 77) : Color.FromRgb(183, 28, 28));
+            SetThemeBrush("CalendarSelectedMonthBackground", Color.FromRgb(211, 47, 47));
+            SetThemeBrush("CalendarSelectedMonthForeground", Color.FromRgb(255, 255, 255));
+            SetThemeBrush("CalendarSelectedMonthBorder", Color.FromRgb(138, 28, 28));
+            SetThemeBrush("CalendarNavFocusBorder", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(33, 33, 33));
+            SetThemeBrush("CalendarNavArrowBackground", _isDarkMode ? Color.FromRgb(243, 244, 246) : Color.FromRgb(245, 245, 247));
+            SetThemeBrush("CalendarNavArrowForeground", Color.FromRgb(17, 17, 17));
+            SetThemeBrush("CalendarNavArrowBorder", _isDarkMode ? Color.FromRgb(255, 114, 114) : Color.FromRgb(224, 224, 224));
+            SetThemeBrush("CalendarNavArrowHoverBackground", _isDarkMode ? Color.FromRgb(229, 231, 235) : Color.FromRgb(255, 235, 238));
+            SetThemeBrush("CalendarNavArrowPressedBackground", _isDarkMode ? Color.FromRgb(209, 213, 219) : Color.FromRgb(255, 205, 210));
+            SetThemeBrush("StudentAddBackground", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(211, 47, 47));
+            SetThemeBrush("StudentAddForeground", _isDarkMode ? Color.FromRgb(17, 17, 17) : Color.FromRgb(255, 255, 255));
+            SetThemeBrush("StudentAddBorder", _isDarkMode ? Color.FromRgb(211, 47, 47) : Color.FromRgb(211, 47, 47));
+            SetThemeBrush("StudentAddHoverBackground", _isDarkMode ? Color.FromRgb(243, 244, 246) : Color.FromRgb(183, 28, 28));
+            SetThemeBrush("StudentAddPressedBackground", _isDarkMode ? Color.FromRgb(229, 231, 235) : Color.FromRgb(183, 28, 28));
+            SetThemeColor("CardCornerTint", _isDarkMode ? Color.FromRgb(53, 39, 44) : Color.FromRgb(255, 241, 241));
+            SetThemeColor("CardCornerMidTint", _isDarkMode ? Color.FromRgb(43, 37, 42) : Color.FromRgb(255, 249, 249));
+            SetThemeColor("CardSurfaceTint", _isDarkMode ? Color.FromRgb(36, 36, 42) : Color.FromRgb(255, 255, 255));
 
             ThemeToggleIcon.Text = _isDarkMode ? "☀" : "☾";
             ThemeToggleText.Text = _isDarkMode ? "Mode Terang" : "Mode Gelap";
@@ -110,6 +140,11 @@ namespace ClassFinance
             }
 
             Application.Current.Resources[resourceKey] = new SolidColorBrush(color);
+        }
+
+        private static void SetThemeColor(string resourceKey, Color color)
+        {
+            Application.Current.Resources[resourceKey] = color;
         }
 
         public void ShowLogin()

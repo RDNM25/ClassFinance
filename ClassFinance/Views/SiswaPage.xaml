@@ -15,7 +15,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="Data Siswa" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
             <Button x:Name="TambahButton" Grid.Column="1" Content="+ Tambah Siswa"
-                    Style="{StaticResource PrimaryButton}" Click="TambahButton_Click" />
+                    Style="{StaticResource StudentAddButton}" Click="TambahButton_Click" />
         </Grid>
 
         <Border Style="{StaticResource Card}">

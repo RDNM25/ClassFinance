@@ -11,6 +11,25 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <conv:StatusToBrushConverter x:Key="StatusBrush" />
         <conv:HasTransactionDateConverter x:Key="TransactionDateHighlight" />
+        <conv:CalendarMonthStateConverter x:Key="CalendarMonthState" />
+        <Style x:Key="HistoryCalendarMonthButtonStyle" TargetType="CalendarButton"
+               BasedOn="{StaticResource CalendarMonthButtonBaseStyle}">
+            <Style.Triggers>
+                <DataTrigger Value="Selected">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource CalendarMonthState}">
+                            <Binding Path="DataContext" RelativeSource="{RelativeSource Self}" />
+                            <Binding Path="DisplayDate" RelativeSource="{RelativeSource AncestorType={x:Type Calendar}}" />
+                            <Binding Path="SelectedDate" RelativeSource="{RelativeSource AncestorType={x:Type Calendar}}" />
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter Property="Background" Value="{DynamicResource CalendarSelectedMonthBackground}" />
+                    <Setter Property="Foreground" Value="{DynamicResource CalendarSelectedMonthForeground}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource CalendarSelectedMonthBorder}" />
+                    <Setter Property="BorderThickness" Value="1" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="HistoryCalendarDayButtonStyle" TargetType="CalendarDayButton"
                BasedOn="{StaticResource CalendarDayButtonBaseStyle}">
             <Style.Triggers>
@@ -30,6 +49,7 @@
         </Style>
         <Style x:Key="HistoryCalendarStyle" TargetType="Calendar" BasedOn="{StaticResource CalendarBaseStyle}">
             <Setter Property="CalendarDayButtonStyle" Value="{StaticResource HistoryCalendarDayButtonStyle}" />
+            <Setter Property="CalendarButtonStyle" Value="{StaticResource HistoryCalendarMonthButtonStyle}" />
         </Style>
         <Style x:Key="HistoryActionButton" TargetType="Button" BasedOn="{StaticResource OutlineButton}">
             <Setter Property="FontSize" Value="11" />
@@ -80,7 +100,7 @@
             <DatePicker x:Name="DateFilterPicker" Width="190" Height="42" Margin="0,0,12,0"
                         CalendarStyle="{StaticResource HistoryCalendarStyle}"
                         SelectedDateChanged="DateFilter_Changed" />
-            <Button Content="Reset Filter" Style="{StaticResource OutlineButton}" Padding="12,8"
+            <Button Content="Reset Filter" Style="{StaticResource ThemeActionButton}" Padding="12,8"
                     Click="ClearDateFilter_Click" />
         </StackPanel>
 

@@ -1,7 +1,12 @@
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
+using System.Windows.Threading;
 using ClassFinance.Models;
 using ClassFinance.Converters;
 using ClassFinance.Services;
@@ -42,9 +47,78 @@ namespace ClassFinance.Views
         private ContextMenu _openTransactionMenu;
         private Button _pendingTransactionMenuToggle;
 
+        private void DateFilterPicker_CalendarOpened(object sender, RoutedEventArgs e)
+        {
+            if (sender is not DatePicker picker)
+                return;
+
+            picker.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+                ApplyCalendarNavigationStyle(picker)));
+        }
+
+        private void ApplyCalendarNavigationStyle(DatePicker picker)
+        {
+            picker.ApplyTemplate();
+            if (picker.Template.FindName("PART_Popup", picker) is not Popup popup)
+                return;
+
+            if (popup.Child is not Calendar calendar)
+                return;
+
+            calendar.ApplyTemplate();
+            if (calendar.Template.FindName("PART_CalendarItem", calendar) is not CalendarItem calendarItem)
+                return;
+
+            calendarItem.ApplyTemplate();
+            ApplyCalendarNavigationStyle(calendarItem, "PART_PreviousButton", "‹", "Previous month");
+            ApplyCalendarNavigationStyle(calendarItem, "PART_NextButton", "›", "Next month");
+
+            if (calendarItem.Template.FindName("PART_HeaderButton", calendarItem) is Control headerButton)
+            {
+                headerButton.SetResourceReference(Control.ForegroundProperty, "TextDark");
+                headerButton.SetResourceReference(TextElement.ForegroundProperty, "TextDark");
+                headerButton.ApplyTemplate();
+                ApplyCalendarHeaderTextForeground(headerButton);
+            }
+        }
+
+        private void ApplyCalendarHeaderTextForeground(DependencyObject element)
+        {
+            if (element is TextBlock textBlock)
+                textBlock.SetResourceReference(TextBlock.ForegroundProperty, "TextDark");
+
+            if (element is not Visual && element is not Visual3D)
+                return;
+
+            for (var childIndex = 0; childIndex < VisualTreeHelper.GetChildrenCount(element); childIndex++)
+                ApplyCalendarHeaderTextForeground(VisualTreeHelper.GetChild(element, childIndex));
+        }
+
+        private void ApplyCalendarNavigationStyle(CalendarItem calendarItem, string partName, string glyph, string accessibleName)
+        {
+            if (calendarItem.Template.FindName(partName, calendarItem) is not Button button)
+                return;
+
+            button.Width = 34;
+            button.Height = 34;
+            button.Margin = new Thickness(4);
+            button.Padding = new Thickness(0);
+            button.Cursor = Cursors.Hand;
+            button.FontSize = 20;
+            button.FontWeight = FontWeights.SemiBold;
+            button.Content = glyph;
+            button.BorderThickness = new Thickness(1);
+            button.SetResourceReference(Control.BackgroundProperty, "CalendarNavArrowBackground");
+            button.SetResourceReference(Control.ForegroundProperty, "CalendarNavArrowForeground");
+            button.SetResourceReference(Control.BorderBrushProperty, "CalendarNavArrowBorder");
+            button.Template = (ControlTemplate)FindResource("CalendarNavigationButtonTemplate");
+            AutomationProperties.SetName(button, accessibleName);
+        }
+
         public RiwayatTransaksiPage(User currentUser, MainWindow mainWindow, string nis = null)
         {
             InitializeComponent();
+            DateFilterPicker.CalendarOpened += DateFilterPicker_CalendarOpened;
             _currentUser = currentUser;
             _mainWindow = mainWindow;
             _nis = nis;
