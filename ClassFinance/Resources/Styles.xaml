@@ -1,11 +1,14 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:behaviors="clr-namespace:ClassFinance.Behaviors">
 
     <!--  Palette  -->
     <SolidColorBrush x:Key="PrimaryRed" Color="#D32F2F" />
     <SolidColorBrush x:Key="PrimaryRedDark" Color="#B71C1C" />
     <SolidColorBrush x:Key="PrimaryRedLight" Color="#FFEBEE" />
     <SolidColorBrush x:Key="CardBackground" Color="#EAE6EF" />
+    <SolidColorBrush x:Key="ElevatedCardBackground" Color="#E2DCEA" />
+    <Color x:Key="CardShadowColor">#000000</Color>
     <SolidColorBrush x:Key="SidebarBackground" Color="#B71C1C" />
     <SolidColorBrush x:Key="AppBackground" Color="#F5F5F7" />
     <SolidColorBrush x:Key="SurfaceBackground" Color="#FFFFFF" />
@@ -14,6 +17,7 @@
     <SolidColorBrush x:Key="TextDark" Color="#212121" />
     <SolidColorBrush x:Key="TextGray" Color="#5F6368" />
     <SolidColorBrush x:Key="AccentText" Color="#B71C1C" />
+    <SolidColorBrush x:Key="TagihanActionForeground" Color="#B71C1C" />
     <SolidColorBrush x:Key="StatusGreen" Color="#1B5E20" />
     <SolidColorBrush x:Key="StatusAmber" Color="#8D4B00" />
     <SolidColorBrush x:Key="StatusRed" Color="#B71C1C" />
@@ -66,15 +70,51 @@
         <Border x:Name="navBorder" Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                 CornerRadius="8">
-            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                              TextElement.Foreground="{TemplateBinding Foreground}" />
+            <Grid>
+                <Border x:Name="hoverFill" Background="{DynamicResource CalendarNavArrowHoverBackground}"
+                        CornerRadius="7" Opacity="0" IsHitTestVisible="False" />
+                <Border x:Name="pressedFill" Background="{DynamicResource CalendarNavArrowPressedBackground}"
+                        CornerRadius="7" Opacity="0" IsHitTestVisible="False" />
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+            </Grid>
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="navBorder" Property="Background" Value="{DynamicResource CalendarNavArrowHoverBackground}" />
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                             To="1" Duration="0:0:0.14" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                             To="0" Duration="0:0:0.11" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="navBorder" Property="Background" Value="{DynamicResource CalendarNavArrowPressedBackground}" />
+                <Trigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                             To="1" Duration="0:0:0.07" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                             To="0" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </Trigger.ExitActions>
             </Trigger>
             <Trigger Property="IsKeyboardFocused" Value="True">
                 <Setter TargetName="navBorder" Property="BorderBrush" Value="{DynamicResource AccentText}" />
@@ -100,15 +140,51 @@
                     <Border x:Name="buttonBorder" Background="{DynamicResource StudentAddBackground}"
                             BorderBrush="{DynamicResource StudentAddBorder}" BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="24" Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                        <Grid>
+                            <Border x:Name="hoverFill" Background="{DynamicResource StudentAddHoverBackground}"
+                                    CornerRadius="23" Opacity="0" IsHitTestVisible="False" />
+                            <Border x:Name="pressedFill" Background="{DynamicResource StudentAddPressedBackground}"
+                                    CornerRadius="23" Opacity="0" IsHitTestVisible="False" />
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="buttonBorder" Property="Background" Value="{DynamicResource StudentAddHoverBackground}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.15" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.11" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="buttonBorder" Property="Background" Value="{DynamicResource StudentAddPressedBackground}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.07" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="buttonBorder" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
@@ -316,15 +392,51 @@
                     <Border x:Name="border" Background="{DynamicResource ActionButtonBackground}"
                             BorderBrush="{DynamicResource ActionButtonBorder}" BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="20" Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                        <Grid>
+                            <Border x:Name="hoverFill" Background="{DynamicResource ActionButtonHoverBackground}"
+                                    CornerRadius="19" Opacity="0" IsHitTestVisible="False" />
+                            <Border x:Name="pressedFill" Background="{DynamicResource ActionButtonPressedBackground}"
+                                    CornerRadius="19" Opacity="0" IsHitTestVisible="False" />
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{DynamicResource ActionButtonHoverBackground}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.14" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.11" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{DynamicResource ActionButtonPressedBackground}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.07" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
@@ -341,10 +453,175 @@
         <Setter Property="Padding" Value="10,5" />
     </Style>
 
+    <Style x:Key="SmallPrimaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="10,5" />
+    </Style>
+
+    <Style x:Key="WarningActionButton" TargetType="Button">
+        <Setter Property="FocusVisualStyle" Value="{StaticResource ThemeFocusVisual}" />
+        <Setter Property="Foreground" Value="{DynamicResource StatusAmber}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Padding" Value="16,10" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="BorderThickness" Value="1.5" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{DynamicResource SurfaceBackground}"
+                            BorderBrush="{DynamicResource StatusAmber}" BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="20" Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Border x:Name="hoverFill" Background="{DynamicResource TransactionDateBackground}"
+                                        CornerRadius="19" Opacity="0" IsHitTestVisible="False" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                             To="1" Duration="0:0:0.14" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.11" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="hoverFill" Property="Opacity" Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+                            <Setter Property="Foreground" Value="{DynamicResource DisabledButtonText}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SmallWarningActionButton" TargetType="Button" BasedOn="{StaticResource WarningActionButton}">
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Padding" Value="10,5" />
+    </Style>
+
     <!--  Small outline button (for row actions)  -->
     <Style x:Key="SmallOutlineButton" TargetType="Button" BasedOn="{StaticResource OutlineButton}">
         <Setter Property="FontSize" Value="11" />
         <Setter Property="Padding" Value="10,5" />
+    </Style>
+
+    <Style x:Key="SmallThemeActionButtonCompact" TargetType="Button" BasedOn="{StaticResource SmallThemeActionButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{DynamicResource ActionButtonBackground}"
+                            BorderBrush="{DynamicResource ActionButtonBorder}" BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="20" Padding="{TemplateBinding Padding}">
+                        <Grid>
+                            <Border x:Name="hoverFill" Background="{DynamicResource ActionButtonHoverBackground}"
+                                    CornerRadius="19" Opacity="0" IsHitTestVisible="False" />
+                            <Border x:Name="pressedFill" Background="{DynamicResource ActionButtonPressedBackground}"
+                                    CornerRadius="19" Opacity="0" IsHitTestVisible="False" />
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.14" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.11" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.07" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
+                            <Setter Property="Foreground" Value="{DynamicResource DisabledButtonText}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SmallOutlineButtonCompact" TargetType="Button" BasedOn="{StaticResource SmallOutlineButton}">
+        <Setter Property="Padding" Value="10,2" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" BorderBrush="{StaticResource PrimaryRed}" BorderThickness="1.5"
+                            CornerRadius="8" Padding="{TemplateBinding Padding}">
+                        <Border.Background>
+                            <SolidColorBrush x:Name="bgBrush" Color="White" />
+                        </Border.Background>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#FFEBEE" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="White" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="OverflowDotsButton" TargetType="Button">
@@ -361,15 +638,51 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="dotsBorder" Background="{TemplateBinding Background}" CornerRadius="8">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Grid>
+                            <Border x:Name="hoverFill" Background="{DynamicResource SubtleBackground}"
+                                    CornerRadius="8" Opacity="0" IsHitTestVisible="False" />
+                            <Border x:Name="pressedFill" Background="{DynamicResource BorderColor}"
+                                    CornerRadius="8" Opacity="0" IsHitTestVisible="False" />
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="dotsBorder" Property="Background" Value="{DynamicResource SubtleBackground}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.12" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                             <Setter Property="Foreground" Value="{DynamicResource TextDark}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="dotsBorder" Property="Background" Value="{DynamicResource BorderColor}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.06" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.1" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -631,18 +944,39 @@
                                     <Border x:Name="toggleBorder" Background="{TemplateBinding Background}"
                                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                                             CornerRadius="20">
-                                        <Path x:Name="arrow" Data="M0,0 L5,5 L10,0" Stroke="{DynamicResource TextDark}"
-                                              StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                              StrokeLineJoin="Round" HorizontalAlignment="Right" VerticalAlignment="Center"
-                                              Margin="0,0,14,0" RenderTransformOrigin="0.5,0.5">
-                                            <Path.RenderTransform>
-                                                <RotateTransform x:Name="arrowRotate" Angle="0" />
-                                            </Path.RenderTransform>
-                                        </Path>
+                                        <Grid>
+                                            <Border x:Name="hoverOutline" Background="Transparent"
+                                                    BorderBrush="{DynamicResource TextDark}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="20" Margin="-1" Opacity="0" IsHitTestVisible="False" />
+                                            <Path x:Name="arrow" Data="M0,0 L5,5 L10,0" Stroke="{DynamicResource TextDark}"
+                                                  StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                                  StrokeLineJoin="Round" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                  Margin="0,0,14,0" RenderTransformOrigin="0.5,0.5">
+                                                <Path.RenderTransform>
+                                                    <RotateTransform x:Name="arrowRotate" Angle="0" />
+                                                </Path.RenderTransform>
+                                            </Path>
+                                        </Grid>
                                     </Border>
                                     <ControlTemplate.Triggers>
                                         <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="toggleBorder" Property="BorderBrush" Value="{DynamicResource TextDark}" />
+                                            <Trigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="hoverOutline" Storyboard.TargetProperty="Opacity"
+                                                                         To="1" Duration="0:0:0.14" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.EnterActions>
+                                            <Trigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="hoverOutline" Storyboard.TargetProperty="Opacity"
+                                                                         To="0" Duration="0:0:0.11" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.ExitActions>
                                         </Trigger>
                                         <Trigger Property="IsChecked" Value="True">
                                             <Trigger.EnterActions>
@@ -707,13 +1041,36 @@
                     <Border x:Name="dayBorder" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="10">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                            <Grid>
+                                <Border x:Name="hoverFill" Background="{DynamicResource PrimaryRedLight}"
+                                        CornerRadius="9" Opacity="0" IsHitTestVisible="False" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="dayBorder" Property="Background" Value="{DynamicResource PrimaryRedLight}" />
-                        </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True" />
+                                    <Condition Property="IsSelected" Value="False" />
+                                </MultiTrigger.Conditions>
+                                <MultiTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                             To="1" Duration="0:0:0.12" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.EnterActions>
+                                <MultiTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </MultiTrigger.ExitActions>
+                            </MultiTrigger>
                         <Trigger Property="IsToday" Value="True">
                             <Setter TargetName="dayBorder" Property="BorderBrush" Value="{StaticResource PrimaryRed}" />
                             <Setter TargetName="dayBorder" Property="BorderThickness" Value="1" />
@@ -750,16 +1107,52 @@
                     <Border x:Name="monthBorder" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="8" Padding="4">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
-                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                            <Grid>
+                                <Border x:Name="hoverFill" Background="{DynamicResource CalendarNavHoverBackground}"
+                                        CornerRadius="7" Opacity="0" IsHitTestVisible="False" />
+                                <Border x:Name="pressedFill" Background="{DynamicResource CalendarNavPressedBackground}"
+                                        CornerRadius="7" Opacity="0" IsHitTestVisible="False" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="monthBorder" Property="Background" Value="{DynamicResource CalendarNavHoverBackground}" />
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                             To="1" Duration="0:0:0.14" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.11" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                             <Setter Property="Foreground" Value="{DynamicResource CalendarNavHoverForeground}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="monthBorder" Property="Background" Value="{DynamicResource CalendarNavPressedBackground}" />
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                             To="1" Duration="0:0:0.06" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="pressedFill" Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.1" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
                             <Setter TargetName="monthBorder" Property="BorderBrush" Value="{DynamicResource CalendarNavFocusBorder}" />
@@ -789,6 +1182,7 @@
     </Style>
 
     <Style TargetType="DatePicker">
+        <Setter Property="behaviors:CalendarPopupStyleBehavior.IsEnabled" Value="True" />
         <Setter Property="Background" Value="{DynamicResource SurfaceBackground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
         <Setter Property="BorderThickness" Value="1" />
@@ -848,6 +1242,16 @@
         <Setter Property="CornerRadius" Value="12" />
         <Setter Property="Padding" Value="16,16" />
         <Setter Property="Margin" Value="0,0,0,10" />
+    </Style>
+
+    <Style x:Key="ElevatedListRow" TargetType="Border" BasedOn="{StaticResource ListRow}">
+        <Setter Property="Background" Value="{DynamicResource ElevatedCardBackground}" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="{DynamicResource CardShadowColor}" BlurRadius="18"
+                                  Opacity="0.2" ShadowDepth="3" />
+            </Setter.Value>
+        </Setter>
     </Style>
 
 </ResourceDictionary>

@@ -8,17 +8,122 @@
         <conv:StatusToBrushConverter x:Key="StatusBrush" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Style x:Key="TagihanActionButton" TargetType="Button" BasedOn="{StaticResource SmallOutlineButton}">
+            <Setter Property="Foreground" Value="{DynamicResource TagihanActionForeground}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="actionBorder" Background="{DynamicResource SurfaceBackground}" BorderBrush="{StaticResource PrimaryRed}"
                                 BorderThickness="1.5" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Border x:Name="hoverOverlay" Background="{DynamicResource PrimaryRedLight}"
+                                        CornerRadius="7" Opacity="0" IsHitTestVisible="False" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverOverlay" Storyboard.TargetProperty="Opacity"
+                                                             To="0.85" Duration="0:0:0.14" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverOverlay" Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.11" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TagihanPrimaryActionButton" TargetType="Button" BasedOn="{StaticResource SmallPrimaryButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <Border.Background>
+                                <SolidColorBrush x:Name="bgBrush" Color="#D32F2F" />
+                            </Border.Background>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                               TextElement.Foreground="{TemplateBinding Foreground}" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="actionBorder" Property="Background" Value="{DynamicResource PrimaryRedLight}" />
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                            To="#B71C1C" Duration="0:0:0.18" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                            To="#D32F2F" Duration="0:0:0.18" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
+                                <Setter Property="Foreground" Value="{DynamicResource DisabledButtonText}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TagihanWarningActionButton" TargetType="Button" BasedOn="{StaticResource SmallWarningActionButton}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{DynamicResource SurfaceBackground}"
+                                BorderBrush="{DynamicResource StatusAmber}" BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <Grid>
+                                <Border x:Name="hoverOverlay" Background="{DynamicResource TransactionDateBackground}"
+                                        CornerRadius="7" Opacity="0" IsHitTestVisible="False" />
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverOverlay" Storyboard.TargetProperty="Opacity"
+                                                             To="0.85" Duration="0:0:0.14" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="hoverOverlay" Storyboard.TargetProperty="Opacity"
+                                                             To="0" Duration="0:0:0.11" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="hoverOverlay" Property="Opacity" Value="1" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
+                                <Setter TargetName="border" Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+                                <Setter Property="Foreground" Value="{DynamicResource DisabledButtonText}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -38,14 +143,15 @@
             <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" SharedSizeGroup="TagihanHeaderRow" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" SharedSizeGroup="TagihanFilterRow" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Text="Tagihan" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="0" Text="Tagihan" Foreground="{DynamicResource TextDark}"
+                           FontSize="24" FontWeight="Bold" VerticalAlignment="Center" />
                 <Button Grid.Column="1" x:Name="BuatTagihanButton" Content="+ Buat Tagihan"
                         Style="{StaticResource PrimaryButton}" Click="BuatTagihanButton_Click" />
 
@@ -64,6 +170,7 @@
                        
                         <ListBox x:Name="TagihanItems" BorderThickness="0" Background="Transparent"
                                  HorizontalContentAlignment="Stretch" SelectionChanged="TagihanItems_SelectionChanged"
+                                 MouseLeftButtonUp="TagihanItems_MouseLeftButtonUp"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
 
                             <ListBox.ItemContainerStyle>
@@ -86,7 +193,10 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Cursor="Hand">
-                                        <Border Style="{StaticResource ListRow}" />
+                                        <Border x:Name="TagihanRow" Style="{StaticResource ElevatedListRow}" />
+
+                                        <Border x:Name="HoverOverlay" Background="{DynamicResource PrimaryRedLight}"
+                                                CornerRadius="12" Opacity="0" IsHitTestVisible="False" />
 
                                         <Border x:Name="SelectionOverlay" Background="{DynamicResource PrimaryRedLight}" BorderBrush="{StaticResource PrimaryRed}"
                                                 BorderThickness="1.5" CornerRadius="12" Opacity="0" IsHitTestVisible="False" />
@@ -99,12 +209,14 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Tagihan.Name}" FontWeight="Bold" FontSize="15" />
+                                                <TextBlock Text="{Binding Tagihan.Name}" Foreground="{DynamicResource TextDark}"
+                                                           FontWeight="Bold" FontSize="15" />
                                                 <TextBlock Text="{Binding Tagihan.CreatedDate, StringFormat='dd MMM yyyy'}"
                                                            FontSize="12" Foreground="{DynamicResource TextGray}" Margin="0,3,0,0" />
                                             </StackPanel>
                                             <TextBlock Grid.Column="1" Text="{Binding Tagihan.Amount, Converter={StaticResource Rupiah}}"
-                                                       FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                                       Foreground="{DynamicResource TextDark}" FontWeight="Bold"
+                                                       VerticalAlignment="Center" Margin="0,0,12,0" />
                                             <Border Grid.Column="2" Width="24" Height="24" CornerRadius="12" Background="#2E7D32"
                                                     VerticalAlignment="Center" ToolTip="Lunas &#8212; semua siswa sudah bayar"
                                                     Visibility="{Binding IsFullyPaid, Converter={StaticResource BoolToVis}}">
@@ -113,6 +225,9 @@
                                             </Border>
                                             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
                                                 <Button Content="•••" Style="{StaticResource OverflowDotsButton}"
+                                                        ToolTip="Aksi tagihan: ubah atau hapus"
+                                                        AutomationProperties.Name="Aksi tagihan"
+                                                        AutomationProperties.HelpText="Buka menu untuk mengubah atau menghapus tagihan."
                                                         Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}"
                                                         PreviewMouseDown="ActionMenuButton_PreviewMouseDown"
                                                         Click="ShowTagihanActions_Click" />
@@ -121,6 +236,28 @@
                                     </Grid>
 
                                     <DataTemplate.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=IsMouseOver}" Value="True" />
+                                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=IsSelected}" Value="False" />
+                                            </MultiDataTrigger.Conditions>
+                                            <MultiDataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="HoverOverlay" Storyboard.TargetProperty="Opacity"
+                                                                         To="0.7" Duration="0:0:0.14" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </MultiDataTrigger.EnterActions>
+                                            <MultiDataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="HoverOverlay" Storyboard.TargetProperty="Opacity"
+                                                                         To="0" Duration="0:0:0.11" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </MultiDataTrigger.ExitActions>
+                                        </MultiDataTrigger>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListBoxItem}, Path=IsSelected}" Value="True">
                                             <DataTrigger.EnterActions>
                                                 <BeginStoryboard>
@@ -153,12 +290,22 @@
         </DockPanel>
 
         <DockPanel x:Name="PaymentDetailsPanel" Grid.Column="2" Margin="30,0,10,0">
-            <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
-                <TextBlock x:Name="DetailTitle" Text="Status Pembayaran"
-                           FontSize="16" FontWeight="Bold" VerticalAlignment="Top" TextWrapping="Wrap" Margin="27,19,18,0" TextAlignment="Right" />
+            <Grid DockPanel.Dock="Top" Margin="0,0,0,20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" SharedSizeGroup="TagihanHeaderRow" />
+                    <RowDefinition Height="Auto" SharedSizeGroup="TagihanFilterRow" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0">
+                    <Button x:Name="BackToTagihanListButton" Content="Kembali ke daftar tagihan"
+                            Style="{StaticResource SmallThemeActionButton}" HorizontalAlignment="Left"
+                            Click="BackToTagihanList_Click" Visibility="Collapsed" />
+                    <TextBlock x:Name="DetailTitle" Text="Status Pembayaran" Foreground="{DynamicResource TextDark}"
+                               FontSize="16" FontWeight="Bold" VerticalAlignment="Top" TextWrapping="Wrap" Margin="27,19,18,0" TextAlignment="Right" />
+                </StackPanel>
 
-                <ComboBox x:Name="StatusFilterComboBox" Style="{StaticResource RoundedComboBox}"
+                <ComboBox Grid.Row="1" x:Name="StatusFilterComboBox" Style="{StaticResource RoundedComboBox}"
                           Margin="27,12,0,0" HorizontalAlignment="Right" Width="180"
+                          Visibility="Collapsed"
                           SelectionChanged="StatusFilterComboBox_SelectionChanged">
                     <ComboBoxItem Content="Semua Status" IsSelected="True" Tag="Semua" />
                     <ComboBoxItem Content="Lunas" Tag="Lunas" />
@@ -166,14 +313,25 @@
                     <ComboBoxItem Content="Sebagian" Tag="Sebagian" />
                     <ComboBoxItem Content="Proses" Tag="Proses" />
                 </ComboBox>
-            </StackPanel>
+            </Grid>
 
             <Border Style="{StaticResource Card}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <ItemsControl x:Name="DetailItems">
+                <Grid>
+                    <TextBlock x:Name="NoSelectedTagihanText"
+                               Text="Pilih tagihan untuk melihat status pembayaran."
+                               Foreground="{DynamicResource TextGray}" TextWrapping="Wrap"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               TextAlignment="Center" Margin="20" />
+                    <TextBlock x:Name="NoMatchingPaymentsText"
+                               Text="Tidak ada siswa dengan status ini."
+                               Foreground="{DynamicResource TextGray}" TextWrapping="Wrap"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"
+                               TextAlignment="Center" Margin="20" Visibility="Collapsed" />
+                    <ScrollViewer x:Name="DetailScrollViewer" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+                        <ItemsControl x:Name="DetailItems">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Style="{StaticResource ListRow}">
+                                <Border Style="{StaticResource ElevatedListRow}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
@@ -181,7 +339,8 @@
                                         </Grid.ColumnDefinitions>
 
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
-                                            <TextBlock Text="{Binding SiswaName}" FontWeight="Bold" FontSize="14" />
+                                            <TextBlock Text="{Binding SiswaName}" Foreground="{DynamicResource TextDark}"
+                                                       FontWeight="Bold" FontSize="14" />
 
                                             <StackPanel Orientation="Horizontal" Margin="0,2,0,4">
                                                 <TextBlock FontSize="12" Foreground="{DynamicResource TextGray}">
@@ -199,51 +358,78 @@
                                                            FontSize="12" FontWeight="Bold" />
                                             </StackPanel>
 
-                                            <ItemsControl ItemsSource="{Binding Transactions}" Margin="0,6,0,0">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Border Background="{DynamicResource SubtleBackground}" CornerRadius="8" Padding="8" Margin="0,2,0,0">
-                                                            <Grid>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="*" />
-                                                                    <ColumnDefinition Width="Auto" />
-                                                                </Grid.ColumnDefinitions>
-                                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                                    <TextBlock Text="{Binding Transaction.Description}" FontSize="12" Foreground="{DynamicResource TextDark}" />
-                                                                    <TextBlock Text="{Binding Transaction.Date, StringFormat='dd MMM yyyy, HH:mm'}" FontSize="12" Foreground="{DynamicResource TextGray}" />
-                                                                </StackPanel>
-                                                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Expander Margin="0,6,0,0">
+                                                <Expander.Style>
+                                                    <Style TargetType="Expander">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Transactions.Count}" Value="0">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Expander.Style>
+                                                <Expander.Header>
+                                                    <TextBlock Text="{Binding Transactions.Count, StringFormat='Riwayat transaksi ({0})'}"
+                                                               FontSize="12" Foreground="{DynamicResource TextGray}" />
+                                                </Expander.Header>
+                                                <ItemsControl ItemsSource="{Binding Transactions}" Margin="0,6,0,0">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border Background="{DynamicResource SubtleBackground}" CornerRadius="8" Padding="8" Margin="0,2,0,0">
+                                                                <Grid>
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="*" />
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                    </Grid.ColumnDefinitions>
+                                                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                                        <TextBlock Text="{Binding Transaction.Description}" FontSize="12" Foreground="{DynamicResource TextDark}" />
+                                                                        <TextBlock Text="{Binding Transaction.Date, StringFormat='dd MMM yyyy, HH:mm'}" FontSize="12" Foreground="{DynamicResource TextGray}" />
+                                                                    </StackPanel>
+                                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                                                                     <TextBlock Text="{Binding Transaction.Amount, Converter={StaticResource Rupiah}}"
-                                                                               FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
-                                                                    <Button Content="•••" Style="{StaticResource OverflowDotsButton}"
-                                                                            Visibility="{Binding CanShowActions, Converter={StaticResource BoolToVis}}"
-                                                                            PreviewMouseDown="ActionMenuButton_PreviewMouseDown"
-                                                                            Click="ShowPaymentActions_Click" />
-                                                                </StackPanel>
-                                                            </Grid>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
+                                                                               Foreground="{DynamicResource TextDark}"
+                                                                                   FontSize="12" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                                                        <Button Content="•••" Style="{StaticResource OverflowDotsButton}"
+                                                                                ToolTip="Aksi transaksi lainnya"
+                                                                                AutomationProperties.Name="Aksi transaksi pembayaran"
+                                                                                AutomationProperties.HelpText="Buka menu untuk melihat tindakan yang tersedia untuk transaksi pembayaran ini."
+                                                                                Visibility="{Binding CanShowActions, Converter={StaticResource BoolToVis}}"
+                                                                                PreviewMouseDown="ActionMenuButton_PreviewMouseDown"
+                                                                                Click="ShowPaymentActions_Click" />
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Expander>
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                            <Button Content="Tandai refund lunas" Style="{StaticResource SmallOutlineButton}"
-                                                    Tag="{Binding}" Click="TandaiRefundLunas_Click" Margin="0,0,0,4" Width="130"
+                                            <Button Content="Selesaikan Refund" Style="{StaticResource TagihanWarningActionButton}"
+                                                    Tag="{Binding}" Click="TandaiRefundLunas_Click" Margin="0,0,0,6" Width="142"
+                                                    ToolTip="Saldo kas akan berkurang dan status refund menjadi Lunas."
+                                                    AutomationProperties.Name="Selesaikan Refund"
                                                     Visibility="{Binding HasPendingRefund, Converter={StaticResource BoolToVis}}" />
-                                            <Button Content="Tandai Lunas" Style="{StaticResource SmallOutlineButton}"
-                                                    Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,0,4" Width="100"
+                                            <Button Content="Bayar Sisa" Style="{StaticResource TagihanPrimaryActionButton}"
+                                                    Tag="{Binding}" Click="TandaiLunas_Click" Margin="0,0,0,6" Width="110"
+                                                    ToolTip="Catat sisa tagihan sebagai pembayaran tunai dan tambahkan ke kas."
+                                                    AutomationProperties.Name="Bayar sisa tagihan"
                                                     Visibility="{Binding CanMakePayment, Converter={StaticResource BoolToVis}}" />
-                                            <Button Content="Bayar Manual" Style="{StaticResource SmallOutlineButton}"
-                                                    Tag="{Binding}" Click="BayarManual_Click" Width="100"
+                                            <Button Content="Input Nominal" Style="{StaticResource TagihanActionButton}"
+                                                    Tag="{Binding}" Click="BayarManual_Click" Width="110"
+                                                    ToolTip="Masukkan nominal pembayaran, termasuk pembayaran sebagian."
+                                                    AutomationProperties.Name="Input nominal pembayaran"
                                                     Visibility="{Binding CanMakePayment, Converter={StaticResource BoolToVis}}" />
                                         </StackPanel>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
             </Border>
         </DockPanel>
     </Grid>

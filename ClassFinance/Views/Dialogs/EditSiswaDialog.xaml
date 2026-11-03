@@ -1,0 +1,27 @@
+<UserControl x:Class="ClassFinance.Views.Dialogs.EditSiswaDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="380" TextElement.Foreground="{DynamicResource TextDark}">
+    <StackPanel Margin="26">
+        <TextBlock Text="Ubah Data Siswa" FontSize="18" FontWeight="Bold" Margin="0,0,0,18" />
+
+        <TextBlock Text="Nama Lengkap" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="2,0,0,4" />
+        <TextBox x:Name="NameBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
+
+        <TextBlock Text="NIS" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="2,0,0,4" />
+        <TextBox x:Name="NisBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,10" />
+
+        <TextBlock x:Name="ErrorText" Foreground="{DynamicResource AccentText}" FontSize="12" Margin="2,0,0,10"
+                   Visibility="Collapsed" TextWrapping="Wrap" />
+
+        <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Batal" Style="{StaticResource OutlineButton}" Click="Cancel_Click" />
+            <Button Grid.Column="2" Content="Simpan" Style="{StaticResource PrimaryButton}" Click="Save_Click" />
+        </Grid>
+    </StackPanel>
+</UserControl>

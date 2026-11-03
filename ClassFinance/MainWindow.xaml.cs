@@ -8,6 +8,7 @@ using System.IO;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views;
+using ClassFinance.Behaviors;
 
 namespace ClassFinance
 {
@@ -19,6 +20,7 @@ namespace ClassFinance
 
         public MainWindow()
         {
+            ButtonHoverAnimationBehavior.Register();
             InitializeComponent();
             _isDarkMode = LoadDarkModePreference();
             ApplyTheme();
@@ -78,12 +80,15 @@ namespace ClassFinance
             SetThemeBrush("SurfaceBackground", _isDarkMode ? Color.FromRgb(36, 36, 42) : Color.FromRgb(255, 255, 255));
             SetThemeBrush("SubtleBackground", _isDarkMode ? Color.FromRgb(46, 46, 53) : Color.FromRgb(245, 245, 247));
             SetThemeBrush("CardBackground", _isDarkMode ? Color.FromRgb(43, 40, 48) : Color.FromRgb(234, 230, 239));
+            SetThemeBrush("ElevatedCardBackground", _isDarkMode ? Color.FromRgb(54, 51, 61) : Color.FromRgb(226, 220, 234));
+            SetThemeColor("CardShadowColor", _isDarkMode ? Color.FromRgb(156, 160, 174) : Color.FromRgb(0, 0, 0));
             SetThemeBrush("SidebarBackground", _isDarkMode ? Color.FromRgb(36, 27, 31) : Color.FromRgb(183, 28, 28));
             SetThemeBrush("TextDark", _isDarkMode ? Color.FromRgb(243, 244, 246) : Color.FromRgb(33, 33, 33));
             SetThemeBrush("TextGray", _isDarkMode ? Color.FromRgb(180, 180, 190) : Color.FromRgb(95, 99, 104));
             SetThemeBrush("BorderColor", _isDarkMode ? Color.FromRgb(66, 66, 75) : Color.FromRgb(224, 224, 224));
             SetThemeBrush("PrimaryRedLight", _isDarkMode ? Color.FromRgb(70, 37, 42) : Color.FromRgb(255, 235, 238));
             SetThemeBrush("AccentText", _isDarkMode ? Color.FromRgb(255, 77, 77) : Color.FromRgb(183, 28, 28));
+            SetThemeBrush("TagihanActionForeground", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(183, 28, 28));
             SetThemeBrush("StatusGreen", _isDarkMode ? Color.FromRgb(129, 199, 132) : Color.FromRgb(27, 94, 32));
             SetThemeBrush("StatusAmber", _isDarkMode ? Color.FromRgb(255, 183, 77) : Color.FromRgb(141, 75, 0));
             SetThemeBrush("StatusRed", _isDarkMode ? Color.FromRgb(255, 114, 114) : Color.FromRgb(183, 28, 28));

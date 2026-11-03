@@ -1,6 +1,8 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using System.Windows.Media.Animation;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views.Dialogs;
@@ -42,6 +44,7 @@ namespace ClassFinance.Views
         private Button _pendingActionMenuToggle;
         private bool _responsiveLayoutInitialized;
         private bool _isCompactLayout;
+        private bool _showCompactDetails;
 
         public TagihanPage(User currentUser, MainWindow mainWindow, int? initialTagihanId = null)
         {
@@ -78,14 +81,13 @@ namespace ClassFinance.Views
             {
                 TagihanLayoutGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 TagihanLayoutGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-                TagihanLayoutGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
 
                 Grid.SetColumn(BillListPanel, 0);
                 Grid.SetColumnSpan(BillListPanel, 1);
                 Grid.SetRow(BillListPanel, 0);
                 Grid.SetColumn(PaymentDetailsPanel, 0);
-                Grid.SetRow(PaymentDetailsPanel, 1);
-                PaymentDetailsPanel.Margin = new Thickness(0, 24, 0, 0);
+                Grid.SetRow(PaymentDetailsPanel, 0);
+                PaymentDetailsPanel.Margin = new Thickness(0);
             }
             else
             {
@@ -101,11 +103,68 @@ namespace ClassFinance.Views
                 Grid.SetRow(PaymentDetailsPanel, 0);
                 PaymentDetailsPanel.Margin = new Thickness(30, 0, 10, 0);
             }
+
+            UpdateCompactPaneVisibility();
+        }
+
+        private void UpdateCompactPaneVisibility()
+        {
+            if (!_responsiveLayoutInitialized)
+                return;
+
+            var showDetails = _selectedTagihan != null && _showCompactDetails;
+            BackToTagihanListButton.Visibility = _isCompactLayout && showDetails
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+            if (_isCompactLayout)
+            {
+                BillListPanel.Visibility = showDetails ? Visibility.Collapsed : Visibility.Visible;
+                PaymentDetailsPanel.Visibility = showDetails ? Visibility.Visible : Visibility.Collapsed;
+                DetailTitle.HorizontalAlignment = HorizontalAlignment.Left;
+                DetailTitle.TextAlignment = TextAlignment.Left;
+                DetailTitle.Margin = new Thickness(0, 12, 0, 0);
+                StatusFilterComboBox.HorizontalAlignment = HorizontalAlignment.Left;
+                StatusFilterComboBox.Margin = new Thickness(0, 12, 0, 0);
+            }
+            else
+            {
+                BillListPanel.Visibility = Visibility.Visible;
+                PaymentDetailsPanel.Visibility = Visibility.Visible;
+                DetailTitle.HorizontalAlignment = HorizontalAlignment.Right;
+                DetailTitle.TextAlignment = TextAlignment.Right;
+                DetailTitle.Margin = new Thickness(27, 19, 18, 0);
+                StatusFilterComboBox.HorizontalAlignment = HorizontalAlignment.Right;
+                StatusFilterComboBox.Margin = new Thickness(27, 12, 0, 0);
+            }
+        }
+
+        private void BackToTagihanList_Click(object sender, RoutedEventArgs e)
+        {
+            if (!_isCompactLayout)
+                return;
+
+            _showCompactDetails = false;
+            UpdateCompactPaneVisibility();
+            TagihanItems.Focus();
+        }
+
+        private void TagihanItems_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!_isCompactLayout || _showCompactDetails || _selectedTagihan == null ||
+                ItemsControl.ContainerFromElement(TagihanItems, e.OriginalSource as DependencyObject) is not ListBoxItem)
+                return;
+
+            _showCompactDetails = true;
+            DetailTitle.Text = $"Status Pembayaran \u2014 {_selectedTagihan.Name}";
+            ApplyFilter();
         }
 
         private void Refresh()
         {
             if (TagihanItems == null) return;
+
+            var preserveCompactPane = _showCompactDetails;
 
             var query = DataStore.Instance.TagihanList.Where(t => t.KelasId == _kelasId)
                 .OrderByDescending(t => t.Id)
@@ -133,6 +192,9 @@ namespace ClassFinance.Views
             var tagihanList = query.ToList();
             TagihanItems.ItemsSource = tagihanList;
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
+            EmptyText.Text = DataStore.Instance.TagihanList.Any(t => t.KelasId == _kelasId)
+                ? "Tidak ada tagihan yang sesuai dengan filter."
+                : "Belum ada tagihan.";
 
             if (_initialTagihanId.HasValue)
             {
@@ -146,9 +208,26 @@ namespace ClassFinance.Views
             }
             else if (_selectedTagihan != null)
             {
-                TagihanItems.SelectedItem = tagihanList.FirstOrDefault(x => x.Tagihan.Id == _selectedTagihan.Id);
-                ApplyFilter();
+                var selected = tagihanList.FirstOrDefault(x => x.Tagihan.Id == _selectedTagihan.Id);
+                if (selected == null)
+                {
+                    _selectedTagihan = null;
+                    _showCompactDetails = false;
+                    TagihanItems.SelectedItem = null;
+                    DetailTitle.Text = "Status Pembayaran";
+                    ApplyFilter();
+                }
+                else
+                {
+                    TagihanItems.SelectedItem = selected;
+                    _showCompactDetails = preserveCompactPane;
+                    ApplyFilter();
+                }
             }
+            else
+                ApplyFilter();
+
+            UpdateCompactPaneVisibility();
         }
 
         private void TagihanFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -161,6 +240,7 @@ namespace ClassFinance.Views
             if (TagihanItems.SelectedItem is TagihanDisplayItem displayItem)
             {
                 _selectedTagihan = displayItem.Tagihan;
+                _showCompactDetails = true;
                 DetailTitle.Text = $"Status Pembayaran \u2014 {_selectedTagihan.Name}";
                 ApplyFilter();
             }
@@ -168,12 +248,24 @@ namespace ClassFinance.Views
 
         private void StatusFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // The initial IsSelected item can raise this event while InitializeComponent
+            // is still building the rest of the page, before DetailItems exists.
+            if (DetailItems == null) return;
             ApplyFilter();
         }
 
         private void ApplyFilter()
         {
-            if (_selectedTagihan == null) return;
+            if (_selectedTagihan == null)
+            {
+                DetailItems.ItemsSource = null;
+                DetailScrollViewer.Visibility = Visibility.Collapsed;
+                NoSelectedTagihanText.Visibility = Visibility.Visible;
+                NoMatchingPaymentsText.Visibility = Visibility.Collapsed;
+                StatusFilterComboBox.Visibility = Visibility.Collapsed;
+                UpdateCompactPaneVisibility();
+                return;
+            }
 
             var query = DataStore.Instance.TagihanSiswaList
                 .Where(ts => ts.TagihanId == _selectedTagihan.Id)
@@ -208,7 +300,28 @@ namespace ClassFinance.Views
                 };
             }
 
-            DetailItems.ItemsSource = query.ToList();
+            var details = query.ToList();
+            DetailItems.ItemsSource = details;
+            if (details.Any())
+            {
+                DetailScrollViewer.Visibility = Visibility.Visible;
+                DetailScrollViewer.Opacity = 0;
+                DetailScrollViewer.BeginAnimation(UIElement.OpacityProperty,
+                    new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(160))
+                    {
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    }, HandoffBehavior.SnapshotAndReplace);
+            }
+            else
+            {
+                DetailScrollViewer.BeginAnimation(UIElement.OpacityProperty, null);
+                DetailScrollViewer.Opacity = 1;
+                DetailScrollViewer.Visibility = Visibility.Collapsed;
+            }
+            NoSelectedTagihanText.Visibility = Visibility.Collapsed;
+            NoMatchingPaymentsText.Visibility = details.Any() ? Visibility.Collapsed : Visibility.Visible;
+            StatusFilterComboBox.Visibility = Visibility.Visible;
+            UpdateCompactPaneVisibility();
         }
 
         private void BuatTagihanButton_Click(object sender, RoutedEventArgs e)
@@ -258,6 +371,11 @@ namespace ClassFinance.Views
             if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display &&
                 display.Entry.Status != StatusTagihan.Lunas && display.Entry.Status != StatusTagihan.Proses)
             {
+                if (MessageBox.Show(
+                        $"Catat pembayaran tunai sebesar Rp {display.Entry.AmountDue:N0} untuk {display.SiswaName}?\n\nSaldo kas akan bertambah sebesar nominal ini.",
+                        "Konfirmasi pembayaran", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                    return;
+
                 bendahara.CatatPembayaran(display.Entry.Id, display.Entry.AmountDue, "Tunai");
                 Refresh();
             }
@@ -272,6 +390,18 @@ namespace ClassFinance.Views
             var pendingRefunds = DataStore.Instance.TransaksiList
                 .Where(t => t.TagihanSiswaId == display.Entry.Id && t.IsPendingRefund)
                 .ToList();
+
+            if (pendingRefunds.Count == 0)
+            {
+                Refresh();
+                return;
+            }
+
+            var totalRefund = pendingRefunds.Sum(t => t.Amount);
+            if (MessageBox.Show(
+                    $"Selesaikan {pendingRefunds.Count} refund untuk {display.SiswaName} dengan total Rp {totalRefund:N0}?\n\nSaldo kas akan berkurang sebesar jumlah tersebut dan status refund berubah menjadi Lunas.",
+                    "Konfirmasi penyelesaian refund", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+                return;
 
             foreach (var refund in pendingRefunds)
                 bendahara.TandaiRefundDibayar(refund.Id);

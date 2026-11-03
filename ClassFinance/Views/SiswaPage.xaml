@@ -46,7 +46,7 @@
                         <ItemsControl x:Name="SiswaItems">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Style="{StaticResource ListRow}">
+                                    <Border Style="{StaticResource ElevatedListRow}">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
@@ -79,8 +79,14 @@
                                                 </WrapPanel>
                                             </StackPanel>
 
-                                            <Button Grid.Column="1" Content="Hapus" Style="{StaticResource SmallOutlineButton}"
-                                    Tag="{Binding Siswa}" Click="Hapus_Click" />
+                                            <Button Grid.Column="1" Content="•••" Style="{StaticResource OverflowDotsButton}"
+                                                    ToolTip="Aksi siswa: ubah atau hapus"
+                                                    AutomationProperties.Name="Aksi siswa"
+                                                    AutomationProperties.HelpText="Buka menu untuk mengubah atau menghapus data siswa."
+                                                    Visibility="{Binding CanManage, Converter={StaticResource BoolToVis}}"
+                                                    PreviewMouseDown="StudentActionMenuButton_PreviewMouseDown"
+                                                    Click="ShowStudentActions_Click"
+                                                    VerticalAlignment="Center" />
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

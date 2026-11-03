@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using ClassFinance.Models;
 using ClassFinance.Services;
@@ -15,6 +16,7 @@ namespace ClassFinance.Views
         public int UnpaidCount { get; set; }
         public int ProsesCount { get; set; }
         public int TotalTagihanCount { get; set; }
+        public bool CanManage { get; set; }
         public bool HasUnpaid => UnpaidCount > 0;
         public bool HasProses => ProsesCount > 0;
 
@@ -27,6 +29,8 @@ namespace ClassFinance.Views
         private readonly User _currentUser;
         private readonly MainWindow _mainWindow;
         private readonly int _kelasId;
+        private ContextMenu _openStudentMenu;
+        private Button _pendingStudentMenuToggle;
 
         public SiswaPage(User currentUser, MainWindow mainWindow)
         {
@@ -54,7 +58,7 @@ namespace ClassFinance.Views
             ApplyFilter();
         }
 
-        private static SiswaRosterItem ToRosterItem(Siswa s)
+        private static SiswaRosterItem ToRosterItem(Siswa s, bool canManage)
         {
             var tagihanEntries = DataStore.Instance.TagihanSiswaList.Where(ts => ts.SiswaId == s.Id).ToList();
             return new SiswaRosterItem
@@ -65,7 +69,8 @@ namespace ClassFinance.Views
                     .Sum(t => (decimal?)t.Amount) ?? 0,
                 UnpaidCount = tagihanEntries.Count(ts => ts.Status != StatusTagihan.Lunas && ts.Status != StatusTagihan.Proses),
                 ProsesCount = tagihanEntries.Count(ts => ts.Status == StatusTagihan.Proses),
-                TotalTagihanCount = tagihanEntries.Count
+                TotalTagihanCount = tagihanEntries.Count,
+                CanManage = canManage
             };
         }
 
@@ -85,7 +90,7 @@ namespace ClassFinance.Views
                     (s.Nis != null && s.Nis.ToLower().Contains(keyword))
                   ).ToList();
 
-            var rosterItems = filteredSiswa.Select(ToRosterItem).ToList();
+            var rosterItems = filteredSiswa.Select(s => ToRosterItem(s, _currentUser is Bendahara)).ToList();
             SiswaItems.ItemsSource = rosterItems;
 
             if (rosterItems.Count == 0)
@@ -110,17 +115,80 @@ namespace ClassFinance.Views
 
         private void Hapus_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is Siswa siswa)
+            if (_currentUser is Bendahara && sender is FrameworkElement element && element.Tag is Siswa siswa)
             {
-                var confirm = MessageBox.Show($"Hapus data siswa '{siswa.Name}'?", "Konfirmasi",
+                var confirm = MessageBox.Show($"Hapus data siswa '{siswa.Name}'?", "Hapus siswa",
                     MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (confirm == MessageBoxResult.Yes)
                 {
                     DataStore.Instance.HapusSiswa(siswa.Id);
-                    ApplyFilter();
                     Refresh();
                 }
             }
+        }
+
+        private void EditSiswa_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is Bendahara && sender is FrameworkElement element && element.Tag is Siswa siswa)
+                _mainWindow.ShowModal(new EditSiswaDialog(siswa, _mainWindow, Refresh));
+        }
+
+        private void ShowStudentActions_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentUser is not Bendahara || sender is not Button button ||
+                button.DataContext is not SiswaRosterItem rosterItem)
+                return;
+
+            if (CloseOpenStudentMenuIfSameButton(button))
+                return;
+
+            if (_openStudentMenu?.IsOpen == true)
+                _openStudentMenu.IsOpen = false;
+
+            var menu = new ContextMenu
+            {
+                Style = (Style)FindResource("PopupActionMenu"),
+                Placement = PlacementMode.Bottom
+            };
+            menu.Items.Add(CreateStudentMenuItem("Ubah data siswa", rosterItem.Siswa, EditSiswa_Click));
+            menu.Items.Add(CreateStudentMenuItem("Hapus siswa", rosterItem.Siswa, Hapus_Click));
+            menu.PlacementTarget = button;
+            menu.Closed += (_, _) =>
+            {
+                if (ReferenceEquals(_pendingStudentMenuToggle, button)) return;
+                if (ReferenceEquals(_openStudentMenu, menu))
+                    _openStudentMenu = null;
+            };
+
+            _openStudentMenu = menu;
+            menu.IsOpen = menu.Items.Count > 0;
+        }
+
+        private bool CloseOpenStudentMenuIfSameButton(Button button)
+        {
+            bool togglingCurrent = ReferenceEquals(_pendingStudentMenuToggle, button) ||
+                ReferenceEquals(_openStudentMenu?.PlacementTarget, button);
+            _pendingStudentMenuToggle = null;
+            if (!togglingCurrent)
+                return false;
+
+            if (_openStudentMenu != null)
+                _openStudentMenu.IsOpen = false;
+            _openStudentMenu = null;
+            return true;
+        }
+
+        private void StudentActionMenuButton_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _pendingStudentMenuToggle = sender is Button button &&
+                ReferenceEquals(_openStudentMenu?.PlacementTarget, button) ? button : null;
+        }
+
+        private static MenuItem CreateStudentMenuItem(string header, Siswa siswa, RoutedEventHandler onClick)
+        {
+            var item = new MenuItem { Header = header, Tag = siswa };
+            item.Click += onClick;
+            return item;
         }
 
         private void SiswaName_Click(object sender, MouseButtonEventArgs e)

@@ -4,9 +4,11 @@
              Width="400" Background="{DynamicResource SurfaceBackground}" TextElement.Foreground="{DynamicResource TextDark}">
     <Border Padding="24" CornerRadius="8" Background="{DynamicResource SurfaceBackground}">
         <StackPanel>
-            <TextBlock Text="Bayar Manual" FontSize="20" FontWeight="Bold" Margin="0,0,0,16"/>
+            <TextBlock Text="Input Nominal Pembayaran" FontSize="20" FontWeight="Bold" Margin="0,0,0,16"/>
             <TextBlock x:Name="SiswaNameText" FontWeight="Bold"/>
             <TextBlock x:Name="AmountDueText" Foreground="{DynamicResource TextGray}" Margin="0,0,0,16"/>
+            <TextBlock Text="Pembayaran yang dicatat akan menambah saldo kas." Foreground="{DynamicResource TextGray}"
+                       FontSize="12" TextWrapping="Wrap" Margin="0,-8,0,16" />
 
             <TextBlock Text="Nominal yang dibayar (Rp)" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="0,0,0,4"/>
             <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,8" />
@@ -23,7 +25,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Content="Batal" Style="{StaticResource OutlineButton}" Click="Cancel_Click"/>
-                <Button Grid.Column="2" Content="Simpan" Style="{StaticResource PrimaryButton}" Click="Save_Click"/>
+                <Button Grid.Column="2" Content="Catat Pembayaran" Style="{StaticResource PrimaryButton}" Click="Save_Click"/>
             </Grid>
         </StackPanel>
     </Border>
