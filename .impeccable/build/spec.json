@@ -1,0 +1,1772 @@
+{
+  "tool": "comp-spec",
+  "version": 1,
+  "createdAt": "2026-11-04T03:43:39.154Z",
+  "comp": ".impeccable/mocks/decision/r3-fintrack-red.png",
+  "warnings": [
+    "region recent-transactions: \"container\": true set in the regions file (the region-size refusal is overridden: one undivided element)",
+    "region transaction-table-rows: \"container\": true set in the regions file (the region-size refusal is overridden: one undivided element)"
+  ],
+  "uncoveredInkCells": [],
+  "compSize": {
+    "width": 1487,
+    "height": 1058
+  },
+  "aspect": 1.4055,
+  "orientation": "landscape",
+  "palette": [
+    {
+      "hex": "#091111",
+      "coverage": 0.8795
+    },
+    {
+      "hex": "#37191b",
+      "coverage": 0.0764
+    },
+    {
+      "hex": "#5c6567",
+      "coverage": 0.0177
+    },
+    {
+      "hex": "#363f3f",
+      "coverage": 0.0133
+    },
+    {
+      "hex": "#e9e9e9",
+      "coverage": 0.0131
+    }
+  ],
+  "bands": [
+    {
+      "y": 0.044,
+      "strength": 0.2275
+    },
+    {
+      "y": 0.0989,
+      "strength": 0.2001
+    },
+    {
+      "y": 0.1319,
+      "strength": 0.3822
+    },
+    {
+      "y": 0.1538,
+      "strength": 0.3799
+    },
+    {
+      "y": 0.2198,
+      "strength": 0.2059
+    },
+    {
+      "y": 0.5934,
+      "strength": 0.2343
+    },
+    {
+      "y": 0.6374,
+      "strength": 0.2361
+    },
+    {
+      "y": 0.6703,
+      "strength": 0.2841
+    },
+    {
+      "y": 0.7033,
+      "strength": 0.3766
+    },
+    {
+      "y": 0.7363,
+      "strength": 0.3392
+    },
+    {
+      "y": 0.7802,
+      "strength": 0.3016
+    },
+    {
+      "y": 0.8571,
+      "strength": 0.2207
+    }
+  ],
+  "regions": [
+    {
+      "id": "sidebar-brand",
+      "kind": "chrome",
+      "note": "Existing Class Finance logo displayed from ClassFinance/Assets/logo.png. The approved comp approximates this horizontal mark; the user explicitly requires the real app logo, which remains unchanged.",
+      "grid": "A0:B0",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "px": {
+        "x": 0,
+        "y": 0,
+        "w": 297,
+        "h": 106
+      },
+      "aspect": 2.8019,
+      "palette": [
+        {
+          "hex": "#090909",
+          "coverage": 0.9063
+        },
+        {
+          "hex": "#bc1617",
+          "coverage": 0.0441
+        },
+        {
+          "hex": "#f5f5f5",
+          "coverage": 0.0267
+        },
+        {
+          "hex": "#ed1c1a",
+          "coverage": 0.0115
+        },
+        {
+          "hex": "#490d0e",
+          "coverage": 0.0115
+        }
+      ],
+      "detail": {
+        "energy": 20.171
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "sidebar-navigation",
+      "kind": "chrome",
+      "note": "Dark app navigation with the Ringkasan item selected in brand red.",
+      "grid": "A1:B9",
+      "box": {
+        "x": 0,
+        "y": 0.1,
+        "w": 0.2,
+        "h": 0.9
+      },
+      "px": {
+        "x": 0,
+        "y": 106,
+        "w": 297,
+        "h": 952
+      },
+      "aspect": 0.312,
+      "palette": [
+        {
+          "hex": "#080a0a",
+          "coverage": 0.9543
+        },
+        {
+          "hex": "#921818",
+          "coverage": 0.0297
+        },
+        {
+          "hex": "#2e3a3a",
+          "coverage": 0.0068
+        },
+        {
+          "hex": "#ebebeb",
+          "coverage": 0.005
+        },
+        {
+          "hex": "#282838",
+          "coverage": 0.0042
+        }
+      ],
+      "detail": {
+        "energy": 8.1747
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "page-heading",
+      "kind": "text",
+      "note": "Ringkasan page title.",
+      "grid": "B0:E0",
+      "coverBox": {
+        "x": 0.1,
+        "y": 0,
+        "w": 0.4,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.1809,
+        "y": 0.017,
+        "w": 0.113,
+        "h": 0.0454
+      },
+      "px": {
+        "x": 269,
+        "y": 18,
+        "w": 168,
+        "h": 48
+      },
+      "aspect": 3.5,
+      "palette": [
+        {
+          "hex": "#090a0a",
+          "coverage": 0.8079
+        },
+        {
+          "hex": "#f3f3f3",
+          "coverage": 0.1135
+        },
+        {
+          "hex": "#7f8283",
+          "coverage": 0.0393
+        },
+        {
+          "hex": "#33383b",
+          "coverage": 0.0213
+        },
+        {
+          "hex": "#b9bcba",
+          "coverage": 0.018
+        }
+      ],
+      "detail": {
+        "energy": 42.0093
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 9,
+          "capHeightPx": 24.5,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.6119,
+          "advTall": 0.6119,
+          "advX": 0.6119,
+          "gap": 0.1224,
+          "xRatio": 0.7342,
+          "stemW": 0.1267,
+          "contrast": 1.0807,
+          "serif": null,
+          "densTall": 0.4855,
+          "densX": 0.4642,
+          "weight": 0.4855
+        },
+        "widthClass": "normal",
+        "weightClass": "medium"
+      }
+    },
+    {
+      "id": "date-context",
+      "kind": "text",
+      "note": "Current date and class context.",
+      "grid": "H0:I0",
+      "coverBox": {
+        "x": 0.7,
+        "y": 0,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.7364,
+        "y": 0.017,
+        "w": 0.1251,
+        "h": 0.034
+      },
+      "px": {
+        "x": 1095,
+        "y": 18,
+        "w": 186,
+        "h": 36
+      },
+      "aspect": 5.1667,
+      "palette": [
+        {
+          "hex": "#09090a",
+          "coverage": 0.8477
+        },
+        {
+          "hex": "#f2f2f2",
+          "coverage": 0.0701
+        },
+        {
+          "hex": "#7e7f7f",
+          "coverage": 0.035
+        },
+        {
+          "hex": "#b7bbbc",
+          "coverage": 0.031
+        },
+        {
+          "hex": "#474849",
+          "coverage": 0.0162
+        }
+      ],
+      "detail": {
+        "energy": 44.3716
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 13,
+          "capHeightPx": 16,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.6234,
+          "advTall": 0.6234,
+          "advX": 0.639,
+          "gap": 0.0935,
+          "xRatio": 0.7396,
+          "stemW": 0.1472,
+          "contrast": 1.0473,
+          "serif": 0.4229,
+          "densTall": 0.4583,
+          "densX": 0.5291,
+          "weight": 0.4583
+        },
+        "widthClass": "normal",
+        "weightClass": "regular"
+      }
+    },
+    {
+      "id": "data-context-control",
+      "kind": "control",
+      "note": "Small label showing the data scope or source.",
+      "grid": "I0:J0",
+      "coverBox": {
+        "x": 0.8,
+        "y": 0,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.885,
+        "y": 0.0113,
+        "w": 0.1049,
+        "h": 0.0454
+      },
+      "px": {
+        "x": 1316,
+        "y": 12,
+        "w": 156,
+        "h": 48
+      },
+      "aspect": 3.25,
+      "palette": [
+        {
+          "hex": "#080a0c",
+          "coverage": 0.7828
+        },
+        {
+          "hex": "#c8c8c5",
+          "coverage": 0.0934
+        },
+        {
+          "hex": "#929292",
+          "coverage": 0.0801
+        },
+        {
+          "hex": "#f0f1f0",
+          "coverage": 0.0255
+        },
+        {
+          "hex": "#3d3f3f",
+          "coverage": 0.0182
+        }
+      ],
+      "detail": {
+        "energy": 39.9694
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "balance-card",
+      "kind": "control",
+      "note": "Available class cash summary card.",
+      "grid": "B1:D1",
+      "coverBox": {
+        "x": 0.1,
+        "y": 0.1,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.2293,
+        "y": 0.1229,
+        "w": 0.121,
+        "h": 0.0397
+      },
+      "px": {
+        "x": 341,
+        "y": 130,
+        "w": 180,
+        "h": 42
+      },
+      "aspect": 4.2857,
+      "palette": [
+        {
+          "hex": "#0a1718",
+          "coverage": 0.8257
+        },
+        {
+          "hex": "#eef0f0",
+          "coverage": 0.0697
+        },
+        {
+          "hex": "#454b4d",
+          "coverage": 0.0505
+        },
+        {
+          "hex": "#949899",
+          "coverage": 0.0288
+        },
+        {
+          "hex": "#bbc0c2",
+          "coverage": 0.0252
+        }
+      ],
+      "detail": {
+        "energy": 41.2937
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "balance-label",
+      "kind": "text",
+      "note": "Kas tersedia label.",
+      "grid": "C1:D1",
+      "coverBox": {
+        "x": 0.2,
+        "y": 0.1,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.228,
+        "y": 0.1229,
+        "w": 0.121,
+        "h": 0.0397
+      },
+      "px": {
+        "x": 339,
+        "y": 130,
+        "w": 180,
+        "h": 42
+      },
+      "aspect": 4.2857,
+      "palette": [
+        {
+          "hex": "#091718",
+          "coverage": 0.8474
+        },
+        {
+          "hex": "#f2f2f3",
+          "coverage": 0.0817
+        },
+        {
+          "hex": "#b1b4b6",
+          "coverage": 0.0264
+        },
+        {
+          "hex": "#545a5b",
+          "coverage": 0.024
+        },
+        {
+          "hex": "#828688",
+          "coverage": 0.0204
+        }
+      ],
+      "detail": {
+        "energy": 41.3742
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 7,
+          "capHeightPx": 21.9,
+          "inkIsDark": false,
+          "allCaps": true,
+          "advance": 0.6858,
+          "advTall": 0.6858,
+          "advX": null,
+          "gap": 0.1829,
+          "xRatio": null,
+          "stemW": 0.1368,
+          "contrast": 1.0513,
+          "serif": null,
+          "densTall": 0.4518,
+          "densX": null,
+          "weight": 0.4518
+        },
+        "widthClass": "normal",
+        "weightClass": "regular"
+      }
+    },
+    {
+      "id": "balance-value",
+      "kind": "text",
+      "note": "Available balance amount.",
+      "grid": "C1:D1",
+      "coverBox": {
+        "x": 0.2,
+        "y": 0.1,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.228,
+        "y": 0.1229,
+        "w": 0.121,
+        "h": 0.0397
+      },
+      "px": {
+        "x": 339,
+        "y": 130,
+        "w": 180,
+        "h": 42
+      },
+      "aspect": 4.2857,
+      "palette": [
+        {
+          "hex": "#091718",
+          "coverage": 0.8474
+        },
+        {
+          "hex": "#f2f2f3",
+          "coverage": 0.0817
+        },
+        {
+          "hex": "#b1b4b6",
+          "coverage": 0.0264
+        },
+        {
+          "hex": "#545a5b",
+          "coverage": 0.024
+        },
+        {
+          "hex": "#828688",
+          "coverage": 0.0204
+        }
+      ],
+      "detail": {
+        "energy": 41.3742
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 7,
+          "capHeightPx": 21.9,
+          "inkIsDark": false,
+          "allCaps": true,
+          "advance": 0.6858,
+          "advTall": 0.6858,
+          "advX": null,
+          "gap": 0.1829,
+          "xRatio": null,
+          "stemW": 0.1368,
+          "contrast": 1.0513,
+          "serif": null,
+          "densTall": 0.4518,
+          "densX": null,
+          "weight": 0.4518
+        },
+        "widthClass": "normal",
+        "weightClass": "regular"
+      }
+    },
+    {
+      "id": "student-card",
+      "kind": "control",
+      "note": "Total active students summary card.",
+      "grid": "D1:F1",
+      "box": {
+        "x": 0.3,
+        "y": 0.1,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "px": {
+        "x": 446,
+        "y": 106,
+        "w": 446,
+        "h": 106
+      },
+      "aspect": 4.2075,
+      "palette": [
+        {
+          "hex": "#081414",
+          "coverage": 0.9289
+        },
+        {
+          "hex": "#293235",
+          "coverage": 0.0383
+        },
+        {
+          "hex": "#565e60",
+          "coverage": 0.0131
+        },
+        {
+          "hex": "#eeeeee",
+          "coverage": 0.013
+        },
+        {
+          "hex": "#878a8a",
+          "coverage": 0.0067
+        }
+      ],
+      "detail": {
+        "energy": 24.5609
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "student-label",
+      "kind": "text",
+      "note": "Total siswa label.",
+      "grid": "E1:F1",
+      "coverBox": {
+        "x": 0.4,
+        "y": 0.1,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.5414,
+        "y": 0.1002,
+        "w": 0.0323,
+        "h": 0.0624
+      },
+      "px": {
+        "x": 805,
+        "y": 106,
+        "w": 48,
+        "h": 66
+      },
+      "aspect": 0.7273,
+      "palette": [
+        {
+          "hex": "#0a1617",
+          "coverage": 0.8522
+        },
+        {
+          "hex": "#f06557",
+          "coverage": 0.0667
+        },
+        {
+          "hex": "#9ea4a2",
+          "coverage": 0.0319
+        },
+        {
+          "hex": "#c4514c",
+          "coverage": 0.0261
+        },
+        {
+          "hex": "#602824",
+          "coverage": 0.0232
+        }
+      ],
+      "detail": {
+        "energy": 7.9792
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": null,
+        "measuredAt": "2026-11-04T03:43:39.815Z",
+        "note": "no separable lettering in the crop; size by the region box"
+      }
+    },
+    {
+      "id": "student-value",
+      "kind": "text",
+      "note": "Student count.",
+      "grid": "E1:F1",
+      "coverBox": {
+        "x": 0.4,
+        "y": 0.1,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.5414,
+        "y": 0.1002,
+        "w": 0.0323,
+        "h": 0.0624
+      },
+      "px": {
+        "x": 805,
+        "y": 106,
+        "w": 48,
+        "h": 66
+      },
+      "aspect": 0.7273,
+      "palette": [
+        {
+          "hex": "#0a1617",
+          "coverage": 0.8522
+        },
+        {
+          "hex": "#f06557",
+          "coverage": 0.0667
+        },
+        {
+          "hex": "#9ea4a2",
+          "coverage": 0.0319
+        },
+        {
+          "hex": "#c4514c",
+          "coverage": 0.0261
+        },
+        {
+          "hex": "#602824",
+          "coverage": 0.0232
+        }
+      ],
+      "detail": {
+        "energy": 7.9792
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": null,
+        "measuredAt": "2026-11-04T03:43:39.924Z",
+        "note": "no separable lettering in the crop; size by the region box"
+      }
+    },
+    {
+      "id": "outstanding-card",
+      "kind": "control",
+      "note": "Open student bill balance summary card.",
+      "grid": "F1:H1",
+      "coverBox": {
+        "x": 0.5,
+        "y": 0.1,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.581,
+        "y": 0.1229,
+        "w": 0.1009,
+        "h": 0.0397
+      },
+      "px": {
+        "x": 864,
+        "y": 130,
+        "w": 150,
+        "h": 42
+      },
+      "aspect": 3.5714,
+      "palette": [
+        {
+          "hex": "#091718",
+          "coverage": 0.7965
+        },
+        {
+          "hex": "#f45b50",
+          "coverage": 0.0805
+        },
+        {
+          "hex": "#bd483e",
+          "coverage": 0.0512
+        },
+        {
+          "hex": "#692b29",
+          "coverage": 0.0469
+        },
+        {
+          "hex": "#331b1b",
+          "coverage": 0.0249
+        }
+      ],
+      "detail": {
+        "energy": 18.187
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "outstanding-label",
+      "kind": "text",
+      "note": "Tagihan belum lunas label.",
+      "grid": "G1:H1",
+      "box": {
+        "x": 0.6,
+        "y": 0.1,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "px": {
+        "x": 892,
+        "y": 106,
+        "w": 297,
+        "h": 106
+      },
+      "aspect": 2.8019,
+      "palette": [
+        {
+          "hex": "#091516",
+          "coverage": 0.8925
+        },
+        {
+          "hex": "#444e50",
+          "coverage": 0.0555
+        },
+        {
+          "hex": "#f1f3f2",
+          "coverage": 0.0228
+        },
+        {
+          "hex": "#f05a51",
+          "coverage": 0.0168
+        },
+        {
+          "hex": "#c0c3c3",
+          "coverage": 0.0124
+        }
+      ],
+      "detail": {
+        "energy": 32.8335
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 2,
+          "glyphs": 30,
+          "capHeightPx": 14,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.5377,
+          "advTall": 0.4024,
+          "advX": 0.6132,
+          "gap": 0.1415,
+          "xRatio": 0.7043,
+          "stemW": 0.1592,
+          "contrast": 1.0492,
+          "serif": 0.9793,
+          "densTall": 0.5615,
+          "densX": 0.6132,
+          "weight": 0.5615
+        },
+        "widthClass": "normal",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "outstanding-value",
+      "kind": "text",
+      "note": "Remaining bill amount.",
+      "grid": "G1:H1",
+      "box": {
+        "x": 0.6,
+        "y": 0.1,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "px": {
+        "x": 892,
+        "y": 106,
+        "w": 297,
+        "h": 106
+      },
+      "aspect": 2.8019,
+      "palette": [
+        {
+          "hex": "#091516",
+          "coverage": 0.8925
+        },
+        {
+          "hex": "#444e50",
+          "coverage": 0.0555
+        },
+        {
+          "hex": "#f1f3f2",
+          "coverage": 0.0228
+        },
+        {
+          "hex": "#f05a51",
+          "coverage": 0.0168
+        },
+        {
+          "hex": "#c0c3c3",
+          "coverage": 0.0124
+        }
+      ],
+      "detail": {
+        "energy": 32.8335
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 2,
+          "glyphs": 30,
+          "capHeightPx": 14,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.5377,
+          "advTall": 0.4024,
+          "advX": 0.6132,
+          "gap": 0.1415,
+          "xRatio": 0.7043,
+          "stemW": 0.1592,
+          "contrast": 1.0492,
+          "serif": 0.9793,
+          "densTall": 0.5615,
+          "densX": 0.6132,
+          "weight": 0.5615
+        },
+        "widthClass": "normal",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "cashflow-card",
+      "kind": "control",
+      "note": "Monthly class cash-flow chart with data-driven income and expense lines.",
+      "grid": "B2:H4",
+      "box": {
+        "x": 0.1,
+        "y": 0.2,
+        "w": 0.7,
+        "h": 0.3
+      },
+      "px": {
+        "x": 149,
+        "y": 212,
+        "w": 1041,
+        "h": 317
+      },
+      "aspect": 3.2839,
+      "palette": [
+        {
+          "hex": "#0c1415",
+          "coverage": 0.8234
+        },
+        {
+          "hex": "#3f1818",
+          "coverage": 0.1376
+        },
+        {
+          "hex": "#434b4d",
+          "coverage": 0.0229
+        },
+        {
+          "hex": "#e4e4e4",
+          "coverage": 0.0104
+        },
+        {
+          "hex": "#9d9f9d",
+          "coverage": 0.0058
+        }
+      ],
+      "detail": {
+        "energy": 15.7463
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "cashflow-title",
+      "kind": "text",
+      "note": "Arus kas title and period context.",
+      "grid": "B2:D2",
+      "coverBox": {
+        "x": 0.1,
+        "y": 0.2,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.189,
+        "y": 0.2401,
+        "w": 0.0686,
+        "h": 0.0605
+      },
+      "px": {
+        "x": 281,
+        "y": 254,
+        "w": 102,
+        "h": 64
+      },
+      "aspect": 1.5938,
+      "palette": [
+        {
+          "hex": "#091718",
+          "coverage": 0.8084
+        },
+        {
+          "hex": "#353a3c",
+          "coverage": 0.0729
+        },
+        {
+          "hex": "#dee0e0",
+          "coverage": 0.0486
+        },
+        {
+          "hex": "#707374",
+          "coverage": 0.0432
+        },
+        {
+          "hex": "#a6a9aa",
+          "coverage": 0.027
+        }
+      ],
+      "detail": {
+        "energy": 27.2154
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 2,
+          "glyphs": 16,
+          "capHeightPx": 10.5,
+          "inkIsDark": false,
+          "allCaps": true,
+          "advance": 0.6851,
+          "advTall": 0.6851,
+          "advX": null,
+          "gap": 0.0644,
+          "xRatio": null,
+          "stemW": 0.1949,
+          "contrast": 1.0021,
+          "serif": null,
+          "densTall": 0.5682,
+          "densX": null,
+          "weight": 0.5682
+        },
+        "widthClass": "normal",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "cashflow-legend",
+      "kind": "text",
+      "note": "Pemasukan and pengeluaran legend.",
+      "grid": "D4:F4",
+      "coverBox": {
+        "x": 0.3,
+        "y": 0.4,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.4654,
+        "y": 0.4735,
+        "w": 0.0928,
+        "h": 0.0265
+      },
+      "px": {
+        "x": 692,
+        "y": 501,
+        "w": 138,
+        "h": 28
+      },
+      "aspect": 4.9286,
+      "palette": [
+        {
+          "hex": "#091717",
+          "coverage": 0.8527
+        },
+        {
+          "hex": "#eff0f1",
+          "coverage": 0.0402
+        },
+        {
+          "hex": "#404648",
+          "coverage": 0.0379
+        },
+        {
+          "hex": "#c8cccd",
+          "coverage": 0.0357
+        },
+        {
+          "hex": "#829d8a",
+          "coverage": 0.0335
+        }
+      ],
+      "detail": {
+        "energy": 30.2043
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 10,
+          "capHeightPx": 11.9,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.926,
+          "advTall": 0.9541,
+          "advX": 0.6173,
+          "gap": 0.0842,
+          "xRatio": 0.7131,
+          "stemW": 0.1766,
+          "contrast": 1.1807,
+          "serif": 0.3714,
+          "densTall": 0.4909,
+          "densX": 0.6121,
+          "weight": 0.4909
+        },
+        "widthClass": "normal",
+        "weightClass": "medium"
+      }
+    },
+    {
+      "id": "attention-panel",
+      "kind": "control",
+      "note": "Students who have no bill record or still owe, with outstanding amounts.",
+      "grid": "H1:J2",
+      "box": {
+        "x": 0.7,
+        "y": 0.1,
+        "w": 0.3,
+        "h": 0.2
+      },
+      "px": {
+        "x": 1041,
+        "y": 106,
+        "w": 446,
+        "h": 212
+      },
+      "aspect": 2.1038,
+      "palette": [
+        {
+          "hex": "#091516",
+          "coverage": 0.8374
+        },
+        {
+          "hex": "#445152",
+          "coverage": 0.0899
+        },
+        {
+          "hex": "#903837",
+          "coverage": 0.0419
+        },
+        {
+          "hex": "#bebfbf",
+          "coverage": 0.0161
+        },
+        {
+          "hex": "#797c7f",
+          "coverage": 0.0147
+        }
+      ],
+      "detail": {
+        "energy": 30.1342
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "attention-title",
+      "kind": "text",
+      "note": "Perlu perhatian heading.",
+      "grid": "H1:J1",
+      "box": {
+        "x": 0.7,
+        "y": 0.1,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "px": {
+        "x": 1041,
+        "y": 106,
+        "w": 446,
+        "h": 106
+      },
+      "aspect": 4.2075,
+      "palette": [
+        {
+          "hex": "#091617",
+          "coverage": 0.8261
+        },
+        {
+          "hex": "#374c4d",
+          "coverage": 0.086
+        },
+        {
+          "hex": "#913937",
+          "coverage": 0.0424
+        },
+        {
+          "hex": "#bfc0c0",
+          "coverage": 0.0236
+        },
+        {
+          "hex": "#f0efef",
+          "coverage": 0.0219
+        }
+      ],
+      "detail": {
+        "energy": 35.1856
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 2,
+          "glyphs": 42,
+          "capHeightPx": 19.1,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.3838,
+          "advTall": 1.5735,
+          "advX": 0.3838,
+          "gap": 0.0533,
+          "xRatio": 0.5035,
+          "stemW": 0.1175,
+          "contrast": 1.0902,
+          "serif": 0.8738,
+          "densTall": 0.5614,
+          "densX": 0.6087,
+          "weight": 0.5614
+        },
+        "widthClass": "compressed",
+        "weightClass": "bold"
+      }
+    },
+    {
+      "id": "active-bill-panel",
+      "kind": "control",
+      "note": "Most recent active class bill and payment summary.",
+      "grid": "H3:J4",
+      "coverBox": {
+        "x": 0.7,
+        "y": 0.3,
+        "w": 0.3,
+        "h": 0.2
+      },
+      "box": {
+        "x": 0.7202,
+        "y": 0.3393,
+        "w": 0.2179,
+        "h": 0.0737
+      },
+      "px": {
+        "x": 1071,
+        "y": 359,
+        "w": 324,
+        "h": 78
+      },
+      "aspect": 4.1538,
+      "palette": [
+        {
+          "hex": "#091717",
+          "coverage": 0.8759
+        },
+        {
+          "hex": "#e8eaea",
+          "coverage": 0.0617
+        },
+        {
+          "hex": "#4b5152",
+          "coverage": 0.0248
+        },
+        {
+          "hex": "#838788",
+          "coverage": 0.0215
+        },
+        {
+          "hex": "#adb3b3",
+          "coverage": 0.0161
+        }
+      ],
+      "detail": {
+        "energy": 49.8729
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "active-bill-title",
+      "kind": "text",
+      "note": "Tagihan aktif heading and current bill name.",
+      "grid": "H3:J3",
+      "coverBox": {
+        "x": 0.7,
+        "y": 0.3,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.7202,
+        "y": 0.3393,
+        "w": 0.2179,
+        "h": 0.0605
+      },
+      "px": {
+        "x": 1071,
+        "y": 359,
+        "w": 324,
+        "h": 64
+      },
+      "aspect": 5.0625,
+      "palette": [
+        {
+          "hex": "#091617",
+          "coverage": 0.8539
+        },
+        {
+          "hex": "#e8eaea",
+          "coverage": 0.073
+        },
+        {
+          "hex": "#4a5152",
+          "coverage": 0.0289
+        },
+        {
+          "hex": "#838788",
+          "coverage": 0.0251
+        },
+        {
+          "hex": "#adb3b3",
+          "coverage": 0.0191
+        }
+      ],
+      "detail": {
+        "energy": 56.9402
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 2,
+          "glyphs": 33,
+          "capHeightPx": 18.3,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.5551,
+          "advTall": 0.7248,
+          "advX": 0.5273,
+          "gap": 0.0833,
+          "xRatio": 0.68,
+          "stemW": 0.132,
+          "contrast": 1.0752,
+          "serif": 0.9556,
+          "densTall": 0.4823,
+          "densX": 0.5267,
+          "weight": 0.4823
+        },
+        "widthClass": "condensed",
+        "weightClass": "medium"
+      }
+    },
+    {
+      "id": "recent-transactions",
+      "kind": "control",
+      "note": "Recent class ledger table with search, type filter, and all-history action.",
+      "grid": "B5:J9",
+      "container": true,
+      "coverBox": {
+        "x": 0.1,
+        "y": 0.5,
+        "w": 0.9,
+        "h": 0.5
+      },
+      "box": {
+        "x": 0.1574,
+        "y": 0.5,
+        "w": 0.8386,
+        "h": 0.4726
+      },
+      "px": {
+        "x": 234,
+        "y": 529,
+        "w": 1247,
+        "h": 500
+      },
+      "aspect": 2.494,
+      "palette": [
+        {
+          "hex": "#091415",
+          "coverage": 0.8475
+        },
+        {
+          "hex": "#37181d",
+          "coverage": 0.0725
+        },
+        {
+          "hex": "#383e40",
+          "coverage": 0.0521
+        },
+        {
+          "hex": "#606668",
+          "coverage": 0.0141
+        },
+        {
+          "hex": "#e9e9e9",
+          "coverage": 0.0137
+        }
+      ],
+      "detail": {
+        "energy": 22.9612
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "transactions-title",
+      "kind": "text",
+      "note": "Transaksi terbaru heading.",
+      "grid": "B5:D5",
+      "coverBox": {
+        "x": 0.1,
+        "y": 0.5,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.1607,
+        "y": 0.5,
+        "w": 0.2394,
+        "h": 0.1002
+      },
+      "px": {
+        "x": 239,
+        "y": 529,
+        "w": 356,
+        "h": 106
+      },
+      "aspect": 3.3585,
+      "palette": [
+        {
+          "hex": "#081213",
+          "coverage": 0.8662
+        },
+        {
+          "hex": "#37181c",
+          "coverage": 0.0783
+        },
+        {
+          "hex": "#35383e",
+          "coverage": 0.0259
+        },
+        {
+          "hex": "#465353",
+          "coverage": 0.0166
+        },
+        {
+          "hex": "#ebebeb",
+          "coverage": 0.013
+        }
+      ],
+      "detail": {
+        "energy": 20.2738
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 1,
+          "glyphs": 15,
+          "capHeightPx": 17.9,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.5593,
+          "advTall": 0.4754,
+          "advX": 0.5872,
+          "gap": 0.1119,
+          "xRatio": 0.7179,
+          "stemW": 0.1441,
+          "contrast": 1.0613,
+          "serif": 0.72,
+          "densTall": 0.4647,
+          "densX": 0.5279,
+          "weight": 0.4647
+        },
+        "widthClass": "normal",
+        "weightClass": "regular"
+      }
+    },
+    {
+      "id": "transaction-filter-controls",
+      "kind": "control",
+      "note": "Transaction search and direction filter controls.",
+      "grid": "H5:J5",
+      "coverBox": {
+        "x": 0.7,
+        "y": 0.5,
+        "w": 0.3,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.7001,
+        "y": 0.5227,
+        "w": 0.2986,
+        "h": 0.0775
+      },
+      "px": {
+        "x": 1041,
+        "y": 553,
+        "w": 444,
+        "h": 82
+      },
+      "aspect": 5.4146,
+      "palette": [
+        {
+          "hex": "#0d1619",
+          "coverage": 0.8144
+        },
+        {
+          "hex": "#37181b",
+          "coverage": 0.1103
+        },
+        {
+          "hex": "#33383b",
+          "coverage": 0.0455
+        },
+        {
+          "hex": "#5d666a",
+          "coverage": 0.0188
+        },
+        {
+          "hex": "#979d9d",
+          "coverage": 0.011
+        }
+      ],
+      "detail": {
+        "energy": 22.5608
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    },
+    {
+      "id": "transaction-table-headers",
+      "kind": "text",
+      "note": "Tanggal, keterangan, jenis, and amount headings.",
+      "grid": "B6:J6",
+      "coverBox": {
+        "x": 0.1,
+        "y": 0.6,
+        "w": 0.9,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.306,
+        "y": 0.6002,
+        "w": 0.6658,
+        "h": 0.1002
+      },
+      "px": {
+        "x": 455,
+        "y": 635,
+        "w": 990,
+        "h": 106
+      },
+      "aspect": 9.3396,
+      "palette": [
+        {
+          "hex": "#081517",
+          "coverage": 0.6728
+        },
+        {
+          "hex": "#381920",
+          "coverage": 0.2512
+        },
+        {
+          "hex": "#444d4e",
+          "coverage": 0.0348
+        },
+        {
+          "hex": "#6f413e",
+          "coverage": 0.0294
+        },
+        {
+          "hex": "#e9e9e9",
+          "coverage": 0.0118
+        }
+      ],
+      "detail": {
+        "energy": 28.1866
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 3,
+          "glyphs": 102,
+          "capHeightPx": 13.9,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.6003,
+          "advTall": 0.6003,
+          "advX": 0.6003,
+          "gap": 0.104,
+          "xRatio": 0.7207,
+          "stemW": 0.1576,
+          "contrast": 1.056,
+          "serif": 0.4507,
+          "densTall": 0.4891,
+          "densX": 0.5879,
+          "weight": 0.4891
+        },
+        "widthClass": "normal",
+        "weightClass": "medium"
+      }
+    },
+    {
+      "id": "transaction-table-rows",
+      "kind": "text",
+      "note": "Recent transaction dates, descriptions, directions, and amounts from the database.",
+      "grid": "B6:J9",
+      "container": true,
+      "coverBox": {
+        "x": 0.1,
+        "y": 0.6,
+        "w": 0.9,
+        "h": 0.4
+      },
+      "box": {
+        "x": 0.1997,
+        "y": 0.6002,
+        "w": 0.7996,
+        "h": 0.3488
+      },
+      "px": {
+        "x": 297,
+        "y": 635,
+        "w": 1189,
+        "h": 369
+      },
+      "aspect": 3.2222,
+      "palette": [
+        {
+          "hex": "#091617",
+          "coverage": 0.8363
+        },
+        {
+          "hex": "#381920",
+          "coverage": 0.0749
+        },
+        {
+          "hex": "#4d5759",
+          "coverage": 0.0473
+        },
+        {
+          "hex": "#2e3335",
+          "coverage": 0.024
+        },
+        {
+          "hex": "#e9e9e9",
+          "coverage": 0.0175
+        }
+      ],
+      "detail": {
+        "energy": 28.7305
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null,
+      "type": {
+        "comp": {
+          "lines": 9,
+          "glyphs": 476,
+          "capHeightPx": 14.4,
+          "inkIsDark": false,
+          "allCaps": false,
+          "advance": 0.5952,
+          "advTall": 0.6022,
+          "advX": 0.589,
+          "gap": 0.1008,
+          "xRatio": 0.7373,
+          "stemW": 0.1593,
+          "contrast": 1.0529,
+          "serif": 1.0975,
+          "densTall": 0.4772,
+          "densX": 0.5757,
+          "weight": 0.4772
+        },
+        "widthClass": "normal",
+        "weightClass": "regular"
+      }
+    },
+    {
+      "id": "history-action",
+      "kind": "control",
+      "note": "Lihat semua navigates to the transaction history page.",
+      "grid": "I9:J9",
+      "coverBox": {
+        "x": 0.8,
+        "y": 0.9,
+        "w": 0.2,
+        "h": 0.1
+      },
+      "box": {
+        "x": 0.881,
+        "y": 0.8998,
+        "w": 0.1009,
+        "h": 0.0284
+      },
+      "px": {
+        "x": 1310,
+        "y": 952,
+        "w": 150,
+        "h": 30
+      },
+      "aspect": 5,
+      "palette": [
+        {
+          "hex": "#081517",
+          "coverage": 0.7431
+        },
+        {
+          "hex": "#220a15",
+          "coverage": 0.1083
+        },
+        {
+          "hex": "#cd3d36",
+          "coverage": 0.0658
+        },
+        {
+          "hex": "#f2423b",
+          "coverage": 0.0488
+        },
+        {
+          "hex": "#742322",
+          "coverage": 0.034
+        }
+      ],
+      "detail": {
+        "energy": 19.9848
+      },
+      "medium": "semantic",
+      "plate": null,
+      "text": null
+    }
+  ]
+}

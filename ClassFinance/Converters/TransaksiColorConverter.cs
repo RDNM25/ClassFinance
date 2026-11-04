@@ -7,19 +7,19 @@ using ClassFinance.Models;
 
 namespace ClassFinance.Converters
 {
-    /// <summary>Masuk -> red (matches the reference UI), Keluar -> gray.</summary>
+    /// <summary>Incoming transactions use semantic green; expenses use semantic red.</summary>
     public class TransaksiColorConverter : IValueConverter
     {
-        private static readonly SolidColorBrush Red = new(Color.FromRgb(0xD3, 0x2F, 0x2F));
-        private static readonly SolidColorBrush Gray = new(Color.FromRgb(0x75, 0x75, 0x75));
+        private static readonly SolidColorBrush Income = new(Color.FromRgb(0x2E, 0x7D, 0x32));
+        private static readonly SolidColorBrush Expense = new(Color.FromRgb(0xC6, 0x28, 0x28));
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is Transaksi t)
                 return t.Type == JenisTransaksi.Masuk
-                    ? ThemeBrush("IncomeColor", Red)
-                    : ThemeBrush("ExpenseColor", Gray);
-            return ThemeBrush("ExpenseColor", Gray);
+                    ? ThemeBrush("IncomeColor", Income)
+                    : ThemeBrush("ExpenseColor", Expense);
+            return ThemeBrush("ExpenseColor", Expense);
         }
 
         private static SolidColorBrush ThemeBrush(string key, SolidColorBrush fallback) =>

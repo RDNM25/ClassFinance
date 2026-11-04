@@ -13,7 +13,7 @@
                 <Border Background="{StaticResource PrimaryRed}" CornerRadius="18,18,60,60" Padding="0,36,0,36">
                     <StackPanel HorizontalAlignment="Center">
                         <Image Source="/Assets/logo.png" Width="110" Height="110" Stretch="Uniform" />
-                        <TextBlock Text="Selamat Datang Kembali" Foreground="White" FontSize="24" FontWeight="Bold"
+                        <TextBlock Text="Selamat Datang Kembali" Foreground="White" FontSize="24"
                                    HorizontalAlignment="Center" Margin="0,16,0,4" />
                         <TextBlock Text="Masuk ke Class Finance" Foreground="White" FontSize="13"
                                    HorizontalAlignment="Center" />

@@ -34,6 +34,7 @@ namespace ClassFinance.Models
             if (transaksi.Type == JenisTransaksi.Keluar)
             {
                 transaksi.Amount = amount;
+                DataStore.Instance.SaveChanges();
                 return;
             }
 
@@ -58,10 +59,12 @@ namespace ClassFinance.Models
                 tagihanSiswa.JumlahDibayar = totalAfterEdit;
                 tagihanSiswa.AmountDue = Math.Max(0, tagihan.Amount - totalAfterEdit);
                 tagihanSiswa.UpdateStatus();
+                DataStore.Instance.SaveChanges();
                 return;
             }
 
             transaksi.Amount = amount;
+            DataStore.Instance.SaveChanges();
         }
 
         public void HapusTransaksi(int transaksiId)
@@ -69,7 +72,7 @@ namespace ClassFinance.Models
             var transaksi = DataStore.Instance.TransaksiList.First(t => t.Id == transaksiId);
             TagihanSiswa linkedEntry = null;
             Tagihan linkedBill = null;
-
+              
             if (transaksi.Type == JenisTransaksi.Masuk && transaksi.TagihanSiswaId.HasValue)
             {
                 var tagihanSiswaId = transaksi.TagihanSiswaId.Value;
@@ -85,7 +88,7 @@ namespace ClassFinance.Models
                     throw new InvalidOperationException("Pembayaran dengan saldo lebih tidak dapat dihapus.");
             }
 
-            DataStore.Instance.TransaksiList.Remove(transaksi);
+            DataStore.Instance.DeleteTransaction(transaksiId);
 
             if (transaksi.IsRefund && transaksi.TagihanSiswaId.HasValue)
             {
@@ -105,6 +108,7 @@ namespace ClassFinance.Models
                 else
                     linkedEntry.UpdateStatus();
             }
+            DataStore.Instance.SaveChanges();
         }
 
         public void UbahTagihan(int tagihanId, string name, decimal amount)
@@ -127,6 +131,12 @@ namespace ClassFinance.Models
                 else
                     entry.UpdateStatus();
             }
+            foreach (var siswa in DataStore.Instance.Users.OfType<Siswa>().Where(s => s.KelasId == tagihan.KelasId))
+            {
+                Notifikasi.Kirim(siswa.Id, "Tagihan Diperbarui",
+                    $"Tagihan '{tagihan.Name}' diperbarui menjadi Rp{tagihan.Amount:N0}.", tagihan.Id);
+            }
+            DataStore.Instance.SaveChanges();
         }
 
         public void HapusTagihan(int tagihanId)
@@ -140,9 +150,7 @@ namespace ClassFinance.Models
             if (DataStore.Instance.TransaksiList.Any(t => t.TagihanSiswaId.HasValue && entryIds.Contains(t.TagihanSiswaId.Value)))
                 throw new InvalidOperationException("Tagihan dengan transaksi pembayaran terkait tidak dapat dihapus.");
 
-            foreach (var entry in DataStore.Instance.TagihanSiswaList.Where(ts => ts.TagihanId == tagihanId).ToList())
-                DataStore.Instance.TagihanSiswaList.Remove(entry);
-            DataStore.Instance.TagihanList.Remove(tagihan);
+            DataStore.Instance.DeleteBill(tagihanId);
         }
 
         public Tagihan BuatTagihan(int kelasId, string name, decimal amount, DateTime? createdDate = null)
@@ -160,6 +168,7 @@ namespace ClassFinance.Models
             }
 
             Notifikasi.KirimUntukTagihanBaru(kelasId, tagihan.Id);
+            DataStore.Instance.SaveChanges();
             return tagihan;
         }
 
@@ -191,6 +200,7 @@ namespace ClassFinance.Models
             refund.IsPendingRefund = true;
             var tagihan = DataStore.Instance.TagihanSiswaList.First(t => t.Id == tagihanSiswaId);
             tagihan.Status = StatusTagihan.Proses;
+            DataStore.Instance.SaveChanges();
             return refund;
         }
 
@@ -208,6 +218,7 @@ namespace ClassFinance.Models
             {
                 DataStore.Instance.TagihanSiswaList.FirstOrDefault(t => t.Id == tagihanId.Value)?.UpdateStatus();
             }
+            DataStore.Instance.SaveChanges();
         }
 
         // Save overpayment to the student's balance and automatically apply it without inflating total cash
@@ -218,6 +229,7 @@ namespace ClassFinance.Models
 
             // Automatically check and apply stored balance to future bills with 0 cash added
             ProsesSaldoTitipanBerikutnya(siswaId, amount, date);
+            DataStore.Instance.SaveChanges();
         }
 
         // Automatically apply stored balance to subsequent bills with 0 additional cash added to the total kas
@@ -267,6 +279,7 @@ namespace ClassFinance.Models
                     break;
                 }
             }
+            DataStore.Instance.SaveChanges();
         }
 
         public string GenerateLaporan(int kelasId, string periode, string format)

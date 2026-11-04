@@ -22,6 +22,18 @@ namespace ClassFinance
         {
             ButtonHoverAnimationBehavior.Register();
             InitializeComponent();
+            try
+            {
+                DataStore.Instance.Initialize();
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(
+                    $"Tidak dapat terhubung ke database kasmate. Pastikan MySQL/MariaDB XAMPP aktif dan database sudah dimigrasikan.\n\n{exception.Message}",
+                    "Koneksi Database Gagal", MessageBoxButton.OK, MessageBoxImage.Error);
+                Close();
+                return;
+            }
             _isDarkMode = LoadDarkModePreference();
             ApplyTheme();
             ShowLogin();
@@ -76,63 +88,68 @@ namespace ClassFinance
 
         private void ApplyTheme()
         {
-            SetThemeBrush("AppBackground", _isDarkMode ? Color.FromRgb(24, 24, 28) : Color.FromRgb(245, 245, 247));
-            SetThemeBrush("SurfaceBackground", _isDarkMode ? Color.FromRgb(36, 36, 42) : Color.FromRgb(255, 255, 255));
-            SetThemeBrush("SubtleBackground", _isDarkMode ? Color.FromRgb(46, 46, 53) : Color.FromRgb(245, 245, 247));
-            SetThemeBrush("CardBackground", _isDarkMode ? Color.FromRgb(43, 40, 48) : Color.FromRgb(234, 230, 239));
-            SetThemeBrush("ElevatedCardBackground", _isDarkMode ? Color.FromRgb(54, 51, 61) : Color.FromRgb(226, 220, 234));
-            SetThemeColor("CardShadowColor", _isDarkMode ? Color.FromRgb(156, 160, 174) : Color.FromRgb(0, 0, 0));
-            SetThemeBrush("SidebarBackground", _isDarkMode ? Color.FromRgb(36, 27, 31) : Color.FromRgb(183, 28, 28));
-            SetThemeBrush("TextDark", _isDarkMode ? Color.FromRgb(243, 244, 246) : Color.FromRgb(33, 33, 33));
-            SetThemeBrush("TextGray", _isDarkMode ? Color.FromRgb(180, 180, 190) : Color.FromRgb(95, 99, 104));
-            SetThemeBrush("BorderColor", _isDarkMode ? Color.FromRgb(66, 66, 75) : Color.FromRgb(224, 224, 224));
-            SetThemeBrush("PrimaryRedLight", _isDarkMode ? Color.FromRgb(70, 37, 42) : Color.FromRgb(255, 235, 238));
-            SetThemeBrush("AccentText", _isDarkMode ? Color.FromRgb(255, 77, 77) : Color.FromRgb(183, 28, 28));
-            SetThemeBrush("TagihanActionForeground", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(183, 28, 28));
-            SetThemeBrush("StatusGreen", _isDarkMode ? Color.FromRgb(129, 199, 132) : Color.FromRgb(27, 94, 32));
-            SetThemeBrush("StatusAmber", _isDarkMode ? Color.FromRgb(255, 183, 77) : Color.FromRgb(141, 75, 0));
-            SetThemeBrush("StatusRed", _isDarkMode ? Color.FromRgb(255, 114, 114) : Color.FromRgb(183, 28, 28));
-            SetThemeBrush("IncomeColor", _isDarkMode ? Color.FromRgb(255, 77, 77) : Color.FromRgb(198, 40, 40));
-            SetThemeBrush("ExpenseColor", _isDarkMode ? Color.FromRgb(196, 198, 207) : Color.FromRgb(84, 84, 84));
-            SetThemeBrush("ErrorColor", _isDarkMode ? Color.FromRgb(255, 77, 77) : Color.FromRgb(183, 28, 28));
-            SetThemeBrush("DisabledButtonBackground", _isDarkMode ? Color.FromRgb(69, 69, 76) : Color.FromRgb(226, 226, 226));
-            SetThemeBrush("DisabledButtonText", _isDarkMode ? Color.FromRgb(224, 224, 229) : Color.FromRgb(87, 87, 87));
-            SetThemeBrush("DisabledText", _isDarkMode ? Color.FromRgb(164, 164, 174) : Color.FromRgb(112, 112, 120));
-            SetThemeBrush("TransactionDateBackground", _isDarkMode ? Color.FromRgb(101, 68, 20) : Color.FromRgb(255, 224, 178));
-            SetThemeBrush("TransactionDateForeground", _isDarkMode ? Color.FromRgb(255, 224, 163) : Color.FromRgb(109, 60, 0));
-            SetThemeBrush("TransactionDateBorder", _isDarkMode ? Color.FromRgb(255, 194, 102) : Color.FromRgb(173, 92, 0));
-            SetThemeBrush("ActionButtonBackground", Color.FromRgb(255, 255, 255));
-            SetThemeBrush("ActionButtonForeground", _isDarkMode ? Color.FromRgb(17, 17, 17) : Color.FromRgb(183, 28, 28));
-            SetThemeBrush("ActionButtonBorder", Color.FromRgb(211, 47, 47));
-            SetThemeBrush("ActionButtonHoverBackground", Color.FromRgb(243, 244, 246));
-            SetThemeBrush("ActionButtonPressedBackground", Color.FromRgb(229, 231, 235));
-            SetThemeBrush("CalendarNavBackground", _isDarkMode ? Color.FromRgb(58, 58, 67) : Color.FromRgb(244, 244, 246));
-            SetThemeBrush("CalendarNavForeground", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(33, 33, 33));
-            SetThemeBrush("CalendarNavBorder", _isDarkMode ? Color.FromRgb(112, 112, 125) : Color.FromRgb(199, 199, 208));
-            SetThemeBrush("CalendarNavHoverBackground", _isDarkMode ? Color.FromRgb(211, 47, 47) : Color.FromRgb(255, 235, 238));
-            SetThemeBrush("CalendarNavHoverForeground", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(33, 33, 33));
-            SetThemeBrush("CalendarNavPressedBackground", _isDarkMode ? Color.FromRgb(183, 28, 28) : Color.FromRgb(255, 205, 210));
-            SetThemeBrush("CalendarCurrentMonthBackground", _isDarkMode ? Color.FromRgb(70, 37, 42) : Color.FromRgb(255, 235, 238));
-            SetThemeBrush("CalendarCurrentMonthBorder", _isDarkMode ? Color.FromRgb(255, 77, 77) : Color.FromRgb(183, 28, 28));
-            SetThemeBrush("CalendarSelectedMonthBackground", Color.FromRgb(211, 47, 47));
+            SetThemeBrush("AppBackground", _isDarkMode ? Color.FromRgb(7, 8, 10) : Color.FromRgb(244, 245, 247));
+            SetThemeBrush("SurfaceBackground", _isDarkMode ? Color.FromRgb(16, 18, 20) : Color.FromRgb(255, 255, 255));
+            SetThemeBrush("SubtleBackground", _isDarkMode ? Color.FromRgb(25, 27, 30) : Color.FromRgb(241, 242, 243));
+            SetThemeBrush("CardBackground", _isDarkMode ? Color.FromRgb(19, 21, 24) : Color.FromRgb(255, 255, 255));
+            SetThemeBrush("ElevatedCardBackground", _isDarkMode ? Color.FromRgb(28, 30, 34) : Color.FromRgb(242, 243, 245));
+            SetThemeColor("CardShadowColor", Color.FromRgb(0, 0, 0));
+            SetThemeBrush("SidebarBackground", Color.FromRgb(8, 9, 10));
+            SetThemeBrush("TextDark", _isDarkMode ? Color.FromRgb(238, 240, 242) : Color.FromRgb(27, 27, 27));
+            SetThemeBrush("TextGray", _isDarkMode ? Color.FromRgb(165, 169, 175) : Color.FromRgb(101, 106, 112));
+            SetThemeBrush("BorderColor", _isDarkMode ? Color.FromRgb(51, 54, 59) : Color.FromRgb(215, 217, 220));
+            SetThemeBrush("PrimaryRed", Color.FromRgb(225, 29, 46));
+            SetThemeBrush("PrimaryRedDark", Color.FromRgb(185, 23, 42));
+            SetThemeBrush("PrimaryRedLight", _isDarkMode ? Color.FromRgb(53, 18, 26) : Color.FromRgb(252, 232, 232));
+            SetThemeBrush("AccentText", _isDarkMode ? Color.FromRgb(255, 77, 90) : Color.FromRgb(185, 28, 28));
+            SetThemeBrush("TagihanActionForeground", _isDarkMode ? Color.FromRgb(255, 77, 90) : Color.FromRgb(185, 28, 28));
+            SetThemeBrush("StatusGreen", _isDarkMode ? Color.FromRgb(123, 203, 152) : Color.FromRgb(46, 125, 50));
+            SetThemeBrush("StatusAmber", _isDarkMode ? Color.FromRgb(231, 184, 94) : Color.FromRgb(141, 107, 47));
+            SetThemeBrush("StatusRed", _isDarkMode ? Color.FromRgb(255, 77, 90) : Color.FromRgb(198, 40, 40));
+            SetThemeBrush("IncomeColor", _isDarkMode ? Color.FromRgb(123, 203, 152) : Color.FromRgb(46, 125, 50));
+            SetThemeBrush("ExpenseColor", _isDarkMode ? Color.FromRgb(255, 77, 90) : Color.FromRgb(198, 40, 40));
+            SetThemeBrush("ErrorColor", _isDarkMode ? Color.FromRgb(255, 77, 90) : Color.FromRgb(198, 40, 40));
+            SetThemeBrush("CashFlowPrimaryColor", _isDarkMode ? Color.FromRgb(255, 56, 76) : Color.FromRgb(225, 29, 46));
+            SetThemeBrush("CashFlowSecondaryColor", _isDarkMode ? Color.FromRgb(161, 173, 165) : Color.FromRgb(130, 145, 137));
+            SetThemeBrush("CashFlowIncomeFill", _isDarkMode ? Color.FromArgb(54, 255, 56, 76) : Color.FromArgb(36, 225, 29, 46));
+            SetThemeBrush("DisabledButtonBackground", _isDarkMode ? Color.FromRgb(43, 46, 50) : Color.FromRgb(231, 233, 236));
+            SetThemeBrush("DisabledButtonText", _isDarkMode ? Color.FromRgb(142, 148, 155) : Color.FromRgb(91, 96, 103));
+            SetThemeBrush("DisabledText", _isDarkMode ? Color.FromRgb(117, 123, 130) : Color.FromRgb(119, 125, 133));
+            SetThemeBrush("TransactionDateBackground", _isDarkMode ? Color.FromRgb(49, 23, 27) : Color.FromRgb(252, 232, 232));
+            SetThemeBrush("TransactionDateForeground", _isDarkMode ? Color.FromRgb(255, 91, 101) : Color.FromRgb(185, 28, 28));
+            SetThemeBrush("TransactionDateBorder", _isDarkMode ? Color.FromRgb(153, 45, 57) : Color.FromRgb(240, 68, 82));
+            SetThemeBrush("ActionButtonBackground", _isDarkMode ? Color.FromRgb(21, 23, 26) : Color.FromRgb(255, 255, 255));
+            SetThemeBrush("ActionButtonForeground", _isDarkMode ? Color.FromRgb(225, 227, 230) : Color.FromRgb(185, 28, 28));
+            SetThemeBrush("ActionButtonBorder", _isDarkMode ? Color.FromRgb(255, 74, 87) : Color.FromRgb(240, 68, 82));
+            SetThemeBrush("ActionButtonHoverBackground", _isDarkMode ? Color.FromRgb(53, 18, 25) : Color.FromRgb(255, 240, 240));
+            SetThemeBrush("ActionButtonPressedBackground", _isDarkMode ? Color.FromRgb(78, 23, 34) : Color.FromRgb(243, 196, 196));
+            SetThemeBrush("CalendarNavBackground", _isDarkMode ? Color.FromRgb(29, 32, 36) : Color.FromRgb(242, 243, 245));
+            SetThemeBrush("CalendarNavForeground", _isDarkMode ? Color.FromRgb(212, 214, 218) : Color.FromRgb(27, 27, 27));
+            SetThemeBrush("CalendarNavBorder", _isDarkMode ? Color.FromRgb(62, 66, 72) : Color.FromRgb(196, 200, 204));
+            SetThemeBrush("CalendarNavHoverBackground", _isDarkMode ? Color.FromRgb(57, 18, 25) : Color.FromRgb(252, 232, 232));
+            SetThemeBrush("CalendarNavHoverForeground", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(27, 27, 27));
+            SetThemeBrush("CalendarNavPressedBackground", _isDarkMode ? Color.FromRgb(78, 23, 34) : Color.FromRgb(243, 196, 196));
+            SetThemeBrush("CalendarCurrentMonthBackground", _isDarkMode ? Color.FromRgb(49, 18, 24) : Color.FromRgb(252, 232, 232));
+            SetThemeBrush("CalendarCurrentMonthBorder", _isDarkMode ? Color.FromRgb(255, 77, 90) : Color.FromRgb(225, 29, 46));
+            SetThemeBrush("CalendarSelectedMonthBackground", Color.FromRgb(225, 29, 46));
             SetThemeBrush("CalendarSelectedMonthForeground", Color.FromRgb(255, 255, 255));
-            SetThemeBrush("CalendarSelectedMonthBorder", Color.FromRgb(138, 28, 28));
-            SetThemeBrush("CalendarNavFocusBorder", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(33, 33, 33));
-            SetThemeBrush("CalendarNavArrowBackground", _isDarkMode ? Color.FromRgb(243, 244, 246) : Color.FromRgb(245, 245, 247));
-            SetThemeBrush("CalendarNavArrowForeground", Color.FromRgb(17, 17, 17));
-            SetThemeBrush("CalendarNavArrowBorder", _isDarkMode ? Color.FromRgb(255, 114, 114) : Color.FromRgb(224, 224, 224));
-            SetThemeBrush("CalendarNavArrowHoverBackground", _isDarkMode ? Color.FromRgb(229, 231, 235) : Color.FromRgb(255, 235, 238));
-            SetThemeBrush("CalendarNavArrowPressedBackground", _isDarkMode ? Color.FromRgb(209, 213, 219) : Color.FromRgb(255, 205, 210));
-            SetThemeBrush("StudentAddBackground", _isDarkMode ? Color.FromRgb(255, 255, 255) : Color.FromRgb(211, 47, 47));
-            SetThemeBrush("StudentAddForeground", _isDarkMode ? Color.FromRgb(17, 17, 17) : Color.FromRgb(255, 255, 255));
-            SetThemeBrush("StudentAddBorder", _isDarkMode ? Color.FromRgb(211, 47, 47) : Color.FromRgb(211, 47, 47));
-            SetThemeBrush("StudentAddHoverBackground", _isDarkMode ? Color.FromRgb(243, 244, 246) : Color.FromRgb(183, 28, 28));
-            SetThemeBrush("StudentAddPressedBackground", _isDarkMode ? Color.FromRgb(229, 231, 235) : Color.FromRgb(183, 28, 28));
-            SetThemeColor("CardCornerTint", _isDarkMode ? Color.FromRgb(53, 39, 44) : Color.FromRgb(255, 241, 241));
-            SetThemeColor("CardCornerMidTint", _isDarkMode ? Color.FromRgb(43, 37, 42) : Color.FromRgb(255, 249, 249));
-            SetThemeColor("CardSurfaceTint", _isDarkMode ? Color.FromRgb(36, 36, 42) : Color.FromRgb(255, 255, 255));
+            SetThemeBrush("CalendarSelectedMonthBorder", _isDarkMode ? Color.FromRgb(255, 77, 90) : Color.FromRgb(185, 28, 28));
+            SetThemeBrush("CalendarNavFocusBorder", _isDarkMode ? Color.FromRgb(255, 77, 90) : Color.FromRgb(185, 28, 28));
+            SetThemeBrush("CalendarNavArrowBackground", _isDarkMode ? Color.FromRgb(23, 26, 29) : Color.FromRgb(244, 245, 247));
+            SetThemeBrush("CalendarNavArrowForeground", _isDarkMode ? Color.FromRgb(212, 214, 218) : Color.FromRgb(27, 27, 27));
+            SetThemeBrush("CalendarNavArrowBorder", _isDarkMode ? Color.FromRgb(62, 66, 72) : Color.FromRgb(215, 217, 220));
+            SetThemeBrush("CalendarNavArrowHoverBackground", _isDarkMode ? Color.FromRgb(57, 18, 25) : Color.FromRgb(252, 232, 232));
+            SetThemeBrush("CalendarNavArrowPressedBackground", _isDarkMode ? Color.FromRgb(78, 23, 34) : Color.FromRgb(243, 196, 196));
+            SetThemeBrush("StudentAddBackground", Color.FromRgb(225, 29, 46));
+            SetThemeBrush("StudentAddForeground", Color.FromRgb(255, 255, 255));
+            SetThemeBrush("StudentAddBorder", Color.FromRgb(240, 68, 82));
+            SetThemeBrush("StudentAddHoverBackground", Color.FromRgb(240, 68, 82));
+            SetThemeBrush("StudentAddPressedBackground", Color.FromRgb(185, 23, 42));
+            SetThemeColor("CardCornerTint", _isDarkMode ? Color.FromRgb(76, 19, 28) : Color.FromRgb(252, 231, 231));
+            SetThemeColor("CardCornerMidTint", _isDarkMode ? Color.FromRgb(40, 22, 25) : Color.FromRgb(255, 247, 247));
+            SetThemeColor("CardSurfaceTint", _isDarkMode ? Color.FromRgb(19, 21, 24) : Color.FromRgb(255, 255, 255));
 
-            ThemeToggleIcon.Text = _isDarkMode ? "☀" : "☾";
+            ThemeToggleIcon.Text = _isDarkMode ? "\uE706" : "\uE708";
             ThemeToggleText.Text = _isDarkMode ? "Mode Terang" : "Mode Gelap";
         }
 
@@ -247,10 +264,10 @@ namespace ClassFinance
             NavPanel.Children.Clear();
 
             // Separate the icon and text into two distinct strings
-            AddNavButton("\uD83D\uDCCA", "Dashboard", typeof(DashboardPage), () => NavigateTo(new DashboardPage(user, this)));
-            AddNavButton("\uD83D\uDC65", "Data Siswa", typeof(SiswaPage), () => NavigateTo(new SiswaPage(user, this)));
-            AddNavButton("\uD83D\uDCC4", "Riwayat Transaksi", typeof(RiwayatTransaksiPage), () => NavigateTo(new RiwayatTransaksiPage(user, this)));
-            AddNavButton("\uD83D\uDCCC", "Tagihan", typeof(TagihanPage), () => NavigateTo(new TagihanPage(user, this)));
+            AddNavButton("\uE80F", "Ringkasan", typeof(DashboardPage), () => NavigateTo(new DashboardPage(user, this)));
+            AddNavButton("\uE716", "Data Siswa", typeof(SiswaPage), () => NavigateTo(new SiswaPage(user, this)));
+            AddNavButton("\uE81C", "Riwayat Transaksi", typeof(RiwayatTransaksiPage), () => NavigateTo(new RiwayatTransaksiPage(user, this)));
+            AddNavButton("\uE8A5", "Tagihan", typeof(TagihanPage), () => NavigateTo(new TagihanPage(user, this)));
 
             UpdateNavHighlight();
         }

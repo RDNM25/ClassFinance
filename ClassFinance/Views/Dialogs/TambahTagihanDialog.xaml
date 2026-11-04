@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Width="380" TextElement.Foreground="{DynamicResource TextDark}">
     <StackPanel Margin="26">
-        <TextBlock Text="Buat Tagihan" FontSize="18" FontWeight="Bold" Margin="0,0,0,6" />
+        <TextBlock Text="Buat Tagihan" FontSize="18" Margin="0,0,0,6" />
         <TextBlock Text="Tagihan akan otomatis dibuat untuk setiap siswa di kelas ini." FontSize="12"
                    Foreground="{DynamicResource TextGray}" Margin="0,0,0,18" TextWrapping="Wrap" />
 

@@ -1,0 +1,266 @@
+{
+  "tool": "build-phase",
+  "version": 2,
+  "startedAt": "2026-11-04T03:37:48.226Z",
+  "comp": ".impeccable/mocks/decision/r3-fintrack-red.png",
+  "direction": null,
+  "breakpoint": "1487x1058",
+  "artifact": null,
+  "phase": "hero",
+  "phases": {
+    "comps": {
+      "status": "skipped",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [
+        {
+          "at": "2026-11-04T03:37:48.226Z",
+          "text": "started with an approved comp; the comp round happened before this state (surface round or manual)"
+        }
+      ],
+      "gate": null,
+      "forced": null
+    },
+    "spec": {
+      "status": "closed",
+      "openedAt": "2026-11-04T03:37:48.226Z",
+      "closedAt": "2026-11-04T03:41:08.567Z",
+      "attempts": 1,
+      "notes": [],
+      "gate": {
+        "ok": true,
+        "reasons": [],
+        "summary": "27 regions, 1 plates, 15 text regions measured",
+        "at": "2026-11-04T03:41:08.567Z"
+      },
+      "forced": null
+    },
+    "plates": {
+      "status": "closed",
+      "openedAt": "2026-11-04T03:41:08.567Z",
+      "closedAt": "2026-11-04T03:43:41.269Z",
+      "attempts": 5,
+      "notes": [
+        {
+          "at": "2026-11-04T03:41:32.116Z",
+          "text": "The logo region reuses the existing ClassFinance/Assets/logo.png unchanged; no new illustration is introduced."
+        }
+      ],
+      "gate": {
+        "ok": true,
+        "reasons": [],
+        "summary": "no plates owed",
+        "at": "2026-11-04T03:43:41.269Z"
+      },
+      "forced": null
+    },
+    "hero": {
+      "status": "open",
+      "openedAt": "2026-11-04T03:43:41.269Z",
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": {
+        "ok": false,
+        "reasons": [
+          "hero capture is 1346x843; the comp is 1487x1058. Capture the first viewport at the comp's own dimensions (viewport 1487x1058, not full page) into .impeccable/review/desktop.png.",
+          "hero overall 51.7% < 72% (structure 44%, color 69%, detail 31%)",
+          "region sidebar-brand is missing (detail 1%, structure 11%): the comp shows material the build does not",
+          "region page-heading is missing (detail 0%, structure 4%): the comp shows material the build does not",
+          "region date-context is missing (detail 0%, structure 6%): the comp shows material the build does not",
+          "region data-context-control is missing (detail 0%, structure 7%): the comp shows material the build does not",
+          "region balance-card is missing (detail 0%, structure 29%): the comp shows material the build does not",
+          "region balance-label is missing (detail 0%, structure 28%): the comp shows material the build does not",
+          "region balance-value is missing (detail 0%, structure 28%): the comp shows material the build does not",
+          "region student-card is missing (detail 3%, structure 46%): the comp shows material the build does not",
+          "region student-label is missing (detail 0%, structure 51%): the comp shows material the build does not",
+          "region student-value is missing (detail 0%, structure 51%): the comp shows material the build does not",
+          "region outstanding-card is missing (detail 0%, structure 42%): the comp shows material the build does not",
+          "region outstanding-label is missing (detail 1%, structure 40%): the comp shows material the build does not",
+          "region outstanding-value is missing (detail 1%, structure 40%): the comp shows material the build does not",
+          "region cashflow-legend is missing (detail 0%, structure 74%): the comp shows material the build does not",
+          "region attention-title is missing (detail 18%, structure 27%): the comp shows material the build does not",
+          "region active-bill-panel is missing (detail 6%, structure 37%): the comp shows material the build does not",
+          "region active-bill-title is missing (detail 1%, structure 44%): the comp shows material the build does not",
+          "region transactions-title is missing (detail 8%, structure 67%): the comp shows material the build does not",
+          "region transaction-table-headers is missing (detail 9%, structure 60%): the comp shows material the build does not",
+          "region history-action is missing (detail 0%, structure 40%): the comp shows material the build does not",
+          "region cashflow-title (text) is contradicted (structure 37%, detail added 31%): the composition of this text region differs from the comp; re-derive it from the spec box",
+          "region attention-panel (control) is contradicted (structure 34%, detail added 3%): this control does not read as the comp's: rebuild its chrome from the crop (border, fill, radius, chevron or arrow, label size) rather than from a component default",
+          "region recent-transactions (control) is contradicted (structure 48%, detail added 17%): this control does not read as the comp's: rebuild its chrome from the crop (border, fill, radius, chevron or arrow, label size) rather than from a component default",
+          "region transaction-filter-controls (control) is contradicted (structure 50%, detail added 7%): this control does not read as the comp's: rebuild its chrome from the crop (border, fill, radius, chevron or arrow, label size) rather than from a component default",
+          "region transaction-table-rows (text) is contradicted (structure 44%, detail added 14%): the composition of this text region differs from the comp; re-derive it from the spec box",
+          "control cashflow-card drifts to 56% (structure 64%, color 62%): its chrome differs from the comp's; open .impeccable/review/diff/hero/regions/cashflow-card.png and match the border, fill, radius, chevron or arrow, and label size",
+          "READINGS, each one CSS edit (8 of 20, the rest after these):",
+          "text balance-label: cap height 16px in the build, 21.9px in the comp (-27%); set font-size so the cap height renders at 21.9px",
+          "text balance-value: cap height 16px in the build, 21.9px in the comp (-27%); set font-size so the cap height renders at 21.9px",
+          "text cashflow-title: cap height 21px in the build, 10.5px in the comp (+100%); set font-size so the cap height renders at 10.5px",
+          "text attention-title: cap height 12.3px in the build, 19.1px in the comp (-36%); set font-size so the cap height renders at 19.1px",
+          "text active-bill-title: cap height 13.8px in the build, 18.3px in the comp (-25%); set font-size so the cap height renders at 18.3px",
+          "text transactions-title: cap height 8.4px in the build, 17.9px in the comp (-53%); set font-size so the cap height renders at 17.9px",
+          "text transaction-table-headers: cap height 3.3px in the build, 13.9px in the comp (-76%); set font-size so the cap height renders at 13.9px",
+          "text cashflow-title: 1 line in the build, 2 in the comp; the measure (max-width, font-size, letter-spacing) wraps it differently, so the block is a different shape",
+          "the build carries ink in 12 grid cells where the comp is calm (E2, A3, A4, H4, A8, A9, B9, C9, F9, G9, H9, I9); nothing exists on the page that the comp does not show (a kicker, an extra nav item, a divider, a second row of controls); remove it or name it in a stated decision after the hero passes"
+        ],
+        "summary": "hero 52% (contradicted)",
+        "score": 0.5167,
+        "verdict": "contradicted",
+        "report": ".impeccable/review/diff/hero/report.json",
+        "sideBySide": "D:/ClassFinance_WPF_App/.impeccable/review/diff/hero/side-by-side.png",
+        "worst": [
+          "date-context missing 4%",
+          "data-context-control missing 5%",
+          "page-heading missing 6%"
+        ],
+        "worstIds": [
+          "date-context",
+          "data-context-control",
+          "page-heading"
+        ],
+        "worstCrops": [
+          {
+            "id": "date-context",
+            "verdict": "missing",
+            "score": {
+              "overall": 0.0393,
+              "structure": 0.0562,
+              "color": 0.0447,
+              "colorIntersection": 0.0332,
+              "paletteMatch": 0.051,
+              "detail": 0,
+              "detailRaw": 0,
+              "detailAdded": 0.125,
+              "bands": 0
+            },
+            "file": ".impeccable/review/diff/hero/regions/date-context.png"
+          },
+          {
+            "id": "data-context-control",
+            "verdict": "missing",
+            "score": {
+              "overall": 0.0464,
+              "structure": 0.0728,
+              "color": 0.0389,
+              "colorIntersection": 0.0139,
+              "paletteMatch": 0.0523,
+              "detail": 0,
+              "detailRaw": 0,
+              "detailAdded": 0.1146,
+              "bands": 0
+            },
+            "file": ".impeccable/review/diff/hero/regions/data-context-control.png"
+          },
+          {
+            "id": "page-heading",
+            "verdict": "missing",
+            "score": {
+              "overall": 0.0645,
+              "structure": 0.0408,
+              "color": 0.1031,
+              "colorIntersection": 0.0947,
+              "paletteMatch": 0.1076,
+              "detail": 0,
+              "detailRaw": 0.0159,
+              "detailAdded": 0.1146,
+              "bands": 0.1833
+            },
+            "file": ".impeccable/review/diff/hero/regions/page-heading.png"
+          }
+        ],
+        "regionVerdicts": {
+          "sidebar-brand": "missing",
+          "sidebar-navigation": "drift",
+          "page-heading": "missing",
+          "date-context": "missing",
+          "data-context-control": "missing",
+          "balance-card": "missing",
+          "balance-label": "missing",
+          "balance-value": "missing",
+          "student-card": "missing",
+          "student-label": "missing",
+          "student-value": "missing",
+          "outstanding-card": "missing",
+          "outstanding-label": "missing",
+          "outstanding-value": "missing",
+          "cashflow-card": "drift",
+          "cashflow-title": "contradicted",
+          "cashflow-legend": "missing",
+          "attention-panel": "contradicted",
+          "attention-title": "missing",
+          "active-bill-panel": "missing",
+          "active-bill-title": "missing",
+          "recent-transactions": "contradicted",
+          "transactions-title": "missing",
+          "transaction-filter-controls": "contradicted",
+          "transaction-table-headers": "missing",
+          "transaction-table-rows": "contradicted",
+          "history-action": "missing"
+        },
+        "at": "2026-11-04T04:11:19.540Z"
+      },
+      "forced": null,
+      "readingsSeen": {
+        "text balance-label: cap height 16px in the build, 21.9px in the comp (-27%); set font-size so the cap height renders at 21.9px": 1,
+        "text balance-value: cap height 16px in the build, 21.9px in the comp (-27%); set font-size so the cap height renders at 21.9px": 1,
+        "text cashflow-title: cap height 21px in the build, 10.5px in the comp (+100%); set font-size so the cap height renders at 10.5px": 1,
+        "text attention-title: cap height 12.3px in the build, 19.1px in the comp (-36%); set font-size so the cap height renders at 19.1px": 1,
+        "text active-bill-title: cap height 13.8px in the build, 18.3px in the comp (-25%); set font-size so the cap height renders at 18.3px": 1,
+        "text transactions-title: cap height 8.4px in the build, 17.9px in the comp (-53%); set font-size so the cap height renders at 17.9px": 1,
+        "text transaction-table-headers: cap height 3.3px in the build, 13.9px in the comp (-76%); set font-size so the cap height renders at 13.9px": 1,
+        "text cashflow-title: 1 line in the build, 2 in the comp; the measure (max-width, font-size, letter-spacing) wraps it differently, so the block is a different shape": 1,
+        "text attention-title: 1 line in the build, 2 in the comp; the measure (max-width, font-size, letter-spacing) wraps it differently, so the block is a different shape": 1,
+        "text active-bill-title: 1 line in the build, 2 in the comp; the measure (max-width, font-size, letter-spacing) wraps it differently, so the block is a different shape": 1,
+        "text transaction-table-headers: 1 line in the build, 3 in the comp; the measure (max-width, font-size, letter-spacing) wraps it differently, so the block is a different shape": 1,
+        "text attention-title: ink is #f8f8f8 in the build, #374c4d in the comp; use the comp's colour": 1,
+        "text active-bill-title: ink is #6a6e74 in the build, #e8eaea in the comp; use the comp's colour": 1,
+        "text transactions-title: ink is #494949 in the build, #37181c in the comp; use the comp's colour": 1,
+        "text attention-title: it starts 128px further right than in the comp": 1,
+        "text active-bill-title: its first line starts 17px lower than in the comp (24px vs 7px into the region box); the spacing above it is too large": 1,
+        "text transactions-title: it starts 55px further right than in the comp": 1,
+        "control data-context-control: its rule sits 7px into the box in the comp and 45px in the build (+38px), so the strip is taller than the comp's; match the height, not only the position": 1,
+        "control balance-card: its ink is 37px tall in the build and 23px in the comp (+14px); match the height, not only the position": 1,
+        "control student-card: its rule sits 77px into the box in the comp and 100px in the build (+23px), so the strip is taller than the comp's; match the height, not only the position": 1
+      },
+      "records": 1
+    },
+    "sections": {
+      "status": "pending",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": null,
+      "forced": null
+    },
+    "motion": {
+      "status": "pending",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": null,
+      "forced": null
+    },
+    "responsive": {
+      "status": "pending",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": null,
+      "forced": null
+    },
+    "review": {
+      "status": "pending",
+      "openedAt": null,
+      "closedAt": null,
+      "attempts": 0,
+      "notes": [],
+      "gate": null,
+      "forced": null
+    }
+  },
+  "finish": null,
+  "plates": {}
+}

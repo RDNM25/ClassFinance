@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -12,8 +13,14 @@ namespace ClassFinance.Views
 {
     public class TransaksiDisplayItem
     {
+        private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
+
         public Transaksi Transaksi { get; set; }
         public string TagihanName { get; set; }
+        public string DateText => Transaksi.Date.ToString("dd MMM yyyy", IdId);
+        public string TimeText => Transaksi.Date.ToString("HH:mm", IdId);
+        public string DescriptionText => string.IsNullOrWhiteSpace(Transaksi.Description) ? "Transaksi" : Transaksi.Description;
+        public string TypeLabel => Transaksi.Type == JenisTransaksi.Masuk ? "Pemasukan" : "Pengeluaran";
         public bool CanMarkRefundPaid { get; set; }
         public bool CanEditAmount { get; set; }
         public bool CanDelete { get; set; }
@@ -121,9 +128,13 @@ namespace ClassFinance.Views
                 CanEditAmount = CanEditTransactionAmount(t),
                 CanDelete = CanDeleteTransaction(t)
             }).ToList();
+            TransactionListHeader.Visibility = Visibility.Visible;
+            TransactionHeaderSeparator.Visibility = Visibility.Visible;
+            TagihanPaymentHeader.Visibility = Visibility.Collapsed;
+            TagihanPaymentHeaderSeparator.Visibility = Visibility.Collapsed;
             TransaksiItems.Visibility = Visibility.Visible;
             TagihanPaymentItems.Visibility = Visibility.Collapsed;
-            TotalOwedCard.Visibility = Visibility.Collapsed;
+            StudentBillTotals.Visibility = Visibility.Collapsed;
 
             EmptyText.Text = "Belum ada transaksi.";
             EmptyText.Visibility = filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
@@ -131,36 +142,41 @@ namespace ClassFinance.Views
 
         private void RefreshTagihanStatus(Siswa siswa)
         {
-            var tagihanList = DataStore.Instance.TagihanList
-                .Where(t => t.KelasId == _kelasId && t.CreatedDate >= siswa.CreatedDate)
-                .OrderByDescending(t => t.Id)
-                .Select(t =>
+            var tagihanList = DataStore.Instance.TagihanSiswaList
+                .Where(entry => entry.SiswaId == siswa.Id)
+                .Join(
+                    DataStore.Instance.TagihanList.Where(tagihan => tagihan.KelasId == _kelasId),
+                    entry => entry.TagihanId,
+                    tagihan => tagihan.Id,
+                    (entry, tagihan) => new { Entry = entry, Tagihan = tagihan })
+                .OrderByDescending(item => item.Tagihan.CreatedDate)
+                .ThenByDescending(item => item.Tagihan.Id)
+                .Select(item =>
                 {
-                    var entry = DataStore.Instance.TagihanSiswaList
-                        .FirstOrDefault(ts => ts.TagihanId == t.Id && ts.SiswaId == siswa.Id);
-
-                    bool hasPaid = entry != null && entry.JumlahDibayar > 0;
-                    bool isLunas = entry != null && entry.Status == StatusTagihan.Lunas;
-
                     return new TagihanPaymentDisplayItem
                     {
-                        Tagihan = t,
-                        HasPaid = hasPaid,
-                        IsLunas = isLunas,
-                        AmountPaid = entry?.JumlahDibayar ?? 0,
-                        AmountDue = entry?.AmountDue ?? t.Amount,
-                        Status = entry?.Status ?? StatusTagihan.BelumBayar
+                        Tagihan = item.Tagihan,
+                        HasPaid = item.Entry.JumlahDibayar > 0,
+                        IsLunas = item.Entry.Status == StatusTagihan.Lunas,
+                        AmountPaid = item.Entry.JumlahDibayar,
+                        AmountDue = item.Entry.AmountDue,
+                        Status = item.Entry.Status
                     };
                 })
                 .ToList();
 
             TagihanPaymentItems.ItemsSource = tagihanList;
             TagihanPaymentItems.Visibility = Visibility.Visible;
+            TransactionListHeader.Visibility = Visibility.Collapsed;
+            TransactionHeaderSeparator.Visibility = Visibility.Collapsed;
+            TagihanPaymentHeader.Visibility = tagihanList.Any() ? Visibility.Visible : Visibility.Collapsed;
+            TagihanPaymentHeaderSeparator.Visibility = tagihanList.Any() ? Visibility.Visible : Visibility.Collapsed;
             TransaksiItems.Visibility = Visibility.Collapsed;
 
             var totalOwed = tagihanList.Sum(x => x.AmountDue);
             TotalOwedText.Text = $"Rp {totalOwed:N0}";
-            TotalOwedCard.Visibility = Visibility.Visible;
+            TotalPaidText.Text = $"Rp {tagihanList.Sum(x => x.AmountPaid):N0}";
+            StudentBillTotals.Visibility = Visibility.Visible;
 
             EmptyText.Text = "Belum ada tagihan.";
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;

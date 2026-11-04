@@ -14,7 +14,18 @@ namespace ClassFinance.Models
         public string PasswordHash { get; set; }
         public Role Role { get; set; }
 
-        public bool VerifyPassword(string password) => PasswordHash == password;
+        public bool VerifyPassword(string password)
+        {
+            if (string.IsNullOrWhiteSpace(PasswordHash)) return false;
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(password, PasswordHash);
+            }
+            catch (ArgumentException)
+            {
+                return false;
+            }
+        }
 
         /// <summary>Polymorphic title shown at the top of each role's dashboard.</summary>
         public abstract string GetDashboardTitle();

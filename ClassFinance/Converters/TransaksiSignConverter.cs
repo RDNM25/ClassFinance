@@ -13,8 +13,8 @@ namespace ClassFinance.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is not Transaksi t) return string.Empty;
-            var sign = t.Type == JenisTransaksi.Masuk ? "+" : "-";
-            return $"{sign}Rp {t.Amount.ToString("N0", IdId)}";
+            var sign = t.Type == JenisTransaksi.Masuk ? "+" : "−";
+            return $"{sign} Rp {t.Amount.ToString("N0", IdId)}";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>

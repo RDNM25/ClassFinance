@@ -1,0 +1,124 @@
+{
+  "title": "Choose Class Finance’s visual world",
+  "question": "Which dashboard direction should shape the modern Bendahara workspace? All options keep the Class Finance name, current logo, Indonesian wording, and existing finance workflows.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Meja Bendahara",
+      "kicker": "THE ROLL",
+      "lineage": "A classroom treasurer’s labeled paper sorter",
+      "thesis": "A quiet file index routes daily cash work into clear, named records.",
+      "palette": ["#F4F1E9", "#252C2A", "#B84235", "#748579", "#C28B45"],
+      "materials": ["warm register paper", "charcoal ink", "red file tabs"],
+      "viewport": "A narrow persistent file index opens to a cash statement: available kas first, students and bills needing attention beside it, with recent transactions in a measured ledger below. The first glance answers how much cash is available and who still owes.",
+      "risk": "If folder language becomes decoration, this will feel like stationery instead of a fast finance tool.",
+      "raised": [
+        {
+          "from": "challenger-crouwel-grid",
+          "raise": "Align rupiah values and status columns to exact shared stops so every row can be compared at a glance."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/assigned.png"
+    },
+    {
+      "id": "model-pick",
+      "label": "Buku Kas Kelas",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "The class cash ledger and its daily closing balance",
+      "thesis": "A living buku kas makes every incoming and outgoing rupiah easy to trace.",
+      "palette": ["#FBFAF6", "#202725", "#B84235", "#77857B", "#C28B45"],
+      "materials": ["ruled ledger page", "tabular numerals", "single red register mark"],
+      "viewport": "The dashboard reads like one current cash book: available balance, unpaid-bill summary, students needing follow-up, then a dated in/out ledger. Navigation stays quiet and familiar.",
+      "risk": "Most familiar to finance users, but it may feel conventional if the ledger structure is too literal.",
+      "comp": ".impeccable/mocks/decision/model-pick.png"
+    },
+    {
+      "id": "challenger-console",
+      "label": "Kas Control Desk",
+      "verdict": "competitive",
+      "lineage": "A dark-first operations console with panels separated by precise seams",
+      "thesis": "A deliberate workspace puts balances and overdue actions ahead of ornament.",
+      "palette": ["#171D1C", "#232B29", "#D4DBD5", "#E06A57", "#8DAD9A"],
+      "materials": ["graphite surfaces", "hairline rules", "monospaced rupiah figures"],
+      "viewport": "Available kas and unpaid student balances lead the top panel; a compact attention queue and transaction list sit in clearly separated regions. Delete actions remain isolated and outlined.",
+      "case": "Fuses as a clear finance control desk and protects destructive actions; it loses narrowly on Bendahara-specific identity.",
+      "risk": "Could read as generic technical tooling, and a dark-first screen may be tiring for routine bookkeeping.",
+      "comp": ".impeccable/mocks/decision/challenger-console.png",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-dark-first-developer-console-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/digital-design-canon-dark-first-developer-console.webp"
+    },
+    {
+      "id": "challenger-atlas",
+      "label": "Star Atlas",
+      "verdict": "declined",
+      "lineage": "A celestial navigation chart",
+      "palette": ["#10182A", "#E8E5D8", "#C44A3A"],
+      "materials": ["dark chart field", "coordinate rules", "ranked points"],
+      "case": "Cosmic navigation does not help a Bendahara recognize class money or payment urgency.",
+      "kept": "Vary marker size only when it encodes a real amount or priority.",
+      "hero": "https://impeccable.style/worlds/cards/notation-diagram-systems-star-atlas-hero.webp"
+    },
+    {
+      "id": "challenger-crouwel-grid",
+      "label": "Measured Type Grid",
+      "verdict": "declined",
+      "lineage": "A Wim Crouwel grid-built type specimen",
+      "palette": ["#F8F7F1", "#222B2B", "#AFC3D2", "#B84235"],
+      "materials": ["visible construction grid", "geometric letterforms", "one accent plane"],
+      "case": "The poster-like typographic system makes letters more prominent than cash and bill status.",
+      "kept": "Use a strict measured grid for amounts and status columns.",
+      "hero": "https://impeccable.style/worlds/cards/crouwel-grid-specimen-hero.webp"
+    },
+    {
+      "id": "challenger-folio",
+      "label": "Payment Season Folio",
+      "verdict": "declined",
+      "lineage": "A botanical sequence of changing states",
+      "palette": ["#F4EBDD", "#3E5347", "#A33C31", "#343735"],
+      "materials": ["cream folio plates", "sepia rules", "botanical state colors"],
+      "case": "A seasonal sequence obscures the immediate amount due and the next payment action.",
+      "kept": "Make before and after payment states easy to compare.",
+      "hero": "https://impeccable.style/worlds/cards/editorial-sequence-montage-botanical-folio-season-hero.webp"
+    },
+    {
+      "id": "challenger-catalog",
+      "label": "Convention Index",
+      "verdict": "declined",
+      "lineage": "A crowded numbered event catalogue",
+      "palette": ["#F1EEE6", "#242321", "#B84235"],
+      "materials": ["newsprint", "postage-size cells", "numbered dividers"],
+      "case": "A dense wall of tiny cells would slow student-by-student payment work.",
+      "kept": "Keep navigation labels and student rows directly addressable.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-doujin-event-catalog-hero.webp"
+    },
+    {
+      "id": "challenger-specimen",
+      "label": "Variable Type Specimen",
+      "verdict": "declined",
+      "lineage": "An interactive foundry specimen with live type axes",
+      "palette": ["#FAFAF7", "#171817", "#B84235"],
+      "materials": ["paper ground", "large letterforms", "monospaced axis readouts"],
+      "case": "Type controls add work without helping the Bendahara reconcile cash or dues.",
+      "kept": "Keep numeric hierarchy stable and purposeful.",
+      "hero": "https://impeccable.style/worlds/cards/variable-font-specimen-hero.webp"
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "The category-standard dashboard",
+    "thesis": "A familiar finance admin layout puts summary metrics above a student balance table.",
+    "palette": ["#FFFFFF", "#1F2937", "#B84235", "#E9ECEF"],
+    "materials": ["clean grid", "neutral panels", "clear status colors"],
+    "viewport": "A conventional left navigation, a top balance summary, student payment statuses, and a recent transactions table.",
+    "risk": "Easy to scan, but visually similar to most admin dashboards.",
+    "comp": ".impeccable/mocks/decision/canon.png"
+  },
+  "steer": true
+}

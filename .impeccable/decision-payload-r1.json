@@ -1,0 +1,140 @@
+{
+  "title": "Explore tech-forward Class Finance directions",
+  "question": "Which modern technical direction should shape the Bendahara dashboard? All options preserve the Class Finance name, existing logo, Indonesian wording, and current workflows. Values are marked as examples.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "Fluent Finance Workspace",
+      "kicker": "THE ROLL",
+      "lineage": "A native Windows control surface with concise system panels",
+      "thesis": "A focused desktop workspace makes available kas, outstanding bills, and recent transactions easy to scan and act on.",
+      "palette": ["#F3F6FA", "#202C3A", "#3D78C6", "#D64D44", "#268A72"],
+      "materials": ["cool white system surfaces", "thin slate rules", "blue focus rails", "Segoe UI Variable with Cascadia Code for figures"],
+      "viewport": "A persistent left rail opens to Ringkasan. A slim application header leads into one wide Kas tersedia band, a compact Perlu perhatian queue at the right, and a clearly columned Transaksi terbaru grid below.",
+      "risk": "It can feel like standard Windows admin software if the system surfaces and status chips become interchangeable.",
+      "raised": [
+        {
+          "from": "challenger-split-flap",
+          "raise": "Align student, amount, and status columns to fixed stops for rapid comparison."
+        },
+        {
+          "from": "challenger-acetate-manual",
+          "raise": "Keep the active section and the full set of destinations visible in the persistent navigation."
+        },
+        {
+          "from": "challenger-wayfinding",
+          "raise": "Give each payment state one concise label and a direct follow-up path."
+        },
+        {
+          "from": "challenger-cassette",
+          "raise": "Keep groups and rupiah totals visually bounded, with every amount right-aligned."
+        },
+        {
+          "from": "challenger-video-feed",
+          "raise": "Give the highest-priority payment issue a clear place in the attention queue."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/r1-assigned.png"
+    },
+    {
+      "id": "model-pick",
+      "label": "Rekening Digital",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "A contemporary online banking account overview",
+      "thesis": "The class fund reads as one digital account, with a clear balance, outstanding dues, and a precise statement of movements.",
+      "palette": ["#101C27", "#1B2C39", "#E9F0F3", "#36D2AE", "#E45D55"],
+      "materials": ["deep blue-black account shell", "quiet cyan account markers", "tabular mono figures", "thin transaction separators"],
+      "viewport": "A compact account header carries Kas tersedia and the active bill totals; a labeled student follow-up list sits beside it, with a dense statement below. Navigation remains steady at the left.",
+      "risk": "Banking patterns are familiar, but the account summary could overpower student-level details if it takes too much space.",
+      "comp": ".impeccable/mocks/decision/r1-model-pick.png"
+    },
+    {
+      "id": "challenger-metro-tiles",
+      "label": "Signal Tiles",
+      "verdict": "competitive",
+      "lineage": "A flat modern operating-system tile canvas",
+      "thesis": "Distinct color fields turn kas, active bills, unpaid students, and recent movements into a crisp, modern technical overview.",
+      "palette": ["#0D1117", "#161E28", "#55D8E8", "#B7ED4B", "#F2F5F8"],
+      "materials": ["flat dark panels", "cyan and lime data fields", "lightweight type", "square modular grid"],
+      "viewport": "A broad Kas tersedia field leads; smaller panels summarize bills and unpaid students. A student attention list and the latest transaction rows remain addressable in a lower zone.",
+      "case": "It holds the modern digital character and can make the main figures clear; the tile hierarchy needs careful restraint to keep dues and student names easy to compare.",
+      "risk": "Large type and high-contrast tiles can compete with the detailed payment work.",
+      "comp": ".impeccable/mocks/decision/r1-metro-tiles.png",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-metro-typographic-tiles-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/digital-design-canon-metro-typographic-tiles.webp"
+    },
+    {
+      "id": "challenger-split-flap",
+      "label": "Departure Board",
+      "verdict": "declined",
+      "lineage": "A fixed-cell departure information display",
+      "palette": ["#101214", "#F3F5F6", "#D69B35", "#A3413A"],
+      "materials": ["black information cells", "fixed-width rows", "amber and red state lamps"],
+      "case": "Clear data columns fit payment states, but the physical display rhythm feels retro beside a modern desktop app.",
+      "kept": "Keep amounts and payment states aligned in fixed columns.",
+      "hero": "https://impeccable.style/worlds/cards/signals-instruments-split-flap-concourse-hero.webp"
+    },
+    {
+      "id": "challenger-acetate-manual",
+      "label": "Tabbed Software Manual",
+      "verdict": "declined",
+      "lineage": "A clear overlay on a color-coded reference manual",
+      "palette": ["#F2F4EF", "#27333B", "#E3C12D", "#D64D44"],
+      "materials": ["translucent leaves", "color-coded section boards", "tight technical labels"],
+      "case": "Distinct section layers help orientation, but manual-like transparency adds visual noise to everyday bookkeeping.",
+      "kept": "Make the active section visible and keep navigation extent clear.",
+      "hero": "https://impeccable.style/worlds/cards/rw-manual-acetate-tab-board-hero.webp"
+    },
+    {
+      "id": "challenger-wayfinding",
+      "label": "Terminal Wayfinding",
+      "verdict": "declined",
+      "lineage": "A high-contrast airport direction system",
+      "palette": ["#F1D32D", "#171A1D", "#F5F7F8", "#D64D44"],
+      "materials": ["signal-yellow panels", "black humanist type", "edge-anchored arrows"],
+      "case": "Strong directional hierarchy could clarify follow-up actions, but its vivid signage palette overwhelms financial comparison.",
+      "kept": "Give each payment state one concise next action.",
+      "hero": "https://impeccable.style/worlds/cards/wayfinding-cartography-signage-terminal-yellow-wayfinding-hero.webp"
+    },
+    {
+      "id": "challenger-cassette",
+      "label": "Technical Track Sheet",
+      "verdict": "declined",
+      "lineage": "A ruled side-by-side cassette track listing",
+      "palette": ["#F5F6F8", "#263341", "#3468B2", "#D64D44"],
+      "materials": ["ruled paper", "compact technical mono", "bounded lists"],
+      "case": "The bounded lists and aligned durations translate well to rows, while the analog, handwritten character moves away from the requested modern look.",
+      "kept": "Bound related rows and align each amount.",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-cassette-j-card-hero.webp"
+    },
+    {
+      "id": "challenger-video-feed",
+      "label": "Full-Screen Status Feed",
+      "verdict": "declined",
+      "lineage": "A one-item-at-a-time vertical information feed",
+      "palette": ["#111317", "#F5F6F7", "#52D5E7", "#D64D44"],
+      "materials": ["edge-to-edge content", "white interface glyphs", "stacked action rail"],
+      "case": "One prominent item gives focus, but hiding the rest of the balance and ledger slows this multi-record desktop task.",
+      "kept": "Give the top-priority item a clear visual place.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-vertical-video-feed-surface-hero.webp"
+    }
+  ],
+  "reroll": {
+    "registers": ["safer", "bolder"]
+  },
+  "buildPath": {
+    "value": "comp",
+    "toggle": true
+  },
+  "canon": true,
+  "canonCard": {
+    "label": "The category-standard dashboard",
+    "thesis": "A familiar finance admin layout puts summary metrics above a student balance table.",
+    "palette": ["#FFFFFF", "#1F2937", "#B84235", "#E9ECEF"],
+    "materials": ["clean grid", "neutral panels", "clear status colors"],
+    "viewport": "A conventional left navigation, a top balance summary, student payment statuses, and a recent transactions table.",
+    "risk": "Easy to scan, but visually similar to most admin dashboards.",
+    "comp": ".impeccable/mocks/decision/canon.png"
+  },
+  "steer": true
+}

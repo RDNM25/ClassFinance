@@ -9,8 +9,15 @@ namespace ClassFinance.Services
 
         public static User Login(string username, string password)
         {
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            {
+                CurrentUser = null;
+                return null;
+            }
+
             var user = DataStore.Instance.Users
-                .FirstOrDefault(u => u.Username.Equals(username, System.StringComparison.OrdinalIgnoreCase)
+                .FirstOrDefault(u => u != null
+                                      && string.Equals(u.Username, username, System.StringComparison.OrdinalIgnoreCase)
                                       && u.VerifyPassword(password));
             CurrentUser = user;
             return user;

@@ -46,6 +46,7 @@ namespace ClassFinance.Views.Dialogs
             _siswa.Name = name;
             _siswa.Nis = nis;
             _siswa.Username = $"siswa-{nis}";
+            DataStore.Instance.SaveChanges();
             _onSaved?.Invoke();
             _mainWindow.CloseModal();
         }

@@ -6,6 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace ClassFinance.Behaviors
@@ -28,9 +29,23 @@ namespace ClassFinance.Behaviors
                 return;
 
             if (e.NewValue is true)
+            {
+                datePicker.Loaded += DatePicker_Loaded;
                 datePicker.CalendarOpened += DatePicker_CalendarOpened;
+                if (datePicker.IsLoaded)
+                    ApplyDatePickerButtonStyle(datePicker);
+            }
             else
+            {
+                datePicker.Loaded -= DatePicker_Loaded;
                 datePicker.CalendarOpened -= DatePicker_CalendarOpened;
+            }
+        }
+
+        private static void DatePicker_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is DatePicker datePicker)
+                ApplyDatePickerButtonStyle(datePicker);
         }
 
         private static void DatePicker_CalendarOpened(object sender, RoutedEventArgs e)
@@ -39,7 +54,41 @@ namespace ClassFinance.Behaviors
                 return;
 
             datePicker.Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
-                ApplyCalendarPopupStyle(datePicker)));
+            {
+                ApplyDatePickerButtonStyle(datePicker);
+                ApplyCalendarPopupStyle(datePicker);
+            }));
+        }
+
+        private static void ApplyDatePickerButtonStyle(DatePicker datePicker)
+        {
+            datePicker.ApplyTemplate();
+            if (datePicker.Template.FindName("PART_Button", datePicker) is not Button button)
+                return;
+
+            var calendarIcon = new Path
+            {
+                Data = Geometry.Parse("M3.5,5.5 H14.5 V15.5 H3.5 Z M6.5,3 V6.5 M11.5,3 V6.5 M3.5,8 H14.5 M6.5,10.5 H7 M9,10.5 H9.5 M11.5,10.5 H12 M6.5,13 H7 M9,13 H9.5 M11.5,13 H12"),
+                Width = 18,
+                Height = 18,
+                StrokeThickness = 1.4,
+                Stretch = Stretch.Uniform,
+                SnapsToDevicePixels = true
+            };
+            calendarIcon.SetResourceReference(Shape.StrokeProperty, "AccentText");
+
+            button.Content = calendarIcon;
+            button.Width = 30;
+            button.Height = 30;
+            button.Padding = new Thickness(0);
+            button.Margin = new Thickness(2);
+            button.Cursor = Cursors.Hand;
+            button.SetResourceReference(Control.BackgroundProperty, "SurfaceBackground");
+            button.SetResourceReference(Control.BorderBrushProperty, "BorderColor");
+            if (datePicker.TryFindResource("DatePickerCalendarButtonTemplate") is ControlTemplate buttonTemplate)
+                button.Template = buttonTemplate;
+
+            AutomationProperties.SetName(button, "Open calendar");
         }
 
         private static void ApplyCalendarPopupStyle(DatePicker datePicker)
@@ -93,7 +142,7 @@ namespace ClassFinance.Behaviors
             button.Padding = new Thickness(0);
             button.Cursor = Cursors.Hand;
             button.FontSize = 20;
-            button.FontWeight = FontWeights.SemiBold;
+            button.FontWeight = FontWeights.Normal;
             button.Content = glyph;
             button.BorderThickness = new Thickness(1);
             button.SetResourceReference(Control.BackgroundProperty, "CalendarNavArrowBackground");

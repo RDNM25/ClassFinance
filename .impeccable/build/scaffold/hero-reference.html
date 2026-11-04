@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Scaffold reference: r3-fintrack-red.png</title>
+  <link rel="stylesheet" href="layout.css">
+  <style>html,body{margin:0}body{background:#091111}.region{box-sizing:border-box}.region.text p{white-space:pre-wrap}</style>
+</head>
+<body>
+<!-- Reference only. Every region sits at its measured box inside a comp-aspect frame. Take the boxes (layout.css), keep your own semantic structure. -->
+<main class="comp-frame" style="max-width:1487px">
+  <div class="r-sidebar-brand region chrome" data-region="sidebar-brand"><!-- Existing Class Finance logo displayed from ClassFinance/Assets/logo.png. The approved comp approximates this horizontal mark; the user explicitly requires the real app logo, which remains unchanged. --></div>
+  <div class="r-sidebar-navigation region chrome" data-region="sidebar-navigation"><!-- Dark app navigation with the Ringkasan item selected in brand red. --></div>
+  <div class="r-page-heading region text" data-region="page-heading"><!-- Ringkasan page title. --><p style="font-size:var(--r-page-heading-font);line-height:1.05;margin:0">page-heading</p></div>
+  <div class="r-date-context region text" data-region="date-context"><!-- Current date and class context. --><p style="font-size:var(--r-date-context-font);line-height:1.05;margin:0">date-context</p></div>
+  <div class="r-data-context-control region control" data-region="data-context-control"><!-- Small label showing the data scope or source.: rebuild the control's chrome from the crop (comp-spec.mjs --crop data-context-control); its ink box, border, fill, radius, and label size are the comp's --></div>
+  <div class="r-balance-card region control" data-region="balance-card"><!-- Available class cash summary card.: rebuild the control's chrome from the crop (comp-spec.mjs --crop balance-card); its ink box, border, fill, radius, and label size are the comp's --></div>
+  <div class="r-balance-label region text" data-region="balance-label"><!-- Kas tersedia label. --><p style="font-size:var(--r-balance-label-font);line-height:1.05;margin:0">balance-label</p></div>
+  <div class="r-balance-value region text" data-region="balance-value"><!-- Available balance amount. --><p style="font-size:var(--r-balance-value-font);line-height:1.05;margin:0">balance-value</p></div>
+  <div class="r-student-card region control" data-region="student-card"><!-- Total active students summary card.: rebuild the control's chrome from the crop (comp-spec.mjs --crop student-card); its ink box, border, fill, radius, and label size are the comp's --></div>
+  <div class="r-student-label region text" data-region="student-label"><!-- Total siswa label. --><p style="line-height:1.05;margin:0">student-label</p></div>
+  <div class="r-student-value region text" data-region="student-value"><!-- Student count. --><p style="line-height:1.05;margin:0">student-value</p></div>
+  <div class="r-outstanding-card region control" data-region="outstanding-card"><!-- Open student bill balance summary card.: rebuild the control's chrome from the crop (comp-spec.mjs --crop outstanding-card); its ink box, border, fill, radius, and label size are the comp's --></div>
+  <div class="r-outstanding-label region text" data-region="outstanding-label"><!-- Tagihan belum lunas label. --><p style="font-size:var(--r-outstanding-label-font);line-height:1.05;margin:0">outstanding-label</p></div>
+  <div class="r-outstanding-value region text" data-region="outstanding-value"><!-- Remaining bill amount. --><p style="font-size:var(--r-outstanding-value-font);line-height:1.05;margin:0">outstanding-value</p></div>
+  <div class="r-cashflow-card region control" data-region="cashflow-card"><!-- Monthly class cash-flow chart with data-driven income and expense lines.: rebuild the control's chrome from the crop (comp-spec.mjs --crop cashflow-card); its ink box, border, fill, radius, and label size are the comp's --></div>
+  <div class="r-cashflow-title region text" data-region="cashflow-title"><!-- Arus kas title and period context. --><p style="font-size:var(--r-cashflow-title-font);line-height:1.05;margin:0">cashflow-title</p></div>
+  <div class="r-cashflow-legend region text" data-region="cashflow-legend"><!-- Pemasukan and pengeluaran legend. --><p style="font-size:var(--r-cashflow-legend-font);line-height:1.05;margin:0">cashflow-legend</p></div>
+  <div class="r-attention-panel region control" data-region="attention-panel"><!-- Students who have no bill record or still owe, with outstanding amounts.: rebuild the control's chrome from the crop (comp-spec.mjs --crop attention-panel); its ink box, border, fill, radius, and label size are the comp's --></div>
+  <div class="r-attention-title region text" data-region="attention-title"><!-- Perlu perhatian heading. --><p style="font-size:var(--r-attention-title-font);line-height:1.05;margin:0">attention-title</p></div>
+  <div class="r-active-bill-panel region control" data-region="active-bill-panel"><!-- Most recent active class bill and payment summary.: rebuild the control's chrome from the crop (comp-spec.mjs --crop active-bill-panel); its ink box, border, fill, radius, and label size are the comp's --></div>
+  <div class="r-active-bill-title region text" data-region="active-bill-title"><!-- Tagihan aktif heading and current bill name. --><p style="font-size:var(--r-active-bill-title-font);line-height:1.05;margin:0">active-bill-title</p></div>
+  <div class="r-recent-transactions region control" data-region="recent-transactions"><!-- Recent class ledger table with search, type filter, and all-history action.: rebuild the control's chrome from the crop (comp-spec.mjs --crop recent-transactions); its ink box, border, fill, radius, and label size are the comp's --></div>
+  <div class="r-transactions-title region text" data-region="transactions-title"><!-- Transaksi terbaru heading. --><p style="font-size:var(--r-transactions-title-font);line-height:1.05;margin:0">transactions-title</p></div>
+  <div class="r-transaction-filter-controls region control" data-region="transaction-filter-controls"><!-- Transaction search and direction filter controls.: rebuild the control's chrome from the crop (comp-spec.mjs --crop transaction-filter-controls); its ink box, border, fill, radius, and label size are the comp's --></div>
+  <div class="r-transaction-table-headers region text" data-region="transaction-table-headers"><!-- Tanggal, keterangan, jenis, and amount headings. --><p style="font-size:var(--r-transaction-table-headers-font);line-height:1.05;margin:0">transaction-table-headers</p></div>
+  <div class="r-transaction-table-rows region text" data-region="transaction-table-rows"><!-- Recent transaction dates, descriptions, directions, and amounts from the database. --><p style="font-size:var(--r-transaction-table-rows-font);line-height:1.05;margin:0">transaction-table-rows</p></div>
+  <div class="r-history-action region control" data-region="history-action"><!-- Lihat semua navigates to the transaction history page.: rebuild the control's chrome from the crop (comp-spec.mjs --crop history-action); its ink box, border, fill, radius, and label size are the comp's --></div>
+</main>
+</body>
+</html>

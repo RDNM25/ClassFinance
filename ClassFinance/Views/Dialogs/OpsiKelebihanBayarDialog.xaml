@@ -4,13 +4,13 @@
              Width="420" Background="{DynamicResource SurfaceBackground}" TextElement.Foreground="{DynamicResource TextDark}">
     <Border Padding="24" CornerRadius="8" Background="{DynamicResource SurfaceBackground}">
         <StackPanel>
-            <TextBlock Text="Kelebihan Pembayaran" FontSize="20" FontWeight="Bold" Margin="0,0,0,8"/>
+            <TextBlock Text="Kelebihan Pembayaran" FontSize="20" Margin="0,0,0,8"/>
             <TextBlock x:Name="InfoText" TextWrapping="Wrap" Foreground="{DynamicResource TextGray}" Margin="0,0,0,16"/>
 
-            <TextBlock Text="Pilih tindakan untuk kelebihan dana:" FontWeight="SemiBold" Margin="0,0,0,8"/>
+            <TextBlock Text="Pilih tindakan untuk kelebihan dana:" Margin="0,0,0,8"/>
 
-            <RadioButton x:Name="SimpanRadio" Content="Simpan sebagai Saldo Titipan siswa untuk tagihan berikutnya" IsChecked="True" Margin="0,0,0,8"/>
-            <RadioButton x:Name="KembalikanRadio" Content="Kembalikan tunai sebagai uang kembalian (Refund)" Margin="0,0,0,16"/>
+            <RadioButton x:Name="SimpanRadio" Content="Simpan sebagai Saldo Titipan siswa untuk tagihan berikutnya" Foreground="{DynamicResource TextDark}" IsChecked="True" Margin="0,0,0,8"/>
+            <RadioButton x:Name="KembalikanRadio" Content="Kembalikan tunai sebagai uang kembalian (Refund)" Foreground="{DynamicResource TextDark}" Margin="0,0,0,16"/>
 
             <Grid>
                 <Grid.ColumnDefinitions>

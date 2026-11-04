@@ -4,41 +4,49 @@
 
 ## Platform
 
-Windows desktop (WPF)
+Windows desktop with a custom charcoal-and-red finance-console design language.
 
 ## Users
 
-- **Primary:** Class treasurer (Bendahara), confirmed by the user. Uses the app to manage class funds, student bills, and payments.
-- **Other roles present in the implementation:** Homeroom teacher (Wali Kelas) and student (Siswa). Their exact responsibilities and access needs are not established here.
+The desktop app is primarily for the class Bendahara, who records class cash, student payments, bills, and expenses. Wali kelas and student roles exist in the codebase, but are not the primary audience for this desktop redesign.
 
 ## Product Purpose
 
-Class Finance is a desktop app for managing classroom finances: maintaining student records, creating and tracking bills, recording payments and other transactions, and viewing the class balance and transaction history.
+Class Finance helps a Bendahara manage one class's shared cash and student bill balances in one desktop app. Success means quickly understanding available class cash, which students still owe, and what action to take next.
 
 ## Positioning
 
-No distinct market position or comparative claim has been established. Do not invent one.
+The app connects each class bill to individual student balances and the class transaction ledger, so bill progress and recorded cash activity can be followed together.
 
 ## Operating Context
 
-- Used as a Windows desktop application built with .NET 8 and WPF.
-- The current interface uses Indonesian labels and formats money in Indonesian rupiah.
-- The main workflows include reviewing the dashboard, managing students and bills, recording payments or cash transactions, and reviewing transaction history.
+The Bendahara uses the app on a Windows desktop to review the cash balance, maintain the student roster, create and edit bills, record payments and expenses, and inspect transaction history. Students pay the Bendahara upfront; the desktop app records the payment and does not collect payment proof. The app connects directly to a local MariaDB database managed through XAMPP.
 
 ## Capabilities and Constraints
 
-- The current implementation includes authentication, role-aware UI, dashboard, student and bill management, payment status and history, manual payment entry, cash withdrawal, and light/dark themes.
-- The repository is a .NET 8 Windows WPF application. Impeccable Live's browser-based HTML/CSS preview does not directly run or modify its native XAML UI.
-- Data retention, backup, synchronization, and deployment expectations have not been confirmed.
+- Class cash balance and transaction history.
+- Student roster with NIS and per-student bill/payment summaries.
+- Class bills with per-student due amount, amount paid, and payment status.
+- Payment, expense, cash withdrawal, overpayment balance, and refund workflows.
+- New and updated bills create notifications for affected students; a separate mobile client consumes them.
+- Preserve the existing workflows and Indonesian UI wording.
+- WPF desktop application with light and dark themes; retain database-backed behavior.
+
+## Brand Commitments
+
+- Keep the product name “Class Finance” and the existing logo.
+- Keep user-facing app copy in Indonesian.
 
 ## Evidence on Hand
 
-- Existing implementation: `ClassFinance/` (WPF views, resources, models, and services).
-- Existing brand asset: `ClassFinance/Assets/logo.png`.
-- No user-provided external proof, testimonials, or market claims are established.
+- Existing WPF screens and models in `ClassFinance/Views` and `ClassFinance/Models`.
+- Existing logo at `ClassFinance/Assets/logo.png`.
+- Existing finance records in the local `kasmate` MariaDB database.
+- Dribbble references supplied by the user: dashboard search results and school/finance dashboard examples. They are layout references, not sources of product features or data.
 
 ## Product Principles
 
-- Keep balances, bills, payments, and transaction history clear and traceable.
-- Preserve role-aware access and actions already represented in the app.
-- Use the existing Indonesian terminology and rupiah conventions consistently.
+1. Put available cash and outstanding student balances where the Bendahara can scan them quickly.
+2. Keep every displayed amount tied to the real class, student, bill, or transaction data.
+3. Make common finance actions easy to find while preserving the existing rules and confirmation steps.
+4. Use Indonesian terms consistently across screens and notifications.

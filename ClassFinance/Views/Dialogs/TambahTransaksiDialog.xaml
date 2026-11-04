@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Width="380" TextElement.Foreground="{DynamicResource TextDark}">
     <StackPanel Margin="26">
-        <TextBlock Text="Tambah Transaksi" FontSize="18" FontWeight="Bold" Margin="0,0,0,16" />
+        <TextBlock Text="Tambah Transaksi" FontSize="18" Margin="0,0,0,16" />
 
         <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
             <RadioButton x:Name="MasukRadio" Content="Kas Masuk" GroupName="Jenis" IsChecked="True" Margin="0,0,20,0" VerticalAlignment="Center" />

@@ -167,7 +167,8 @@ namespace ClassFinance.Views
             var preserveCompactPane = _showCompactDetails;
 
             var query = DataStore.Instance.TagihanList.Where(t => t.KelasId == _kelasId)
-                .OrderByDescending(t => t.Id)
+                .OrderByDescending(t => t.CreatedDate)
+                .ThenByDescending(t => t.Id)
                 .Select(t =>
                 {
                     var entries = DataStore.Instance.TagihanSiswaList.Where(ts => ts.TagihanId == t.Id).ToList();

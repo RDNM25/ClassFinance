@@ -53,6 +53,7 @@ namespace ClassFinance.Views.Dialogs
                 PasswordHash = Guid.NewGuid().ToString("N")
             };
             DataStore.Instance.Users.Add(siswa);
+            DataStore.Instance.SaveChanges();
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();

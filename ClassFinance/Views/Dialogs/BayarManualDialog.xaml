@@ -4,8 +4,8 @@
              Width="400" Background="{DynamicResource SurfaceBackground}" TextElement.Foreground="{DynamicResource TextDark}">
     <Border Padding="24" CornerRadius="8" Background="{DynamicResource SurfaceBackground}">
         <StackPanel>
-            <TextBlock Text="Input Nominal Pembayaran" FontSize="20" FontWeight="Bold" Margin="0,0,0,16"/>
-            <TextBlock x:Name="SiswaNameText" FontWeight="Bold"/>
+            <TextBlock Text="Input Nominal Pembayaran" FontSize="20" Margin="0,0,0,16"/>
+            <TextBlock x:Name="SiswaNameText"/>
             <TextBlock x:Name="AmountDueText" Foreground="{DynamicResource TextGray}" Margin="0,0,0,16"/>
             <TextBlock Text="Pembayaran yang dicatat akan menambah saldo kas." Foreground="{DynamicResource TextGray}"
                        FontSize="12" TextWrapping="Wrap" Margin="0,-8,0,16" />
