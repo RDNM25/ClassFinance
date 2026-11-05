@@ -43,6 +43,21 @@ namespace ClassFinance.Services
             }
             var defaultClassId = store.KelasList[0].Id;
 
+            using (var command = new MySqlCommand("SELECT id, class_id, name, amount, starts_on, ends_on, is_active, created_at FROM weekly_billing_schedules ORDER BY id", connection))
+            using (var reader = command.ExecuteReader())
+                while (reader.Read())
+                    store.JadwalTagihanMingguanList.Add(new JadwalTagihanMingguan
+                    {
+                        Id = reader.GetInt32("id"),
+                        KelasId = reader.GetInt32("class_id"),
+                        Name = reader.GetString("name"),
+                        Amount = ReadDecimal(reader, "amount"),
+                        StartsOn = reader.GetDateTime("starts_on"),
+                        EndsOn = reader.IsDBNull(reader.GetOrdinal("ends_on")) ? null : reader.GetDateTime("ends_on"),
+                        IsActive = reader.GetBoolean("is_active"),
+                        CreatedDate = reader.GetDateTime("created_at")
+                    });
+
             using (var command = new MySqlCommand("SELECT id, name, username, password_hash, role, class_id FROM users ORDER BY id", connection))
             using (var reader = command.ExecuteReader())
             {
@@ -76,23 +91,54 @@ namespace ClassFinance.Services
                 }
             }
 
-            using (var command = new MySqlCommand("SELECT id, class_id, name, amount, created_at FROM bills ORDER BY id", connection))
+            using (var command = new MySqlCommand("SELECT id, class_id, name, amount, created_at, weekly_schedule_id, period_start, period_end, is_archived FROM bills ORDER BY id", connection))
             using (var reader = command.ExecuteReader())
                 while (reader.Read())
-                    store.TagihanList.Add(new Tagihan { Id = reader.GetInt32("id"), KelasId = reader.GetInt32("class_id"), Name = reader.GetString("name"), Amount = ReadDecimal(reader, "amount"), CreatedDate = reader.GetDateTime("created_at") });
+                {
+                    var scheduleIdOrdinal = reader.GetOrdinal("weekly_schedule_id");
+                    var periodStartOrdinal = reader.GetOrdinal("period_start");
+                    var periodEndOrdinal = reader.GetOrdinal("period_end");
+                    var scheduleId = reader.IsDBNull(scheduleIdOrdinal) ? (int?)null : reader.GetInt32(scheduleIdOrdinal);
+                    var periodStart = reader.IsDBNull(periodStartOrdinal) ? (DateTime?)null : reader.GetDateTime(periodStartOrdinal);
+                    var periodEnd = reader.IsDBNull(periodEndOrdinal) ? (DateTime?)null : reader.GetDateTime(periodEndOrdinal);
+                    store.TagihanList.Add(new Tagihan
+                    {
+                        Id = reader.GetInt32("id"),
+                        KelasId = reader.GetInt32("class_id"),
+                        Name = reader.GetString("name"),
+                        Amount = ReadDecimal(reader, "amount"),
+                        CreatedDate = reader.GetDateTime("created_at"),
+                        WeeklyScheduleId = scheduleId,
+                        PeriodStart = periodStart,
+                        PeriodEnd = periodEnd,
+                        IsArchived = reader.GetBoolean("is_archived") || !scheduleId.HasValue || !periodStart.HasValue || !periodEnd.HasValue
+                    });
+                }
 
-            using (var command = new MySqlCommand("SELECT id, bill_id, student_id, status, amount_due, amount_paid FROM bill_students ORDER BY id", connection))
+            using (var command = new MySqlCommand("SELECT id, bill_id, student_id, status, amount_due, amount_paid, assessed_amount FROM bill_student_balances ORDER BY id", connection))
             using (var reader = command.ExecuteReader())
                 while (reader.Read())
-                    store.TagihanSiswaList.Add(new TagihanSiswa { Id = reader.GetInt32("id"), TagihanId = reader.GetInt32("bill_id"), SiswaId = reader.GetInt32("student_id"), Status = ParseStatus(reader.GetString("status")), AmountDue = ReadDecimal(reader, "amount_due"), JumlahDibayar = ReadDecimal(reader, "amount_paid") });
+                {
+                    store.TagihanSiswaList.Add(new TagihanSiswa
+                    {
+                        Id = reader.GetInt32("id"),
+                        TagihanId = reader.GetInt32("bill_id"),
+                        SiswaId = reader.GetInt32("student_id"),
+                        Status = ParseStatus(reader.GetString("status")),
+                        AmountDue = ReadDecimal(reader, "amount_due"),
+                        JumlahDibayar = ReadDecimal(reader, "amount_paid"),
+                        AssessedAmount = ReadDecimal(reader, "assessed_amount")
+                    });
+                }
 
-            using (var command = new MySqlCommand("SELECT id, class_id, type, amount, note, student_id, bill_student_id, created_by, created_at, affects_kas, is_refund, is_pending_refund FROM transaksi ORDER BY id", connection))
+            using (var command = new MySqlCommand("SELECT id, class_id, type, payment_method, amount, note, student_id, bill_student_id, created_by, created_at, affects_kas, is_refund, is_pending_refund FROM transaksi ORDER BY id", connection))
             using (var reader = command.ExecuteReader())
                 while (reader.Read())
                     store.TransaksiList.Add(new Transaksi
                     {
                         Id = reader.GetInt32("id"), KelasId = reader.IsDBNull(reader.GetOrdinal("class_id")) ? defaultClassId : reader.GetInt32("class_id"),
                         Type = reader.GetString("type").Equals("MASUK", StringComparison.OrdinalIgnoreCase) ? JenisTransaksi.Masuk : JenisTransaksi.Keluar,
+                        Metode = ParseMetode(reader.GetString("payment_method")),
                         Amount = ReadDecimal(reader, "amount"), Description = reader.IsDBNull(reader.GetOrdinal("note")) ? string.Empty : reader.GetString("note"),
                         SiswaId = reader.IsDBNull(reader.GetOrdinal("student_id")) ? null : reader.GetInt32("student_id"),
                         TagihanSiswaId = reader.IsDBNull(reader.GetOrdinal("bill_student_id")) ? null : reader.GetInt32("bill_student_id"),
@@ -130,6 +176,10 @@ namespace ClassFinance.Services
                 foreach (var item in store.KelasList)
                     Execute(connection, transaction, "INSERT INTO classes (id,name,academic_year) VALUES (@id,@name,@year) ON DUPLICATE KEY UPDATE name=VALUES(name), academic_year=VALUES(academic_year)", ("@id", item.Id), ("@name", item.Name), ("@year", item.AcademicYear));
 
+                foreach (var item in store.JadwalTagihanMingguanList)
+                    Execute(connection, transaction, "INSERT INTO weekly_billing_schedules (id,class_id,name,amount,starts_on,ends_on,is_active,created_at) VALUES (@id,@classId,@name,@amount,@startsOn,@endsOn,@isActive,@createdAt) ON DUPLICATE KEY UPDATE class_id=VALUES(class_id), name=VALUES(name), amount=VALUES(amount), starts_on=VALUES(starts_on), ends_on=VALUES(ends_on), is_active=VALUES(is_active)",
+                        ("@id", item.Id), ("@classId", item.KelasId), ("@name", item.Name), ("@amount", item.Amount), ("@startsOn", item.StartsOn.Date), ("@endsOn", item.EndsOn?.Date), ("@isActive", item.IsActive), ("@createdAt", item.CreatedDate));
+
                 foreach (var item in store.Users.Where(x => x is not Siswa))
                 {
                     var role = item is WaliKelas ? "wali_kelas" : "bendahara";
@@ -140,14 +190,18 @@ namespace ClassFinance.Services
                     Execute(connection, transaction, "INSERT INTO students (id,nama,nis,class_id,saldo_titipan) VALUES (@id,@name,@nis,@classId,@balance) ON DUPLICATE KEY UPDATE nama=VALUES(nama), nis=VALUES(nis), class_id=VALUES(class_id), saldo_titipan=VALUES(saldo_titipan)", ("@id", item.Id), ("@name", item.Name), ("@nis", NullIfEmpty(item.Nis)), ("@classId", item.KelasId), ("@balance", item.SaldoTitipan));
 
                 foreach (var item in store.TagihanList)
-                    Execute(connection, transaction, "INSERT INTO bills (id,class_id,name,amount,created_at) VALUES (@id,@classId,@name,@amount,@createdAt) ON DUPLICATE KEY UPDATE class_id=VALUES(class_id), name=VALUES(name), amount=VALUES(amount), created_at=VALUES(created_at)", ("@id", item.Id), ("@classId", item.KelasId), ("@name", item.Name), ("@amount", item.Amount), ("@createdAt", item.CreatedDate));
+                    Execute(connection, transaction, "INSERT INTO bills (id,class_id,name,amount,created_at,weekly_schedule_id,period_start,period_end,is_archived) VALUES (@id,@classId,@name,@amount,@createdAt,@scheduleId,@periodStart,@periodEnd,@isArchived) ON DUPLICATE KEY UPDATE class_id=VALUES(class_id), name=VALUES(name), amount=VALUES(amount), created_at=VALUES(created_at), weekly_schedule_id=VALUES(weekly_schedule_id), period_start=VALUES(period_start), period_end=VALUES(period_end), is_archived=VALUES(is_archived)",
+                        ("@id", item.Id), ("@classId", item.KelasId), ("@name", item.Name), ("@amount", item.Amount), ("@createdAt", item.CreatedDate), ("@scheduleId", item.WeeklyScheduleId), ("@periodStart", item.PeriodStart?.Date), ("@periodEnd", item.PeriodEnd?.Date), ("@isArchived", item.IsArchived || !item.WeeklyScheduleId.HasValue || !item.PeriodStart.HasValue || !item.PeriodEnd.HasValue));
 
                 foreach (var item in store.TagihanSiswaList)
-                    Execute(connection, transaction, "INSERT INTO bill_students (id,bill_id,student_id,status,amount_due,amount_paid) VALUES (@id,@billId,@studentId,@status,@due,@paid) ON DUPLICATE KEY UPDATE bill_id=VALUES(bill_id), student_id=VALUES(student_id), status=VALUES(status), amount_due=VALUES(amount_due), amount_paid=VALUES(amount_paid)", ("@id", item.Id), ("@billId", item.TagihanId), ("@studentId", item.SiswaId), ("@status", DbStatus(item.Status)), ("@due", item.AmountDue), ("@paid", item.JumlahDibayar));
+                    Execute(connection, transaction, "INSERT INTO bill_students (id,bill_id,student_id,status,amount_due,amount_paid,assessed_amount) VALUES (@id,@billId,@studentId,@status,@due,@paid,@assessed) ON DUPLICATE KEY UPDATE bill_id=VALUES(bill_id), student_id=VALUES(student_id), status=VALUES(status), amount_due=VALUES(amount_due), amount_paid=VALUES(amount_paid), assessed_amount=VALUES(assessed_amount)", ("@id", item.Id), ("@billId", item.TagihanId), ("@studentId", item.SiswaId), ("@status", DbStatus(item.Status)), ("@due", item.AmountDue), ("@paid", item.JumlahDibayar), ("@assessed", item.AssessedAmount));
 
                 foreach (var item in store.TransaksiList)
-                    Execute(connection, transaction, "INSERT INTO transaksi (id,class_id,type,amount,note,student_id,bill_student_id,created_by,created_at,affects_kas,is_refund,is_pending_refund) VALUES (@id,@classId,@type,@amount,@note,@studentId,@billStudentId,@createdBy,@createdAt,@affectsKas,@isRefund,@pendingRefund) ON DUPLICATE KEY UPDATE class_id=VALUES(class_id), type=VALUES(type), amount=VALUES(amount), note=VALUES(note), student_id=VALUES(student_id), bill_student_id=VALUES(bill_student_id), created_by=VALUES(created_by), created_at=VALUES(created_at), affects_kas=VALUES(affects_kas), is_refund=VALUES(is_refund), is_pending_refund=VALUES(is_pending_refund)",
-                        ("@id", item.Id), ("@classId", item.KelasId), ("@type", item.Type == JenisTransaksi.Masuk ? "MASUK" : "KELUAR"), ("@amount", item.Amount), ("@note", item.Description), ("@studentId", item.SiswaId), ("@billStudentId", item.TagihanSiswaId), ("@createdBy", item.CreatedBy), ("@createdAt", item.Date), ("@affectsKas", item.AffectsKas), ("@isRefund", item.IsRefund), ("@pendingRefund", item.IsPendingRefund));
+                    Execute(connection, transaction, "INSERT INTO transaksi (id,class_id,type,payment_method,amount,note,student_id,bill_student_id,created_by,created_at,affects_kas,is_refund,is_pending_refund) VALUES (@id,@classId,@type,@paymentMethod,@amount,@note,@studentId,@billStudentId,@createdBy,@createdAt,@affectsKas,@isRefund,@pendingRefund) ON DUPLICATE KEY UPDATE class_id=VALUES(class_id), type=VALUES(type), payment_method=VALUES(payment_method), amount=VALUES(amount), note=VALUES(note), student_id=VALUES(student_id), bill_student_id=VALUES(bill_student_id), created_by=VALUES(created_by), created_at=VALUES(created_at), affects_kas=VALUES(affects_kas), is_refund=VALUES(is_refund), is_pending_refund=VALUES(is_pending_refund)",
+                        ("@id", item.Id), ("@classId", item.KelasId), ("@type", item.Type == JenisTransaksi.Masuk ? "MASUK" : "KELUAR"),
+                        ("@paymentMethod", ToDbMethod(item.Metode)), ("@amount", item.Amount), ("@note", item.Description),
+                        ("@studentId", item.SiswaId), ("@billStudentId", item.TagihanSiswaId), ("@createdBy", item.CreatedBy),
+                        ("@createdAt", item.Date), ("@affectsKas", item.AffectsKas), ("@isRefund", item.IsRefund), ("@pendingRefund", item.IsPendingRefund));
 
                 foreach (var item in store.NotifikasiList)
                     Execute(connection, transaction, "INSERT INTO notifications (id,student_id,bill_id,title,message,is_read,created_at) VALUES (@id,@studentId,@billId,@title,@message,@isRead,@createdAt) ON DUPLICATE KEY UPDATE student_id=VALUES(student_id), bill_id=VALUES(bill_id), title=VALUES(title), message=VALUES(message), is_read=VALUES(is_read), created_at=VALUES(created_at)", ("@id", item.Id), ("@studentId", item.UserId), ("@billId", item.BillId), ("@title", item.Title), ("@message", item.Message), ("@isRead", item.IsRead), ("@createdAt", item.CreatedAt));
@@ -163,8 +217,6 @@ namespace ClassFinance.Services
 
         public void DeleteStudent(int id) => Execute("DELETE FROM students WHERE id=@id", ("@id", id));
         public void DeleteTransaction(int id) => Execute("DELETE FROM transaksi WHERE id=@id", ("@id", id));
-        public void DeleteBill(int id) => Execute("DELETE FROM bills WHERE id=@id", ("@id", id));
-
         private void Execute(string sql, params (string Name, object Value)[] values)
         {
             using var connection = new MySqlConnection(_connectionString);
@@ -191,6 +243,20 @@ namespace ClassFinance.Services
             "PROSES" => StatusTagihan.Proses,
             "LUNAS" => StatusTagihan.Lunas,
             _ => StatusTagihan.BelumBayar
+        };
+
+        private static MetodeTransaksi ParseMetode(string method) => method?.Trim().ToUpperInvariant() switch
+        {
+            "QRIS" => MetodeTransaksi.Qris,
+            "TF" or "TRANSFER" => MetodeTransaksi.Tf,
+            _ => MetodeTransaksi.Tunai
+        };
+
+        private static string ToDbMethod(MetodeTransaksi method) => method switch
+        {
+            MetodeTransaksi.Qris => "QRIS",
+            MetodeTransaksi.Tf => "TF",
+            _ => "TUNAI"
         };
 
         private static string DbStatus(StatusTagihan status) => status switch

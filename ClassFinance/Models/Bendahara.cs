@@ -13,14 +13,18 @@ namespace ClassFinance.Models
 
         public override string GetDashboardTitle() => "Dashboard Bendahara";
 
-        public Transaksi TambahPemasukan(int kelasId, string source, decimal amount, DateTime date, int? tagihanSiswaId = null, int? siswaId = null)
+        public Transaksi TambahPemasukan(int kelasId, string source, decimal amount, DateTime date, int? tagihanSiswaId = null,
+            int? siswaId = null, MetodeTransaksi metode = MetodeTransaksi.Tunai)
         {
-            return DataStore.Instance.TambahTransaksi(kelasId, JenisTransaksi.Masuk, amount, date, source, tagihanSiswaId, Name, siswaId: siswaId);
+            return DataStore.Instance.TambahTransaksi(kelasId, JenisTransaksi.Masuk, amount, date, source, tagihanSiswaId, Name,
+                siswaId: siswaId, metode: metode);
         }
 
-        public Transaksi TambahPengeluaran(int kelasId, string category, decimal amount, DateTime date)
+        public Transaksi TambahPengeluaran(int kelasId, string category, decimal amount, DateTime date,
+            MetodeTransaksi metode = MetodeTransaksi.Tunai)
         {
-            return DataStore.Instance.TambahTransaksi(kelasId, JenisTransaksi.Keluar, amount, date, category, null, Name);
+            return DataStore.Instance.TambahTransaksi(kelasId, JenisTransaksi.Keluar, amount, date, category, null, Name,
+                metode: metode);
         }
 
         public void UbahNominalTransaksi(int transaksiId, decimal amount)
@@ -111,71 +115,64 @@ namespace ClassFinance.Models
             DataStore.Instance.SaveChanges();
         }
 
-        public void UbahTagihan(int tagihanId, string name, decimal amount)
+        public JadwalTagihanMingguan SimpanJadwalTagihanMingguan(
+            int kelasId, string name, decimal amount, DateTime startsOn, DateTime? endsOn, bool isActive)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Nama tagihan wajib diisi.", nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Nama iuran wajib diisi.", nameof(name));
             if (amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount));
+            if (endsOn.HasValue && endsOn.Value.Date < startsOn.Date)
+                throw new ArgumentException("Tanggal akhir tidak boleh sebelum tanggal mulai.", nameof(endsOn));
 
-            var tagihan = DataStore.Instance.TagihanList.First(t => t.Id == tagihanId);
-            var entries = DataStore.Instance.TagihanSiswaList.Where(ts => ts.TagihanId == tagihanId).ToList();
-            if (entries.Any(ts => ts.JumlahDibayar > amount))
-                throw new InvalidOperationException("Jumlah tagihan tidak boleh lebih kecil dari pembayaran yang sudah diterima.");
-
-            tagihan.Name = name.Trim();
-            tagihan.Amount = amount;
-            foreach (var entry in entries)
+            var store = DataStore.Instance;
+            var schedule = store.JadwalTagihanMingguanList.FirstOrDefault(x => x.KelasId == kelasId);
+            var isExistingSchedule = schedule != null;
+            var previousName = schedule?.Name;
+            var previousAmount = schedule?.Amount;
+            var previousStart = schedule?.StartsOn.Date;
+            var previousEnd = schedule?.EndsOn?.Date;
+            var previousActive = schedule?.IsActive;
+            if (schedule == null)
             {
-                entry.AmountDue = Math.Max(0, amount - entry.JumlahDibayar);
-                if (DataStore.Instance.TransaksiList.Any(t => t.IsPendingRefund && t.TagihanSiswaId == entry.Id))
-                    entry.Status = StatusTagihan.Proses;
-                else
-                    entry.UpdateStatus();
-            }
-            foreach (var siswa in DataStore.Instance.Users.OfType<Siswa>().Where(s => s.KelasId == tagihan.KelasId))
-            {
-                Notifikasi.Kirim(siswa.Id, "Tagihan Diperbarui",
-                    $"Tagihan '{tagihan.Name}' diperbarui menjadi Rp{tagihan.Amount:N0}.", tagihan.Id);
-            }
-            DataStore.Instance.SaveChanges();
-        }
-
-        public void HapusTagihan(int tagihanId)
-        {
-            var tagihan = DataStore.Instance.TagihanList.First(t => t.Id == tagihanId);
-            var entryIds = DataStore.Instance.TagihanSiswaList
-                .Where(ts => ts.TagihanId == tagihanId)
-                .Select(ts => ts.Id)
-                .ToHashSet();
-
-            if (DataStore.Instance.TransaksiList.Any(t => t.TagihanSiswaId.HasValue && entryIds.Contains(t.TagihanSiswaId.Value)))
-                throw new InvalidOperationException("Tagihan dengan transaksi pembayaran terkait tidak dapat dihapus.");
-
-            DataStore.Instance.DeleteBill(tagihanId);
-        }
-
-        public Tagihan BuatTagihan(int kelasId, string name, decimal amount, DateTime? createdDate = null)
-        {
-            var tagihan = DataStore.Instance.BuatTagihan(kelasId, name, amount, createdDate);
-
-            // Automatically apply any existing student SaldoTitipan toward the newly created bill without adding extra cash
-            var siswaList = DataStore.Instance.Users.OfType<Siswa>().Where(s => s.KelasId == kelasId).ToList();
-            foreach (var siswa in siswaList)
-            {
-                if (siswa.SaldoTitipan > 0)
+                schedule = new JadwalTagihanMingguan
                 {
-                    ProsesSaldoTitipanBerikutnya(siswa.Id, siswa.SaldoTitipan, createdDate);
-                }
+                    Id = store.NextWeeklyScheduleId(),
+                    KelasId = kelasId,
+                    CreatedDate = DateTime.Now
+                };
+                store.JadwalTagihanMingguanList.Add(schedule);
             }
 
-            Notifikasi.KirimUntukTagihanBaru(kelasId, tagihan.Id);
-            DataStore.Instance.SaveChanges();
-            return tagihan;
+            var daysSinceMonday = ((int)startsOn.DayOfWeek + 6) % 7;
+            var normalizedStart = startsOn.Date.AddDays(-daysSinceMonday);
+            schedule.Name = name.Trim();
+            schedule.Amount = amount;
+            schedule.StartsOn = normalizedStart;
+            schedule.EndsOn = endsOn?.Date;
+            schedule.IsActive = isActive;
+            store.SaveChanges();
+
+            var changed = isExistingSchedule &&
+                (!string.Equals(previousName, schedule.Name, StringComparison.Ordinal) ||
+                 previousAmount != schedule.Amount ||
+                 previousStart != schedule.StartsOn.Date ||
+                 previousEnd != schedule.EndsOn?.Date ||
+                 previousActive != schedule.IsActive);
+            if (changed)
+                Notifikasi.KirimPembaruanJadwalMingguan(schedule);
+
+            return schedule;
         }
 
-        public Transaksi CatatPembayaran(int tagihanSiswaId, decimal amount, string method, string proofFile = null, DateTime? date = null)
+        public Transaksi CatatPembayaran(int tagihanSiswaId, decimal amount, MetodeTransaksi metode = MetodeTransaksi.Tunai,
+            string proofFile = null, DateTime? date = null)
         {
-            var ts = DataStore.Instance.TagihanSiswaList.First(t => t.Id == tagihanSiswaId);
-            var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == ts.SiswaId);
+            var store = DataStore.Instance;
+            var ts = store.TagihanSiswaList.First(t => t.Id == tagihanSiswaId);
+            var bill = store.TagihanList.First(t => t.Id == ts.TagihanId);
+            if (!bill.IsWeeklyOccurrence)
+                throw new InvalidOperationException("Pembayaran baru hanya dapat dicatat untuk tagihan mingguan.");
+
+            var siswa = store.Users.OfType<Siswa>().First(s => s.Id == ts.SiswaId);
 
             // TRACK PARTIAL PAYMENTS
             ts.JumlahDibayar += amount;
@@ -184,18 +181,19 @@ namespace ClassFinance.Models
 
             return DataStore.Instance.TambahTransaksi(
                 siswa.KelasId, JenisTransaksi.Masuk, amount, date ?? DateTime.Now,
-                $"Pembayaran dari {siswa.Name}", tagihanSiswaId, Name, proofFile, siswaId: siswa.Id);
+                $"Pembayaran dari {siswa.Name}", tagihanSiswaId, Name, proofFile, siswaId: siswa.Id, metode: metode);
         }
 
         // Record a refund as pending. It only reduces kas after the cash is paid out.
-        public Transaksi KembalikanDana(int kelasId, int siswaId, decimal amount, int tagihanSiswaId, DateTime? date = null)
+        public Transaksi KembalikanDana(int kelasId, int siswaId, decimal amount, int tagihanSiswaId, DateTime? date = null,
+            MetodeTransaksi metode = MetodeTransaksi.Tunai)
         {
             var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
 
             var refund = DataStore.Instance.TambahTransaksi(
                 kelasId, JenisTransaksi.Keluar, amount, date ?? DateTime.Now,
                 $"Pengembalian dana lebih (refund) untuk {siswa.Name}", tagihanSiswaId, Name,
-                siswaId: siswa.Id, affectsKas: false);
+                siswaId: siswa.Id, affectsKas: false, metode: metode);
             refund.IsRefund = true;
             refund.IsPendingRefund = true;
             var tagihan = DataStore.Instance.TagihanSiswaList.First(t => t.Id == tagihanSiswaId);
@@ -222,24 +220,31 @@ namespace ClassFinance.Models
         }
 
         // Save overpayment to the student's balance and automatically apply it without inflating total cash
-        public void SimpanKelebihan(int siswaId, decimal amount, DateTime? date = null)
+        public void SimpanKelebihan(int siswaId, decimal amount, DateTime? date = null,
+            MetodeTransaksi metode = MetodeTransaksi.Tunai)
         {
             var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
             siswa.SaldoTitipan += amount;
 
             // Automatically check and apply stored balance to future bills with 0 cash added
-            ProsesSaldoTitipanBerikutnya(siswaId, amount, date);
+            ProsesSaldoTitipanBerikutnya(siswaId, amount, date, metode);
             DataStore.Instance.SaveChanges();
         }
 
         // Automatically apply stored balance to subsequent bills with 0 additional cash added to the total kas
-        public void ProsesSaldoTitipanBerikutnya(int siswaId, decimal storedAmountContext = 0, DateTime? date = null)
+        public void ProsesSaldoTitipanBerikutnya(int siswaId, decimal storedAmountContext = 0, DateTime? date = null,
+            MetodeTransaksi metode = MetodeTransaksi.Tunai)
         {
             var siswa = DataStore.Instance.Users.OfType<Siswa>().First(s => s.Id == siswaId);
             var effectiveDate = date ?? DateTime.Now;
+            var weeklyBillIds = DataStore.Instance.TagihanList
+                .Where(bill => bill.KelasId == siswa.KelasId && bill.IsWeeklyOccurrence)
+                .Select(bill => bill.Id)
+                .ToHashSet();
 
             var unpaidBills = DataStore.Instance.TagihanSiswaList
-                .Where(ts => ts.SiswaId == siswaId && ts.Status != StatusTagihan.Lunas && ts.Status != StatusTagihan.Proses)
+                .Where(ts => ts.SiswaId == siswaId && weeklyBillIds.Contains(ts.TagihanId) &&
+                             ts.Status != StatusTagihan.Lunas && ts.Status != StatusTagihan.Proses)
                 .OrderBy(ts => ts.Id)
                 .ToList();
 
@@ -262,7 +267,8 @@ namespace ClassFinance.Models
                     // when the original overpayment came in.
                     DataStore.Instance.TambahTransaksi(
                         siswa.KelasId, JenisTransaksi.Masuk, amountToPay, effectiveDate,
-                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id, affectsKas: false);
+                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name,
+                        siswaId: siswa.Id, affectsKas: false, metode: metode);
                 }
                 else
                 {
@@ -275,7 +281,8 @@ namespace ClassFinance.Models
 
                     DataStore.Instance.TambahTransaksi(
                         siswa.KelasId, JenisTransaksi.Masuk, amountToPay, effectiveDate,
-                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name, siswaId: siswa.Id, affectsKas: false);
+                        $"Pembayaran dari {siswa.Name} (dari simpanan Rp {storedAmountContext:N0})", ts.Id, Name,
+                        siswaId: siswa.Id, affectsKas: false, metode: metode);
                     break;
                 }
             }

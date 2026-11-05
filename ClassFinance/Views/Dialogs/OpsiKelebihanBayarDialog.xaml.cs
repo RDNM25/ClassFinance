@@ -12,10 +12,12 @@ namespace ClassFinance.Views.Dialogs
         private readonly TagihanSiswa _tagihan;
         private readonly decimal _totalBayar;
         private readonly DateTime _paymentDate;
+        private readonly MetodeTransaksi _metode;
         private readonly MainWindow _mainWindow;
         private readonly Action _onSaved;
 
-        public OpsiKelebihanBayarDialog(Bendahara bendahara, Siswa siswa, TagihanSiswa tagihan, decimal totalBayar, DateTime paymentDate, MainWindow mainWindow, Action onSaved)
+        public OpsiKelebihanBayarDialog(Bendahara bendahara, Siswa siswa, TagihanSiswa tagihan,
+            decimal totalBayar, DateTime paymentDate, MetodeTransaksi metode, MainWindow mainWindow, Action onSaved)
         {
             InitializeComponent();
             _bendahara = bendahara;
@@ -23,6 +25,7 @@ namespace ClassFinance.Views.Dialogs
             _tagihan = tagihan;
             _totalBayar = totalBayar;
             _paymentDate = paymentDate;
+            _metode = metode;
             _mainWindow = mainWindow;
             _onSaved = onSaved;
 
@@ -35,16 +38,16 @@ namespace ClassFinance.Views.Dialogs
             decimal kelebihan = _totalBayar - _tagihan.AmountDue;
 
             // Add that result (amountForKas) to the total kas by recording the payment for the exact due amount
-            _bendahara.CatatPembayaran(_tagihan.Id, _totalBayar, "Tunai", date: _paymentDate);
+            _bendahara.CatatPembayaran(_tagihan.Id, _totalBayar, _metode, date: _paymentDate);
 
             // Handle the overpayment based on user selection
             if (SimpanRadio.IsChecked == true)
             {
-                _bendahara.SimpanKelebihan(_siswa.Id, kelebihan, _paymentDate);
+                _bendahara.SimpanKelebihan(_siswa.Id, kelebihan, _paymentDate, _metode);
             }
             else if (KembalikanRadio.IsChecked == true)
             {
-                _bendahara.KembalikanDana(_siswa.KelasId, _siswa.Id, kelebihan, _tagihan.Id, _paymentDate);
+                _bendahara.KembalikanDana(_siswa.KelasId, _siswa.Id, kelebihan, _tagihan.Id, _paymentDate, _metode);
             }
 
             _onSaved?.Invoke();

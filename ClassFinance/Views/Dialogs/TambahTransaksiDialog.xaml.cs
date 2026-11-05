@@ -33,6 +33,10 @@ namespace ClassFinance.Views.Dialogs
             // just-added entry belongs.
             var pickedDate = (DatePickerInput.SelectedDate ?? DateTime.Now).Date;
             var dateValue = pickedDate + DateTime.Now.TimeOfDay;
+            var method = PaymentMethodCombo.SelectedItem is ComboBoxItem methodItem &&
+                         Enum.TryParse(methodItem.Tag?.ToString(), true, out MetodeTransaksi parsedMethod)
+                ? parsedMethod
+                : MetodeTransaksi.Tunai;
 
             if (string.IsNullOrWhiteSpace(description) ||
                 !decimal.TryParse(AmountBox.Text.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) ||
@@ -44,9 +48,9 @@ namespace ClassFinance.Views.Dialogs
             }
 
             if (MasukRadio.IsChecked == true)
-                _bendahara.TambahPemasukan(_kelasId, description, amount, dateValue);
+                _bendahara.TambahPemasukan(_kelasId, description, amount, dateValue, metode: method);
             else
-                _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue);
+                _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue, method);
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();

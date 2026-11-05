@@ -11,6 +11,9 @@ namespace ClassFinance.Models
 
         public decimal JumlahDibayar { get; set; }
 
+        /// <summary>The student's original assessed amount for this specific bill/week.</summary>
+        public decimal AssessedAmount { get; set; }
+
         public void UpdateStatus()
         {
             if (AmountDue <= 0)

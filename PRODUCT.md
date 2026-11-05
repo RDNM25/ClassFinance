@@ -12,7 +12,7 @@ The desktop app is primarily for the class Bendahara, who records class cash, st
 
 ## Product Purpose
 
-Class Finance helps a Bendahara manage one class's shared cash and student bill balances in one desktop app. Success means quickly understanding available class cash, which students still owe, and what action to take next.
+KasMate helps a Bendahara manage one class's shared cash and student bill balances in one desktop app. Success means quickly understanding available class cash, which students still owe, and what action to take next.
 
 ## Positioning
 
@@ -34,13 +34,13 @@ The Bendahara uses the app on a Windows desktop to review the cash balance, main
 
 ## Brand Commitments
 
-- Keep the product name “Class Finance” and the existing logo.
+- Keep the product name “KasMate” and the supplied KasMate logo.
 - Keep user-facing app copy in Indonesian.
 
 ## Evidence on Hand
 
 - Existing WPF screens and models in `ClassFinance/Views` and `ClassFinance/Models`.
-- Existing logo at `ClassFinance/Assets/logo.png`.
+- Existing logo at `ClassFinance/Assets/kasmate-logo.jpeg`.
 - Existing finance records in the local `kasmate` MariaDB database.
 - Dribbble references supplied by the user: dashboard search results and school/finance dashboard examples. They are layout references, not sources of product features or data.
 

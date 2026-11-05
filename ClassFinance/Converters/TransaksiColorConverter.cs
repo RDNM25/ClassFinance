@@ -10,8 +10,8 @@ namespace ClassFinance.Converters
     /// <summary>Incoming transactions use semantic green; expenses use semantic red.</summary>
     public class TransaksiColorConverter : IValueConverter
     {
-        private static readonly SolidColorBrush Income = new(Color.FromRgb(0x2E, 0x7D, 0x32));
-        private static readonly SolidColorBrush Expense = new(Color.FromRgb(0xC6, 0x28, 0x28));
+        private static readonly SolidColorBrush Income = new(Color.FromRgb(0x10, 0xB9, 0x81));
+        private static readonly SolidColorBrush Expense = new(Color.FromRgb(0xF4, 0x3F, 0x5E));
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

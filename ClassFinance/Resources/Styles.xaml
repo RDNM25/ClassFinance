@@ -3,72 +3,73 @@
                      xmlns:behaviors="clr-namespace:ClassFinance.Behaviors">
 
     <!--  Palette  -->
-    <SolidColorBrush x:Key="PrimaryRed" Color="#E11D2E" />
-    <SolidColorBrush x:Key="PrimaryRedDark" Color="#B9172A" />
-    <SolidColorBrush x:Key="PrimaryRedLight" Color="#FCE8E8" />
+    <SolidColorBrush x:Key="PrimaryRed" Color="#F43F5E" />
+    <SolidColorBrush x:Key="PrimaryRedDark" Color="#E11D48" />
+    <SolidColorBrush x:Key="PrimaryRedLight" Color="#FFE4E9" />
     <SolidColorBrush x:Key="CardBackground" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="ElevatedCardBackground" Color="#F2F3F5" />
+    <SolidColorBrush x:Key="ElevatedCardBackground" Color="#EEEFF3" />
     <Color x:Key="CardShadowColor">#000000</Color>
-    <SolidColorBrush x:Key="SidebarBackground" Color="#030404" />
-    <SolidColorBrush x:Key="AppBackground" Color="#F4F5F7" />
-    <SolidColorBrush x:Key="SurfaceBackground" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="SubtleBackground" Color="#F1F2F3" />
-    <SolidColorBrush x:Key="BorderColor" Color="#D7D9DC" />
-    <SolidColorBrush x:Key="TextDark" Color="#1B1B1B" />
-    <SolidColorBrush x:Key="TextGray" Color="#656A70" />
-    <SolidColorBrush x:Key="AccentText" Color="#B91C1C" />
-    <SolidColorBrush x:Key="TagihanActionForeground" Color="#B91C1C" />
-    <SolidColorBrush x:Key="StatusGreen" Color="#2E7D32" />
-    <SolidColorBrush x:Key="StatusAmber" Color="#8D6B2F" />
-    <SolidColorBrush x:Key="StatusRed" Color="#C62828" />
-    <SolidColorBrush x:Key="IncomeColor" Color="#2E7D32" />
-    <SolidColorBrush x:Key="ExpenseColor" Color="#C62828" />
-    <SolidColorBrush x:Key="ErrorColor" Color="#C62828" />
-    <SolidColorBrush x:Key="CashFlowPrimaryColor" Color="#E11D2E" />
-    <SolidColorBrush x:Key="CashFlowSecondaryColor" Color="#829189" />
-    <SolidColorBrush x:Key="CashFlowIncomeFill" Color="#24E11D2E" />
-    <SolidColorBrush x:Key="DisabledButtonBackground" Color="#E7E9EC" />
-    <SolidColorBrush x:Key="DisabledButtonText" Color="#5B6067" />
-    <SolidColorBrush x:Key="DisabledText" Color="#777D85" />
-    <SolidColorBrush x:Key="TransactionDateBackground" Color="#FCE8E8" />
-    <SolidColorBrush x:Key="TransactionDateForeground" Color="#B91C1C" />
-    <SolidColorBrush x:Key="TransactionDateBorder" Color="#F04452" />
-    <SolidColorBrush x:Key="ActionButtonBackground" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="ActionButtonForeground" Color="#B91C1C" />
-    <SolidColorBrush x:Key="ActionButtonBorder" Color="#F04452" />
-    <SolidColorBrush x:Key="ActionButtonHoverBackground" Color="#FFF0F0" />
-    <SolidColorBrush x:Key="ActionButtonPressedBackground" Color="#F3C4C4" />
-    <SolidColorBrush x:Key="CalendarNavBackground" Color="#F2F3F5" />
-    <SolidColorBrush x:Key="CalendarNavForeground" Color="#1B1B1B" />
-    <SolidColorBrush x:Key="CalendarNavBorder" Color="#C4C8CC" />
-    <SolidColorBrush x:Key="CalendarNavHoverBackground" Color="#FCE8E8" />
-    <SolidColorBrush x:Key="CalendarNavHoverForeground" Color="#1B1B1B" />
-    <SolidColorBrush x:Key="CalendarNavPressedBackground" Color="#F8DADC" />
-    <SolidColorBrush x:Key="CalendarCurrentMonthBackground" Color="#FCE8E8" />
-    <SolidColorBrush x:Key="CalendarCurrentMonthBorder" Color="#E11D2E" />
-    <SolidColorBrush x:Key="CalendarSelectedMonthBackground" Color="#E11D2E" />
-    <SolidColorBrush x:Key="CalendarSelectedMonthForeground" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="CalendarSelectedMonthBorder" Color="#B9172A" />
-    <SolidColorBrush x:Key="CalendarNavFocusBorder" Color="#E11D2E" />
-    <SolidColorBrush x:Key="CalendarNavArrowBackground" Color="#F4F5F7" />
-    <SolidColorBrush x:Key="CalendarNavArrowForeground" Color="#1B1B1B" />
-    <SolidColorBrush x:Key="CalendarNavArrowBorder" Color="#D7D9DC" />
-    <SolidColorBrush x:Key="CalendarNavArrowHoverBackground" Color="#FCE8E8" />
-    <SolidColorBrush x:Key="CalendarNavArrowPressedBackground" Color="#F8DADC" />
-    <SolidColorBrush x:Key="StudentAddBackground" Color="#E11D2E" />
-    <SolidColorBrush x:Key="StudentAddForeground" Color="#FFFFFF" />
-    <SolidColorBrush x:Key="StudentAddBorder" Color="#F04452" />
-    <SolidColorBrush x:Key="StudentAddHoverBackground" Color="#F04452" />
-    <SolidColorBrush x:Key="StudentAddPressedBackground" Color="#B9172A" />
-    <Color x:Key="CardCornerTint">#FCE7E7</Color>
-    <Color x:Key="CardCornerMidTint">#FFF7F7</Color>
-    <Color x:Key="CardSurfaceTint">#FFFFFF</Color>
-    <RadialGradientBrush x:Key="CardCornerFade" Center="1,0" GradientOrigin="1,0" RadiusX="0.85" RadiusY="0.8">
-        <GradientStop Color="{DynamicResource CardCornerTint}" Offset="0" />
-        <GradientStop Color="{DynamicResource CardCornerMidTint}" Offset="0.5" />
-        <GradientStop Color="{DynamicResource CardSurfaceTint}" Offset="1" />
+    <SolidColorBrush x:Key="SidebarBackground" Color="#0B0D12" />
+    <SolidColorBrush x:Key="AppBackground" Color="#F5F6FA" />
+    <RadialGradientBrush x:Key="PageBackground" MappingMode="RelativeToBoundingBox"
+                         Center="0.5,0" GradientOrigin="0.5,0" RadiusX="0.75" RadiusY="0.4">
+        <GradientStop Color="#FFF1F3" Offset="0" />
+        <GradientStop Color="#F5F6FA" Offset="1" />
     </RadialGradientBrush>
-
+    <SolidColorBrush x:Key="SurfaceBackground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="SubtleBackground" Color="#F0F1F5" />
+    <SolidColorBrush x:Key="BorderColor" Color="#E4E4E7" />
+    <SolidColorBrush x:Key="TextDark" Color="#18181B" />
+    <SolidColorBrush x:Key="TextGray" Color="#71717A" />
+    <SolidColorBrush x:Key="AccentText" Color="#BE123C" />
+    <SolidColorBrush x:Key="TagihanActionForeground" Color="#BE123C" />
+    <SolidColorBrush x:Key="StatusGreen" Color="#047857" />
+    <SolidColorBrush x:Key="StatusAmber" Color="#B45309" />
+    <SolidColorBrush x:Key="StatusRed" Color="#BE123C" />
+    <SolidColorBrush x:Key="WarningBadgeBackground" Color="#FFE4E6" />
+    <SolidColorBrush x:Key="WarningBadgeForeground" Color="#BE123C" />
+    <SolidColorBrush x:Key="WarningBadgeBorder" Color="#F43F5E" />
+    <SolidColorBrush x:Key="IncomeColor" Color="#047857" />
+    <SolidColorBrush x:Key="ExpenseColor" Color="#BE123C" />
+    <SolidColorBrush x:Key="ErrorColor" Color="#BE123C" />
+    <SolidColorBrush x:Key="CashFlowPrimaryColor" Color="#047857" />
+    <SolidColorBrush x:Key="CashFlowSecondaryColor" Color="#B45309" />
+    <SolidColorBrush x:Key="CashFlowIncomeFill" Color="#24047857" />
+    <SolidColorBrush x:Key="CashFlowExpenseFill" Color="#24B45309" />
+    <SolidColorBrush x:Key="DisabledButtonBackground" Color="#E4E4E7" />
+    <SolidColorBrush x:Key="DisabledButtonText" Color="#52525B" />
+    <SolidColorBrush x:Key="DisabledText" Color="#71717A" />
+    <SolidColorBrush x:Key="TransactionDateBackground" Color="#FFE4E9" />
+    <SolidColorBrush x:Key="TransactionDateForeground" Color="#BE123C" />
+    <SolidColorBrush x:Key="TransactionDateBorder" Color="#F43F5E" />
+    <SolidColorBrush x:Key="ActionButtonBackground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ActionButtonForeground" Color="#BE123C" />
+    <SolidColorBrush x:Key="ActionButtonBorder" Color="#F43F5E" />
+    <SolidColorBrush x:Key="ButtonHoverBackground" Color="#00F0F1F5" />
+    <SolidColorBrush x:Key="ActionButtonHoverBackground" Color="#00F0F1F5" />
+    <SolidColorBrush x:Key="ActionButtonPressedBackground" Color="#FECDD3" />
+    <SolidColorBrush x:Key="CalendarNavBackground" Color="#EEEFF3" />
+    <SolidColorBrush x:Key="CalendarNavForeground" Color="#18181B" />
+    <SolidColorBrush x:Key="CalendarNavBorder" Color="#D4D4D8" />
+    <SolidColorBrush x:Key="CalendarNavHoverBackground" Color="#00F0F1F5" />
+    <SolidColorBrush x:Key="CalendarNavHoverForeground" Color="#18181B" />
+    <SolidColorBrush x:Key="CalendarNavPressedBackground" Color="#FECDD3" />
+    <SolidColorBrush x:Key="CalendarCurrentMonthBackground" Color="#FFE4E9" />
+    <SolidColorBrush x:Key="CalendarCurrentMonthBorder" Color="#F43F5E" />
+    <SolidColorBrush x:Key="CalendarSelectedMonthBackground" Color="#F43F5E" />
+    <SolidColorBrush x:Key="CalendarSelectedMonthForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="CalendarSelectedMonthBorder" Color="#BE123C" />
+    <SolidColorBrush x:Key="CalendarNavFocusBorder" Color="#F43F5E" />
+    <SolidColorBrush x:Key="CalendarNavArrowBackground" Color="#F5F6FA" />
+    <SolidColorBrush x:Key="CalendarNavArrowForeground" Color="#18181B" />
+    <SolidColorBrush x:Key="CalendarNavArrowBorder" Color="#E4E4E7" />
+    <SolidColorBrush x:Key="CalendarNavArrowHoverBackground" Color="#00F0F1F5" />
+    <SolidColorBrush x:Key="CalendarNavArrowPressedBackground" Color="#FECDD3" />
+    <SolidColorBrush x:Key="StudentAddBackground" Color="#F43F5E" />
+    <SolidColorBrush x:Key="StudentAddForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="StudentAddBorder" Color="#FB7185" />
+    <SolidColorBrush x:Key="StudentAddHoverBackground" Color="#00F0F1F5" />
+    <SolidColorBrush x:Key="StudentAddPressedBackground" Color="#E11D48" />
     <ControlTemplate x:Key="CalendarNavigationButtonTemplate" TargetType="Button">
         <Border x:Name="navBorder" Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
@@ -228,9 +229,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" CornerRadius="24" Padding="{TemplateBinding Padding}">
+                    <Border x:Name="border" CornerRadius="12" Padding="{TemplateBinding Padding}">
                         <Border.Background>
-                            <SolidColorBrush x:Name="bgBrush" Color="#E11D2E" />
+                            <SolidColorBrush x:Name="bgBrush" Color="#F43F5E" />
                         </Border.Background>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                           TextElement.Foreground="{TemplateBinding Foreground}" />
@@ -241,7 +242,7 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
-                                                        To="#B9172A" Duration="0:0:0.18" />
+                                                        To="#F43F5E" Duration="0:0:0.16" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -249,7 +250,25 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
-                                                        To="#E11D2E" Duration="0:0:0.18" />
+                                                        To="#F43F5E" Duration="0:0:0.18" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#E11D48" Duration="0:0:0.06" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
+                                                        To="#F43F5E" Duration="0:0:0.1" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -264,13 +283,7 @@
         </Setter>
     </Style>
 
-    <!--
-        "Pop" button: a white pill button meant to sit on top of a colored card
-        (e.g. the Tarik Kas button on the red Total Saldo card). Colors are
-        self-contained rather than TemplateBinding'd. Hovering smoothly animates
-        the background from white to deep red and the text from red to white,
-        plus a soft glow, instead of any instant color snap.
-    -->
+    <!-- White action button used on colored cards, with a neutral hover surface. -->
     <Style x:Key="PopButton" TargetType="Button">
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="FontSize" Value="14" />
@@ -284,48 +297,38 @@
                         <Border.Background>
                             <SolidColorBrush x:Name="borderBrush" Color="White" />
                         </Border.Background>
-                        <Border.Effect>
-                            <DropShadowEffect x:Name="shadow" Color="#E11D2E" Direction="270"
-                                               BlurRadius="0" ShadowDepth="0" Opacity="0" />
-                        </Border.Effect>
-                        <TextBlock x:Name="contentText" Text="{TemplateBinding Content}"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   FontWeight="{TemplateBinding FontWeight}" FontSize="{TemplateBinding FontSize}">
-                            <TextBlock.Foreground>
-                                <SolidColorBrush x:Name="fgBrush" Color="#E11D2E" />
-                            </TextBlock.Foreground>
-                        </TextBlock>
+                        <Grid>
+                            <Border x:Name="hoverFill" Background="{DynamicResource ButtonHoverBackground}"
+                                    CornerRadius="23" Opacity="0" IsHitTestVisible="False" />
+                            <Border x:Name="pressedFill" Background="{DynamicResource ActionButtonPressedBackground}"
+                                    CornerRadius="23" Opacity="0" IsHitTestVisible="False" />
+                            <TextBlock x:Name="contentText" Text="{TemplateBinding Content}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontWeight="{TemplateBinding FontWeight}" FontSize="{TemplateBinding FontSize}"
+                                       Foreground="{DynamicResource AccentText}" />
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <ColorAnimation Storyboard.TargetName="borderBrush" Storyboard.TargetProperty="Color"
-                                                        To="#F04452" Duration="0:0:0.18" />
-                                        <ColorAnimation Storyboard.TargetName="fgBrush" Storyboard.TargetProperty="Color"
-                                                        To="White" Duration="0:0:0.18" />
-                                        <DoubleAnimation Storyboard.TargetName="shadow" Storyboard.TargetProperty="Opacity"
-                                                         To="0.45" Duration="0:0:0.18" />
-                                        <DoubleAnimation Storyboard.TargetName="shadow" Storyboard.TargetProperty="BlurRadius"
-                                                         To="18" Duration="0:0:0.18" />
-                                        <DoubleAnimation Storyboard.TargetName="shadow" Storyboard.TargetProperty="ShadowDepth"
-                                                         To="6" Duration="0:0:0.18" />
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="1" Duration="0:0:0.14" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
                             <Trigger.ExitActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <ColorAnimation Storyboard.TargetName="borderBrush" Storyboard.TargetProperty="Color"
-                                                        To="White" Duration="0:0:0.18" />
-                                        <ColorAnimation Storyboard.TargetName="fgBrush" Storyboard.TargetProperty="Color"
-                                                        To="#E11D2E" Duration="0:0:0.18" />
-                                        <DoubleAnimation Storyboard.TargetName="shadow" Storyboard.TargetProperty="Opacity"
-                                                         To="0" Duration="0:0:0.15" />
+                                        <DoubleAnimation Storyboard.TargetName="hoverFill" Storyboard.TargetProperty="Opacity"
+                                                         To="0" Duration="0:0:0.11" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="pressedFill" Property="Opacity" Value="1" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
@@ -348,7 +351,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" BorderBrush="{StaticResource PrimaryRed}" BorderThickness="1.5" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                    <Border x:Name="border" BorderBrush="{StaticResource PrimaryRed}" BorderThickness="1.5" CornerRadius="12" Padding="{TemplateBinding Padding}">
                         <Border.Background>
                             <SolidColorBrush x:Name="bgBrush" Color="White" />
                         </Border.Background>
@@ -361,7 +364,7 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
-                                                        To="#FCE8E8" Duration="0:0:0.18" />
+                                                        To="White" Duration="0:0:0.18" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -456,6 +459,57 @@
         <Setter Property="Padding" Value="10,5" />
     </Style>
 
+    <Style x:Key="CheckmarkRadioButton" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{DynamicResource TextDark}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource ThemeFocusVisual}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Grid Background="Transparent" MinHeight="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="CheckSurface" Width="16" Height="16" CornerRadius="4"
+                                Background="{DynamicResource SurfaceBackground}"
+                                BorderBrush="{DynamicResource BorderColor}" BorderThickness="1.5"
+                                VerticalAlignment="Center" Margin="0,0,9,0">
+                            <Path x:Name="CheckMark" Data="M2,8 L6,12 L14,3" Width="10" Height="10"
+                                  Stretch="Uniform" Stroke="White" StrokeThickness="2"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round" Visibility="Collapsed" />
+                        </Border>
+                        <ContentPresenter Grid.Column="1" ContentSource="Content" RecognizesAccessKey="True"
+                                          VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckSurface" Property="Background" Value="{DynamicResource PrimaryRed}" />
+                            <Setter TargetName="CheckSurface" Property="BorderBrush" Value="{DynamicResource PrimaryRed}" />
+                            <Setter TargetName="CheckMark" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsChecked" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="CheckSurface" Property="BorderBrush" Value="{DynamicResource AccentText}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="CheckSurface" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                            <Setter Property="Foreground" Value="{DynamicResource DisabledText}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="SmallPrimaryButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
         <Setter Property="FontSize" Value="11" />
         <Setter Property="Padding" Value="10,5" />
@@ -476,7 +530,9 @@
                             BorderBrush="{DynamicResource StatusAmber}" BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="20" Padding="{TemplateBinding Padding}">
                             <Grid>
-                                <Border x:Name="hoverFill" Background="{DynamicResource TransactionDateBackground}"
+                                <Border x:Name="hoverFill" Background="{DynamicResource ButtonHoverBackground}"
+                                        CornerRadius="19" Opacity="0" IsHitTestVisible="False" />
+                                <Border x:Name="pressedFill" Background="{DynamicResource SubtleBackground}"
                                         CornerRadius="19" Opacity="0" IsHitTestVisible="False" />
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                                   TextElement.Foreground="{TemplateBinding Foreground}" />
@@ -502,7 +558,7 @@
                                 </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="hoverFill" Property="Opacity" Value="1" />
+                                <Setter TargetName="pressedFill" Property="Opacity" Value="1" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="border" Property="Background" Value="{DynamicResource DisabledButtonBackground}" />
@@ -624,7 +680,7 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
-                                                        To="#FCE8E8" Duration="0:0:0.18" />
+                                                        To="White" Duration="0:0:0.18" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -658,7 +714,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="dotsBorder" Background="{TemplateBinding Background}" CornerRadius="8">
                         <Grid>
-                            <Border x:Name="hoverFill" Background="{DynamicResource SubtleBackground}"
+                            <Border x:Name="hoverFill" Background="{DynamicResource ButtonHoverBackground}"
                                     CornerRadius="8" Opacity="0" IsHitTestVisible="False" />
                             <Border x:Name="pressedFill" Background="{DynamicResource BorderColor}"
                                     CornerRadius="8" Opacity="0" IsHitTestVisible="False" />
@@ -783,7 +839,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="border" CornerRadius="8" Padding="{TemplateBinding Padding}" Margin="8,3">
                         <Border.Background>
-                            <SolidColorBrush x:Name="bgBrush" Color="#00E11D2E" />
+                            <SolidColorBrush x:Name="bgBrush" Color="#00F43F5E" />
                         </Border.Background>
                         <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"
                                           TextElement.Foreground="{TemplateBinding Foreground}" />
@@ -794,7 +850,7 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
-                                                        To="#E11D2E" Duration="0:0:0.18" />
+                                                        To="#F43F5E" Duration="0:0:0.18" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -802,7 +858,7 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
-                                                        To="#00E11D2E" Duration="0:0:0.18" />
+                                                        To="#00F43F5E" Duration="0:0:0.18" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -840,7 +896,7 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="border" CornerRadius="8" Padding="{TemplateBinding Padding}" Margin="8,3">
                         <Border.Background>
-                            <SolidColorBrush x:Name="bgBrush" Color="#E11D2E" />
+                            <SolidColorBrush x:Name="bgBrush" Color="#F43F5E" />
                         </Border.Background>
                         <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"
                                           TextElement.Foreground="{TemplateBinding Foreground}" />
@@ -851,7 +907,7 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
-                                                        To="#B9172A" Duration="0:0:0.18" />
+                                                        To="#F43F5E" Duration="0:0:0.18" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -859,7 +915,7 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <ColorAnimation Storyboard.TargetName="bgBrush" Storyboard.TargetProperty="Color"
-                                                        To="#E11D2E" Duration="0:0:0.18" />
+                                                        To="#F43F5E" Duration="0:0:0.18" />
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -958,18 +1014,19 @@
                         <ToggleButton x:Name="toggle" Background="{TemplateBinding Background}"
                                       BorderBrush="{TemplateBinding BorderBrush}"
                                       BorderThickness="{TemplateBinding BorderThickness}"
+                                      Tag="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
                                       Focusable="False" ClickMode="Press"
                                       IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                             <ToggleButton.Template>
                                 <ControlTemplate TargetType="ToggleButton">
                                     <Border x:Name="toggleBorder" Background="{TemplateBinding Background}"
                                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
-                                            CornerRadius="20">
+                                            CornerRadius="12">
                                         <Grid>
                                             <Border x:Name="hoverOutline" Background="Transparent"
                                                     BorderBrush="{DynamicResource TextDark}"
                                                     BorderThickness="{TemplateBinding BorderThickness}"
-                                                    CornerRadius="20" Margin="-1" Opacity="0" IsHitTestVisible="False" />
+                                                    CornerRadius="12" Margin="-1" Opacity="0" IsHitTestVisible="False" />
                                             <Path x:Name="arrow" Data="M0,0 L5,5 L10,0" Stroke="{DynamicResource TextDark}"
                                                   StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                                   StrokeLineJoin="Round" HorizontalAlignment="Right" VerticalAlignment="Center"
@@ -1017,6 +1074,9 @@
                                                 </BeginStoryboard>
                                             </Trigger.ExitActions>
                                         </Trigger>
+                                        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Value="WeekSelector">
+                                            <Setter TargetName="arrow" Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </ToggleButton.Template>
@@ -1027,22 +1087,33 @@
                                           ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                           TextElement.Foreground="{TemplateBinding Foreground}"
                                           Margin="{TemplateBinding Padding}"
-                                          HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="Center" />
 
                         <Popup x:Name="popup" Placement="Bottom" IsOpen="{TemplateBinding IsDropDownOpen}"
                                AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
-                            <Border Background="{DynamicResource SurfaceBackground}" BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="12" Padding="4"
+                            <Border x:Name="dropDownBorder" Background="{DynamicResource SurfaceBackground}"
+                                    BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="12" Padding="4"
                                     MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
                                     MaxHeight="{TemplateBinding MaxDropDownHeight}" Margin="0,6,0,0">
                                 <Border.Effect>
                                     <DropShadowEffect ShadowDepth="1" Direction="270" BlurRadius="10" Color="Black" Opacity="0.2"/>
                                 </Border.Effect>
-                                <ScrollViewer SnapsToDevicePixels="True">
+                        <ScrollViewer x:Name="dropDownScrollViewer" SnapsToDevicePixels="True">
                                     <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
                                 </ScrollViewer>
                             </Border>
                         </Popup>
                     </Grid>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                     Value="WeekSelector">
+                            <Setter TargetName="dropDownBorder" Property="Padding" Value="4,4,4,0" />
+                            <Setter TargetName="dropDownScrollViewer" Property="VerticalScrollBarVisibility" Value="Auto" />
+                            <Setter TargetName="dropDownScrollViewer" Property="HorizontalScrollBarVisibility" Value="Disabled" />
+                            <Setter TargetName="dropDownScrollViewer" Property="CanContentScroll" Value="True" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -1130,7 +1201,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="10">
                             <Grid>
-                                <Border x:Name="hoverFill" Background="{DynamicResource PrimaryRedLight}"
+                                <Border x:Name="hoverFill" Background="{DynamicResource ButtonHoverBackground}"
                                         CornerRadius="9" Opacity="0" IsHitTestVisible="False" />
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                                                   TextElement.Foreground="{TemplateBinding Foreground}" />
@@ -1202,7 +1273,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="8" Padding="4">
                             <Grid>
-                                <Border x:Name="hoverFill" Background="{DynamicResource CalendarNavHoverBackground}"
+                                <Border x:Name="hoverFill" Background="{DynamicResource ButtonHoverBackground}"
                                         CornerRadius="7" Opacity="0" IsHitTestVisible="False" />
                                 <Border x:Name="pressedFill" Background="{DynamicResource CalendarNavPressedBackground}"
                                         CornerRadius="7" Opacity="0" IsHitTestVisible="False" />
@@ -1282,8 +1353,7 @@
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="buttonBorder" Property="Background" Value="{DynamicResource PrimaryRedLight}" />
-                <Setter TargetName="buttonBorder" Property="BorderBrush" Value="{DynamicResource AccentText}" />
+                <Setter TargetName="buttonBorder" Property="Background" Value="{DynamicResource ButtonHoverBackground}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="buttonBorder" Property="Background" Value="{DynamicResource CalendarNavArrowPressedBackground}" />
@@ -1342,7 +1412,7 @@
 
     <!--  Card container  -->
     <Style x:Key="Card" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource CardCornerFade}" />
+        <Setter Property="Background" Value="{DynamicResource CardBackground}" />
         <Setter Property="CornerRadius" Value="14" />
         <Setter Property="Padding" Value="20" />
         <Setter Property="BorderBrush" Value="Transparent" />
@@ -1356,7 +1426,7 @@
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Effect">
                     <Setter.Value>
-                        <DropShadowEffect Color="{DynamicResource CardCornerTint}" BlurRadius="16"
+                        <DropShadowEffect Color="{DynamicResource CardShadowColor}" BlurRadius="16"
                                           Opacity="0.3" ShadowDepth="2" />
                     </Setter.Value>
                 </Setter>
@@ -1376,7 +1446,7 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource AccentText}" />
                 <Setter Property="Effect">
                     <Setter.Value>
-                        <DropShadowEffect Color="{DynamicResource CardCornerTint}" BlurRadius="14"
+                        <DropShadowEffect Color="{DynamicResource CardShadowColor}" BlurRadius="14"
                                           Opacity="0.26" ShadowDepth="2" />
                     </Setter.Value>
                 </Setter>
@@ -1397,7 +1467,7 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource AccentText}" />
                 <Setter Property="Effect">
                     <Setter.Value>
-                        <DropShadowEffect Color="{DynamicResource CardCornerTint}" BlurRadius="16"
+                        <DropShadowEffect Color="{DynamicResource CardShadowColor}" BlurRadius="16"
                                           Opacity="0.3" ShadowDepth="2" />
                     </Setter.Value>
                 </Setter>

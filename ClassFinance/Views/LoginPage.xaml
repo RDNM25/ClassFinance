@@ -1,7 +1,7 @@
 <Page x:Class="ClassFinance.Views.LoginPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" TextElement.Foreground="{DynamicResource TextDark}"
-      Title="Masuk" Background="{DynamicResource AppBackground}">
+      Title="Masuk" Background="{DynamicResource PageBackground}">
     <Grid>
         <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="420"
                 Background="{DynamicResource SurfaceBackground}" CornerRadius="18">
@@ -12,10 +12,16 @@
                 <!--  Red hero header  -->
                 <Border Background="{StaticResource PrimaryRed}" CornerRadius="18,18,60,60" Padding="0,36,0,36">
                     <StackPanel HorizontalAlignment="Center">
-                        <Image Source="/Assets/logo.png" Width="110" Height="110" Stretch="Uniform" />
+                        <Border Width="110" Height="110" ClipToBounds="True" HorizontalAlignment="Center">
+                            <Border.Clip>
+                                <RectangleGeometry Rect="0,0,110,110" RadiusX="20.5" RadiusY="20.5" />
+                            </Border.Clip>
+                            <Image Source="/Assets/kasmate-logo.jpeg" Width="154" Height="154" Stretch="Uniform"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
                         <TextBlock Text="Selamat Datang Kembali" Foreground="White" FontSize="24"
                                    HorizontalAlignment="Center" Margin="0,16,0,4" />
-                        <TextBlock Text="Masuk ke Class Finance" Foreground="White" FontSize="13"
+                        <TextBlock Text="Masuk ke KasMate" Foreground="White" FontSize="13"
                                    HorizontalAlignment="Center" />
                     </StackPanel>
                 </Border>

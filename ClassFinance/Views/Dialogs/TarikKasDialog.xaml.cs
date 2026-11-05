@@ -59,8 +59,12 @@ namespace ClassFinance.Views.Dialogs
             // "today" would sort as if it happened at 00:00.
             var pickedDate = (DatePickerInput.SelectedDate ?? DateTime.Now).Date;
             var dateValue = pickedDate + DateTime.Now.TimeOfDay;
+            var method = PaymentMethodCombo.SelectedItem is ComboBoxItem methodItem &&
+                         Enum.TryParse(methodItem.Tag?.ToString(), true, out MetodeTransaksi parsedMethod)
+                ? parsedMethod
+                : MetodeTransaksi.Tunai;
 
-            _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue);
+            _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue, method);
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();

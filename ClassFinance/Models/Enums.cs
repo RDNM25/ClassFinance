@@ -13,6 +13,23 @@ namespace ClassFinance.Models
         Keluar
     }
 
+    public enum MetodeTransaksi
+    {
+        Tunai,
+        Qris,
+        Tf
+    }
+
+    public static class MetodeTransaksiExtensions
+    {
+        public static string ToDisplayLabel(this MetodeTransaksi method) => method switch
+        {
+            MetodeTransaksi.Qris => "Qris",
+            MetodeTransaksi.Tf => "Tf",
+            _ => "Tunai"
+        };
+    }
+
     public enum StatusTagihan
     {
         BelumBayar,

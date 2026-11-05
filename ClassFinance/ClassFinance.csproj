@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\logo.png" />
+    <Resource Include="Assets\kasmate-logo.jpeg" />
   </ItemGroup>
 
   <ItemGroup>

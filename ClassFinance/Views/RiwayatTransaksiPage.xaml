@@ -4,7 +4,7 @@
       xmlns:conv="clr-namespace:ClassFinance.Converters"
       xmlns:services="clr-namespace:ClassFinance.Services"
       xmlns:behaviors="clr-namespace:ClassFinance.Behaviors" TextElement.Foreground="{DynamicResource TextDark}"
-      Title="Riwayat Transaksi" Background="{DynamicResource AppBackground}">
+      Title="Riwayat Transaksi" Background="{DynamicResource PageBackground}">
     <Page.Resources>
         <conv:TransaksiSignConverter x:Key="Sign" />
         <conv:TransaksiColorConverter x:Key="SignColor" />
@@ -113,26 +113,48 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="0" Style="{StaticResource Card}" behaviors:HoverLiftBehavior.IsEnabled="True"
-                    Background="{StaticResource PrimaryRed}"
                     CornerRadius="16" Padding="20">
-                <StackPanel>
-                    <TextBlock Text="Saldo Kas Saat Ini" Foreground="White" FontSize="13" />
-                    <TextBlock x:Name="TotalKasText" Text="Rp 0" Foreground="White" FontSize="24" Margin="0,6,0,0" />
-                </StackPanel>
+                <Grid Margin="-20">
+                    <Border CornerRadius="16" Background="{DynamicResource CashFlowIncomeFill}" IsHitTestVisible="False">
+                        <Border.OpacityMask>
+                            <LinearGradientBrush StartPoint="1,0" EndPoint="0.15,1">
+                                <GradientStop Color="#FF000000" Offset="0" />
+                                <GradientStop Color="#00000000" Offset="0.95" />
+                            </LinearGradientBrush>
+                        </Border.OpacityMask>
+                    </Border>
+                    <StackPanel Margin="20">
+                        <TextBlock Text="Saldo Kas Saat Ini" Foreground="{DynamicResource TextGray}" FontSize="13" FontWeight="Medium" />
+                        <TextBlock x:Name="TotalKasText" Text="Rp 0" Foreground="{DynamicResource TextDark}" FontSize="24"
+                                   FontWeight="Medium" Margin="0,6,0,0" />
+                    </StackPanel>
+                </Grid>
             </Border>
 
             <Border Grid.Column="2" Style="{StaticResource Card}" behaviors:HoverLiftBehavior.IsEnabled="True">
                 <StackPanel>
-                    <TextBlock Text="Kas Masuk" Foreground="{DynamicResource TextGray}" FontSize="13" />
-                    <TextBlock x:Name="TotalEarnedText" Text="Rp 0" FontSize="24" Foreground="{DynamicResource AccentText}" Margin="0,6,0,0" />
+                    <TextBlock Text="Kas Masuk" Foreground="{DynamicResource TextGray}" FontSize="13" FontWeight="Medium" />
+                    <TextBlock x:Name="TotalEarnedText" Text="Rp 0" FontSize="24" FontWeight="Medium"
+                               Foreground="{DynamicResource AccentText}" Margin="0,6,0,0" />
                 </StackPanel>
             </Border>
 
             <Border Grid.Column="4" Style="{StaticResource Card}" behaviors:HoverLiftBehavior.IsEnabled="True">
-                <StackPanel>
-                    <TextBlock Text="Kas Keluar" Foreground="{DynamicResource TextGray}" FontSize="13" />
-                    <TextBlock x:Name="TotalSpentText" Text="Rp 0" FontSize="24" Foreground="{DynamicResource TextDark}" Margin="0,6,0,0" />
-                </StackPanel>
+                <Grid Margin="-20">
+                    <Border CornerRadius="14" Background="{DynamicResource CashFlowExpenseFill}" IsHitTestVisible="False">
+                        <Border.OpacityMask>
+                            <LinearGradientBrush StartPoint="1,0" EndPoint="0.15,1">
+                                <GradientStop Color="#FF000000" Offset="0" />
+                                <GradientStop Color="#00000000" Offset="0.95" />
+                            </LinearGradientBrush>
+                        </Border.OpacityMask>
+                    </Border>
+                    <StackPanel Margin="20">
+                        <TextBlock Text="Kas Keluar" Foreground="{DynamicResource TextGray}" FontSize="13" FontWeight="Medium" />
+                        <TextBlock x:Name="TotalSpentText" Text="Rp 0" FontSize="24" FontWeight="Medium"
+                                   Foreground="{DynamicResource TextDark}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </Grid>
             </Border>
         </Grid>
 
@@ -143,10 +165,11 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Border x:Name="TotalOwedCard" Grid.Column="0" Style="{StaticResource Card}"
-                    Background="{StaticResource PrimaryRed}" CornerRadius="16" Padding="20">
+                    CornerRadius="16" Padding="20">
                 <StackPanel>
-                    <TextBlock Text="Total Tagihan Belum Dibayar" Foreground="White" FontSize="13" />
-                    <TextBlock x:Name="TotalOwedText" Text="Rp 0" Foreground="White" FontSize="26" Margin="0,6,0,0" />
+                    <TextBlock Text="Total Tagihan Belum Dibayar" Foreground="{DynamicResource TextGray}" FontSize="13" />
+                    <TextBlock x:Name="TotalOwedText" Text="Rp 0" Foreground="{DynamicResource StatusRed}"
+                               FontSize="26" Margin="0,6,0,0" />
                 </StackPanel>
             </Border>
             <Border x:Name="TotalPaidCard" Grid.Column="2" Style="{StaticResource Card}" CornerRadius="16" Padding="20">
@@ -213,6 +236,7 @@
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
                                         <TextBlock Text="{Binding DescriptionText}" FontSize="11" Foreground="{DynamicResource TextDark}"
                                                    TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding PaymentMethodText}" FontSize="10" Foreground="{DynamicResource TextGray}" Margin="0,2,0,0" />
                                         <TextBlock Text="{Binding RefundStatus}" FontSize="10" Foreground="{DynamicResource TextGray}" Margin="0,2,0,0">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">

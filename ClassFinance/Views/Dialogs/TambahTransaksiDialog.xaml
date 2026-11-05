@@ -6,8 +6,10 @@
         <TextBlock Text="Tambah Transaksi" FontSize="18" Margin="0,0,0,16" />
 
         <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
-            <RadioButton x:Name="MasukRadio" Content="Kas Masuk" GroupName="Jenis" IsChecked="True" Margin="0,0,20,0" VerticalAlignment="Center" />
-            <RadioButton x:Name="KeluarRadio" Content="Kas Keluar" GroupName="Jenis" VerticalAlignment="Center" />
+            <RadioButton x:Name="MasukRadio" Content="Kas Masuk" GroupName="Jenis" Style="{StaticResource CheckmarkRadioButton}"
+                         IsChecked="True" Margin="0,0,20,0" VerticalAlignment="Center" />
+            <RadioButton x:Name="KeluarRadio" Content="Kas Keluar" GroupName="Jenis" Style="{StaticResource CheckmarkRadioButton}"
+                         VerticalAlignment="Center" />
         </StackPanel>
 
         <TextBlock Text="Keterangan" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="2,0,0,4" />
@@ -15,6 +17,13 @@
 
         <TextBlock Text="Jumlah (Rp)" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="2,0,0,4" />
         <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,12" />
+
+        <TextBlock Text="Metode transaksi" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="2,0,0,4" />
+        <ComboBox x:Name="PaymentMethodCombo" Style="{StaticResource RoundedComboBox}" SelectedIndex="0" Margin="0,0,0,12">
+            <ComboBoxItem Content="Tunai" Tag="Tunai" />
+            <ComboBoxItem Content="Qris" Tag="Qris" />
+            <ComboBoxItem Content="Tf" Tag="Tf" />
+        </ComboBox>
 
         <TextBlock Text="Tanggal" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="2,0,0,4" />
         <DatePicker x:Name="DatePickerInput" Margin="0,0,0,10" />

@@ -6,12 +6,20 @@
         <StackPanel>
             <TextBlock Text="Input Nominal Pembayaran" FontSize="20" Margin="0,0,0,16"/>
             <TextBlock x:Name="SiswaNameText"/>
+            <TextBlock x:Name="PaymentTargetText" Foreground="{DynamicResource TextGray}" FontSize="12" Margin="0,4,0,0"/>
             <TextBlock x:Name="AmountDueText" Foreground="{DynamicResource TextGray}" Margin="0,0,0,16"/>
             <TextBlock Text="Pembayaran yang dicatat akan menambah saldo kas." Foreground="{DynamicResource TextGray}"
                        FontSize="12" TextWrapping="Wrap" Margin="0,-8,0,16" />
 
             <TextBlock Text="Nominal yang dibayar (Rp)" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="0,0,0,4"/>
             <TextBox x:Name="AmountBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,8" />
+
+            <TextBlock Text="Metode pembayaran" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="0,0,0,4"/>
+            <ComboBox x:Name="PaymentMethodCombo" Style="{StaticResource RoundedComboBox}" SelectedIndex="0" Margin="0,0,0,8">
+                <ComboBoxItem Content="Tunai" Tag="Tunai" />
+                <ComboBoxItem Content="Qris" Tag="Qris" />
+                <ComboBoxItem Content="Tf" Tag="Tf" />
+            </ComboBox>
 
             <TextBlock Text="Tanggal Pembayaran" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="0,0,0,4"/>
             <DatePicker x:Name="DatePickerInput" Margin="0,0,0,8" />

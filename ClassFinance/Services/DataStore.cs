@@ -18,6 +18,7 @@ namespace ClassFinance.Services
 
         public ObservableCollection<User> Users { get; } = new();
         public ObservableCollection<Kelas> KelasList { get; } = new();
+        public ObservableCollection<JadwalTagihanMingguan> JadwalTagihanMingguanList { get; } = new();
         public ObservableCollection<Tagihan> TagihanList { get; } = new();
         public ObservableCollection<TagihanSiswa> TagihanSiswaList { get; } = new();
         public ObservableCollection<Transaksi> TransaksiList { get; } = new();
@@ -29,6 +30,7 @@ namespace ClassFinance.Services
 
         private int _userId = 1;
         private int _kelasId = 1;
+        private int _weeklyScheduleId = 1;
         private int _tagihanId = 1;
         private int _tagihanSiswaId = 1;
         private int _transaksiId = 1;
@@ -36,6 +38,7 @@ namespace ClassFinance.Services
 
         public int NextUserId() => _userId++;
         public int NextKelasId() => _kelasId++;
+        public int NextWeeklyScheduleId() => _weeklyScheduleId++;
         public int NextTagihanId() => _tagihanId++;
         public int NextTagihanSiswaId() => _tagihanSiswaId++;
         public int NextTransaksiId() => _transaksiId++;
@@ -60,10 +63,32 @@ namespace ClassFinance.Services
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        public void UpdateStudentTransactionDescriptions(int studentId, string previousName, string currentName)
+        {
+            if (string.IsNullOrWhiteSpace(previousName) || string.IsNullOrWhiteSpace(currentName) ||
+                string.Equals(previousName, currentName, StringComparison.Ordinal))
+                return;
+
+            var linkedBillStudentIds = TagihanSiswaList
+                .Where(entry => entry.SiswaId == studentId)
+                .Select(entry => entry.Id)
+                .ToHashSet();
+
+            foreach (var transaction in TransaksiList.Where(item =>
+                         item.SiswaId == studentId ||
+                         item.TagihanSiswaId.HasValue && linkedBillStudentIds.Contains(item.TagihanSiswaId.Value)))
+            {
+                if (!string.IsNullOrEmpty(transaction.Description) &&
+                    transaction.Description.Contains(previousName, StringComparison.Ordinal))
+                    transaction.Description = transaction.Description.Replace(previousName, currentName, StringComparison.Ordinal);
+            }
+        }
+
         internal void SetNextIds()
         {
             _userId = Math.Max(Users.Select(u => u.Id).DefaultIfEmpty(0).Max(), Users.OfType<Siswa>().Select(s => s.Id).DefaultIfEmpty(0).Max()) + 1;
             _kelasId = KelasList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
+            _weeklyScheduleId = JadwalTagihanMingguanList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
             _tagihanId = TagihanList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
             _tagihanSiswaId = TagihanSiswaList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
             _transaksiId = TransaksiList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
@@ -77,30 +102,19 @@ namespace ClassFinance.Services
         }
 
         public Transaksi TambahTransaksi(int kelasId, JenisTransaksi type, decimal amount, DateTime date,
-            string description, int? tagihanSiswaId, string createdBy, string proofFile = null, int? siswaId = null, bool affectsKas = true)
+            string description, int? tagihanSiswaId, string createdBy, string proofFile = null, int? siswaId = null,
+            bool affectsKas = true, MetodeTransaksi metode = MetodeTransaksi.Tunai)
         {
             var t = new Transaksi
             {
                 Id = NextTransaksiId(), KelasId = kelasId, Type = type, Amount = amount,
                 Date = date, Description = description, TagihanSiswaId = tagihanSiswaId,
-                CreatedBy = createdBy, ProofFile = proofFile, SiswaId = siswaId, AffectsKas = affectsKas
+                CreatedBy = createdBy, ProofFile = proofFile, SiswaId = siswaId, AffectsKas = affectsKas,
+                Metode = metode
             };
             TransaksiList.Add(t);
             SaveChanges();
             return t;
-        }
-
-        public Tagihan BuatTagihan(int kelasId, string name, decimal amount, DateTime? createdDate = null)
-        {
-            var tagihan = new Tagihan
-            {
-                Id = NextTagihanId(), KelasId = kelasId, Name = name,
-                Amount = amount, CreatedDate = createdDate ?? DateTime.Now
-            };
-            TagihanList.Add(tagihan);
-            tagihan.GenerateTagihanSiswa(this);
-            SaveChanges();
-            return tagihan;
         }
 
         public void HapusSiswa(int siswaId)
@@ -128,17 +142,5 @@ namespace ClassFinance.Services
             if (item != null) TransaksiList.Remove(item);
         }
 
-        public void DeleteBill(int billId)
-        {
-            _repository.DeleteBill(billId);
-            var entryIds = TagihanSiswaList.Where(x => x.TagihanId == billId).Select(x => x.Id).ToHashSet();
-            foreach (var transaction in TransaksiList.Where(x => x.TagihanSiswaId.HasValue && entryIds.Contains(x.TagihanSiswaId.Value)))
-                transaction.TagihanSiswaId = null;
-            foreach (var notification in NotifikasiList.Where(x => x.BillId == billId))
-                notification.BillId = null;
-            TagihanSiswaList.Where(x => x.TagihanId == billId).ToList().ForEach(x => TagihanSiswaList.Remove(x));
-            TagihanList.Remove(TagihanList.FirstOrDefault(x => x.Id == billId));
-            SaveChanges();
-        }
     }
 }

@@ -12,6 +12,11 @@ namespace ClassFinance.Models
         public decimal Amount { get; set; }
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public int? WeeklyScheduleId { get; set; }
+        public DateTime? PeriodStart { get; set; }
+        public DateTime? PeriodEnd { get; set; }
+        public bool IsArchived { get; set; }
+        public bool IsWeeklyOccurrence => !IsArchived && WeeklyScheduleId.HasValue && PeriodStart.HasValue && PeriodEnd.HasValue;
 
 
         public void GenerateTagihanSiswa(DataStore store)
@@ -25,6 +30,7 @@ namespace ClassFinance.Models
                     TagihanId = Id,
                     SiswaId = siswa.Id,
                     AmountDue = Amount,
+                    AssessedAmount = Amount,
                     Status = StatusTagihan.BelumBayar
                 });
             }

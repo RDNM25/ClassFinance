@@ -7,6 +7,7 @@ namespace ClassFinance.Models
         public int Id { get; set; }
         public int KelasId { get; set; }
         public JenisTransaksi Type { get; set; }
+        public MetodeTransaksi Metode { get; set; } = MetodeTransaksi.Tunai;
         public decimal Amount { get; set; }
         public DateTime Date { get; set; }
         public string Description { get; set; }

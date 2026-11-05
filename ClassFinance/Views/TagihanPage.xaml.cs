@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using System.Globalization;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views.Dialogs;
@@ -21,6 +22,7 @@ namespace ClassFinance.Views
     public class TagihanTransactionDisplay
     {
         public Transaksi Transaction { get; set; }
+        public string PaymentMethodLabel => Transaction?.Metode.ToDisplayLabel() ?? "Tunai";
         public bool CanEdit { get; set; }
         public bool CanDelete { get; set; }
         public bool CanShowActions => CanEdit || CanDelete;
@@ -30,11 +32,16 @@ namespace ClassFinance.Views
     {
         public Tagihan Tagihan { get; set; }
         public bool IsFullyPaid { get; set; }
-        public bool CanManage { get; set; }
+        public string PeriodTitle { get; set; }
+        public string PeriodRange { get; set; }
+        public string PaymentSummary { get; set; }
+        public string AmountPerStudentLabel { get; set; }
+        public string OutstandingLabel { get; set; }
     }
 
     public partial class TagihanPage : Page
     {
+        private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
         private readonly User _currentUser;
         private readonly MainWindow _mainWindow;
         private readonly int _kelasId;
@@ -59,7 +66,7 @@ namespace ClassFinance.Views
                 _ => DataStore.Instance.KelasList.First().Id
             };
 
-            BuatTagihanButton.Visibility = currentUser is Bendahara ? Visibility.Visible : Visibility.Collapsed;
+            AturJadwalButton.Visibility = currentUser is Bendahara ? Visibility.Visible : Visibility.Collapsed;
             Refresh();
         }
 
@@ -113,7 +120,7 @@ namespace ClassFinance.Views
                 return;
 
             var showDetails = _selectedTagihan != null && _showCompactDetails;
-            BackToTagihanListButton.Visibility = _isCompactLayout && showDetails
+            ShowBillListButton.Visibility = _isCompactLayout && showDetails
                 ? Visibility.Visible
                 : Visibility.Collapsed;
 
@@ -124,6 +131,9 @@ namespace ClassFinance.Views
                 DetailTitle.HorizontalAlignment = HorizontalAlignment.Left;
                 DetailTitle.TextAlignment = TextAlignment.Left;
                 DetailTitle.Margin = new Thickness(0, 12, 0, 0);
+                SelectedWeekText.HorizontalAlignment = HorizontalAlignment.Left;
+                SelectedWeekText.TextAlignment = TextAlignment.Left;
+                SelectedWeekText.Margin = new Thickness(0, 10, 0, 0);
                 StatusFilterComboBox.HorizontalAlignment = HorizontalAlignment.Left;
                 StatusFilterComboBox.Margin = new Thickness(0, 12, 0, 0);
             }
@@ -134,12 +144,15 @@ namespace ClassFinance.Views
                 DetailTitle.HorizontalAlignment = HorizontalAlignment.Right;
                 DetailTitle.TextAlignment = TextAlignment.Right;
                 DetailTitle.Margin = new Thickness(27, 19, 18, 0);
+                SelectedWeekText.HorizontalAlignment = HorizontalAlignment.Right;
+                SelectedWeekText.TextAlignment = TextAlignment.Right;
+                SelectedWeekText.Margin = new Thickness(27, 10, 0, 0);
                 StatusFilterComboBox.HorizontalAlignment = HorizontalAlignment.Right;
                 StatusFilterComboBox.Margin = new Thickness(27, 12, 0, 0);
             }
         }
 
-        private void BackToTagihanList_Click(object sender, RoutedEventArgs e)
+        private void ShowBillList_Click(object sender, RoutedEventArgs e)
         {
             if (!_isCompactLayout)
                 return;
@@ -156,7 +169,7 @@ namespace ClassFinance.Views
                 return;
 
             _showCompactDetails = true;
-            DetailTitle.Text = $"Status Pembayaran \u2014 {_selectedTagihan.Name}";
+            DetailTitle.Text = $"Status Pembayaran \u2014 {GetPeriodTitle(_selectedTagihan)}";
             ApplyFilter();
         }
 
@@ -164,19 +177,45 @@ namespace ClassFinance.Views
         {
             if (TagihanItems == null) return;
 
+            var currentWeek = JadwalTagihanMingguanService.MondayOf(DateTime.Today);
+            var schedule = DataStore.Instance.JadwalTagihanMingguanList.FirstOrDefault(x => x.KelasId == _kelasId);
+            var currentWeekNumber = JadwalTagihanMingguanService.GetWeekNumber(schedule, currentWeek);
+            var currentWeekLabel = schedule == null
+                ? "Jadwal belum diatur"
+                : currentWeekNumber == 0
+                    ? $"Jadwal dimulai {schedule.StartsOn.ToString("dd MMM yyyy", IdId)}"
+                    : $"Minggu ke-{currentWeekNumber}";
+            CurrentWeekText.Text = $"Minggu ini · {currentWeekLabel} · {FormatWeekRange(currentWeek, currentWeek.AddDays(6))}";
+            ScheduleSummaryText.Text = schedule == null
+                ? "Jadwal mingguan belum diatur."
+                : !schedule.IsActive
+                    ? $"{schedule.Name} · Rp {schedule.Amount.ToString("N0", IdId)} per siswa · dijeda"
+                    : schedule.EndsOn.HasValue && schedule.EndsOn.Value.Date < DateTime.Today
+                        ? $"{schedule.Name} · Rp {schedule.Amount.ToString("N0", IdId)} per siswa · berakhir {schedule.EndsOn.Value.ToString("dd MMM yyyy", IdId)}"
+                    : $"{schedule.Name} · Rp {schedule.Amount.ToString("N0", IdId)} per siswa · aktif";
+
             var preserveCompactPane = _showCompactDetails;
 
-            var query = DataStore.Instance.TagihanList.Where(t => t.KelasId == _kelasId)
-                .OrderByDescending(t => t.CreatedDate)
+            var query = DataStore.Instance.TagihanList.Where(t => t.KelasId == _kelasId && t.IsWeeklyOccurrence)
+                .OrderByDescending(t => t.PeriodStart)
                 .ThenByDescending(t => t.Id)
                 .Select(t =>
                 {
                     var entries = DataStore.Instance.TagihanSiswaList.Where(ts => ts.TagihanId == t.Id).ToList();
+                    var paidCount = entries.Count(ts => ts.Status == StatusTagihan.Lunas);
+                    var outstanding = entries.Where(ts => ts.Status != StatusTagihan.Proses)
+                        .Sum(ts => Math.Max(0, ts.AmountDue));
                     return new TagihanDisplayItem
                     {
                         Tagihan = t,
                         IsFullyPaid = entries.Any() && entries.All(ts => ts.Status == StatusTagihan.Lunas),
-                        CanManage = _currentUser is Bendahara
+                        PeriodTitle = $"Minggu ke-{JadwalTagihanMingguanService.GetWeekNumber(t)}",
+                        PeriodRange = FormatWeekRange(t.PeriodStart.Value, t.PeriodEnd.Value),
+                        PaymentSummary = entries.Count == 0
+                            ? "Belum ada data siswa untuk minggu ini"
+                            : $"{paidCount} dari {entries.Count} siswa lunas · sisa Rp {outstanding.ToString("N0", IdId)}",
+                        AmountPerStudentLabel = $"Rp {t.Amount.ToString("N0", IdId)} / siswa",
+                        OutstandingLabel = $"Sisa Rp {outstanding.ToString("N0", IdId)}"
                     };
                 });
 
@@ -186,6 +225,7 @@ namespace ClassFinance.Views
                 {
                     "Selesai" => query.Where(x => x.IsFullyPaid),
                     "BelumSelesai" => query.Where(x => !x.IsFullyPaid),
+                    "MingguIni" => query.Where(x => x.Tagihan.PeriodStart?.Date == currentWeek),
                     _ => query
                 };
             }
@@ -193,13 +233,19 @@ namespace ClassFinance.Views
             var tagihanList = query.ToList();
             TagihanItems.ItemsSource = tagihanList;
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
-            EmptyText.Text = DataStore.Instance.TagihanList.Any(t => t.KelasId == _kelasId)
+            EmptyText.Text = DataStore.Instance.TagihanList.Any(t => t.KelasId == _kelasId && t.IsWeeklyOccurrence)
                 ? "Tidak ada tagihan yang sesuai dengan filter."
-                : "Belum ada tagihan.";
+                : schedule == null
+                    ? "Atur jadwal untuk membuat tagihan minggu pertama."
+                    : !schedule.IsActive
+                        ? "Jadwal mingguan sedang dijeda. Aktifkan kembali untuk membuat tagihan."
+                        : "Belum ada minggu tagihan yang dibuat.";
 
             if (_initialTagihanId.HasValue)
             {
                 var target = tagihanList.FirstOrDefault(x => x.Tagihan.Id == _initialTagihanId.Value);
+                target ??= tagihanList.FirstOrDefault(x => x.Tagihan.PeriodStart?.Date == currentWeek)
+                    ?? tagihanList.FirstOrDefault();
                 if (target != null)
                 {
                     TagihanItems.SelectedItem = target;
@@ -226,7 +272,17 @@ namespace ClassFinance.Views
                 }
             }
             else
-                ApplyFilter();
+            {
+                var currentWeekBill = tagihanList.FirstOrDefault(x => x.Tagihan.PeriodStart?.Date == currentWeek)
+                    ?? tagihanList.FirstOrDefault();
+                if (currentWeekBill != null)
+                {
+                    TagihanItems.SelectedItem = currentWeekBill;
+                    TagihanItems.ScrollIntoView(currentWeekBill);
+                }
+                else
+                    ApplyFilter();
+            }
 
             UpdateCompactPaneVisibility();
         }
@@ -242,7 +298,7 @@ namespace ClassFinance.Views
             {
                 _selectedTagihan = displayItem.Tagihan;
                 _showCompactDetails = true;
-                DetailTitle.Text = $"Status Pembayaran \u2014 {_selectedTagihan.Name}";
+                DetailTitle.Text = $"Status Pembayaran \u2014 {GetPeriodTitle(_selectedTagihan)}";
                 ApplyFilter();
             }
         }
@@ -264,9 +320,14 @@ namespace ClassFinance.Views
                 NoSelectedTagihanText.Visibility = Visibility.Visible;
                 NoMatchingPaymentsText.Visibility = Visibility.Collapsed;
                 StatusFilterComboBox.Visibility = Visibility.Collapsed;
+                ReminderButton.Visibility = Visibility.Collapsed;
+                SelectedWeekText.Text = string.Empty;
                 UpdateCompactPaneVisibility();
                 return;
             }
+
+            SelectedWeekText.Text = FormatWeekRange(_selectedTagihan.PeriodStart.Value, _selectedTagihan.PeriodEnd.Value);
+            ReminderButton.Visibility = _currentUser is Siswa ? Visibility.Collapsed : Visibility.Visible;
 
             var query = DataStore.Instance.TagihanSiswaList
                 .Where(ts => ts.TagihanId == _selectedTagihan.Id)
@@ -325,60 +386,78 @@ namespace ClassFinance.Views
             UpdateCompactPaneVisibility();
         }
 
-        private void BuatTagihanButton_Click(object sender, RoutedEventArgs e)
+        private void AturJadwalButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new TambahTagihanDialog((Bendahara)_currentUser, _kelasId, _mainWindow, Refresh);
+            var schedule = DataStore.Instance.JadwalTagihanMingguanList.FirstOrDefault(x => x.KelasId == _kelasId);
+            var dialog = new JadwalTagihanMingguanDialog((Bendahara)_currentUser, _kelasId, _mainWindow, Refresh, schedule);
             _mainWindow.ShowModal(dialog);
         }
 
-        private void EditTagihan_Click(object sender, RoutedEventArgs e)
+        private void KirimPengingat_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentUser is Bendahara bendahara && sender is FrameworkElement element && element.Tag is TagihanDisplayItem display)
-                _mainWindow.ShowModal(new EditTagihanDialog(bendahara, display.Tagihan, _mainWindow, Refresh));
-        }
-
-        private void DeleteTagihan_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentUser is not Bendahara bendahara || sender is not FrameworkElement element || element.Tag is not TagihanDisplayItem display)
+            if (_selectedTagihan == null || _currentUser is Siswa)
                 return;
 
-            if (MessageBox.Show($"Hapus tagihan '{display.Tagihan.Name}'? Tagihan yang memiliki transaksi pembayaran tidak dapat dihapus.",
-                    "Hapus tagihan", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+            var dueEntries = DataStore.Instance.TagihanSiswaList
+                .Where(x => x.TagihanId == _selectedTagihan.Id && x.AmountDue > 0 &&
+                            x.Status != StatusTagihan.Proses && x.Status != StatusTagihan.Lunas)
+                .ToList();
+            if (dueEntries.Count == 0)
+            {
+                AppMessageBox.Show(_mainWindow, "Tidak ada siswa dengan sisa tagihan pada periode ini.", "Semua lunas", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var total = dueEntries.Sum(x => x.AmountDue);
+            var period = $"{GetPeriodTitle(_selectedTagihan)} ({FormatWeekRange(_selectedTagihan.PeriodStart.Value, _selectedTagihan.PeriodEnd.Value)})";
+            if (AppMessageBox.Show(_mainWindow,
+                    $"Kirim pengingat kepada {dueEntries.Count} siswa untuk {period}?\n\nTotal sisa yang perlu dibayar: Rp {total.ToString("N0", IdId)}.",
+                    "Kirim pengingat", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
                 return;
 
             try
             {
-                bendahara.HapusTagihan(display.Tagihan.Id);
-                _selectedTagihan = null;
-                TagihanItems.SelectedItem = null;
-                DetailItems.ItemsSource = null;
-                DetailTitle.Text = "Status pembayaran";
-                Refresh();
+                var result = Notifikasi.KirimPengingatTagihan(_selectedTagihan.Id);
+                var summary = result.JumlahTerkirim > 0
+                    ? $"Pengingat dibuat untuk {result.JumlahTerkirim} siswa. {result.SudahDiingatkanHariIni} siswa lain sudah diingatkan hari ini. Total sisa tagihan Rp {result.TotalSisa.ToString("N0", IdId)}."
+                    : $"Pengingat untuk siswa yang masih memiliki tagihan sudah dikirim hari ini ({result.SudahDiingatkanHariIni} siswa).";
+                AppMessageBox.Show(_mainWindow, summary, "Pengingat tagihan", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-            catch (InvalidOperationException exception)
+            catch (Exception exception)
             {
-                MessageBox.Show(exception.Message, "Tagihan tidak dapat dihapus", MessageBoxButton.OK, MessageBoxImage.Information);
+                AppMessageBox.Show(_mainWindow, exception.Message, "Pengingat tidak dapat dikirim", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private static string GetPeriodTitle(Tagihan tagihan) =>
+            $"Minggu ke-{JadwalTagihanMingguanService.GetWeekNumber(tagihan)}";
+
+        private static string FormatWeekRange(DateTime start, DateTime end)
+        {
+            if (start.Year == end.Year && start.Month == end.Month)
+                return $"{start.Day}–{end.Day} {end.ToString("MMM yyyy", IdId)}";
+            if (start.Year == end.Year)
+                return $"{start.ToString("dd MMM", IdId)}–{end.ToString("dd MMM yyyy", IdId)}";
+            return $"{start.ToString("dd MMM yyyy", IdId)}–{end.ToString("dd MMM yyyy", IdId)}";
         }
 
         private void TandaiLunas_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser is not Bendahara bendahara)
             {
-                MessageBox.Show("Hanya Bendahara yang dapat mencatat pembayaran.", "Akses ditolak");
+                AppMessageBox.Show(_mainWindow, "Hanya Bendahara yang dapat mencatat pembayaran.", "Akses ditolak");
                 return;
             }
 
             if (sender is Button btn && btn.Tag is TagihanSiswaDisplay display &&
                 display.Entry.Status != StatusTagihan.Lunas && display.Entry.Status != StatusTagihan.Proses)
             {
-                if (MessageBox.Show(
-                        $"Catat pembayaran tunai sebesar Rp {display.Entry.AmountDue:N0} untuk {display.SiswaName}?\n\nSaldo kas akan bertambah sebesar nominal ini.",
-                        "Konfirmasi pembayaran", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                var siswa = DataStore.Instance.Users.OfType<Siswa>()
+                    .FirstOrDefault(item => item.Id == display.Entry.SiswaId);
+                if (siswa == null)
                     return;
 
-                bendahara.CatatPembayaran(display.Entry.Id, display.Entry.AmountDue, "Tunai");
-                Refresh();
+                _mainWindow.ShowModal(new BayarManualDialog(bendahara, siswa, display.Entry, _mainWindow, Refresh));
             }
         }
 
@@ -399,7 +478,7 @@ namespace ClassFinance.Views
             }
 
             var totalRefund = pendingRefunds.Sum(t => t.Amount);
-            if (MessageBox.Show(
+            if (AppMessageBox.Show(_mainWindow,
                     $"Selesaikan {pendingRefunds.Count} refund untuk {display.SiswaName} dengan total Rp {totalRefund:N0}?\n\nSaldo kas akan berkurang sebesar jumlah tersebut dan status refund berubah menjadi Lunas.",
                     "Konfirmasi penyelesaian refund", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
                 return;
@@ -447,7 +526,7 @@ namespace ClassFinance.Views
             if (_currentUser is not Bendahara bendahara || sender is not FrameworkElement element || element.Tag is not Transaksi transaksi)
                 return;
 
-            if (MessageBox.Show($"Hapus transaksi ini sebesar Rp {transaksi.Amount:N0}? Total kas akan disesuaikan.",
+            if (AppMessageBox.Show(_mainWindow, $"Hapus transaksi ini sebesar Rp {transaksi.Amount:N0}? Total kas akan disesuaikan.",
                     "Hapus transaksi", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
                 return;
 
@@ -458,24 +537,8 @@ namespace ClassFinance.Views
             }
             catch (InvalidOperationException exception)
             {
-                MessageBox.Show(exception.Message, "Transaksi tidak dapat dihapus", MessageBoxButton.OK, MessageBoxImage.Information);
+                AppMessageBox.Show(_mainWindow, exception.Message, "Transaksi tidak dapat dihapus", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-        }
-
-        private void ShowTagihanActions_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is not Button button || button.DataContext is not TagihanDisplayItem bill)
-                return;
-
-            if (CloseOpenMenuIfSameButton(button))
-            {
-                return;
-            }
-
-            var menu = CreatePopupActionMenu();
-            menu.Items.Add(CreateBillMenuItem("Ubah tagihan", bill, EditTagihan_Click));
-            menu.Items.Add(CreateBillMenuItem("Hapus tagihan", bill, DeleteTagihan_Click));
-            OpenActionMenu(button, menu);
         }
 
         private void ShowPaymentActions_Click(object sender, RoutedEventArgs e)
@@ -494,13 +557,6 @@ namespace ClassFinance.Views
             if (payment.CanDelete)
                 menu.Items.Add(CreatePaymentMenuItem("Hapus transaksi", payment.Transaction, DeletePayment_Click));
             OpenActionMenu(button, menu);
-        }
-
-        private static MenuItem CreateBillMenuItem(string header, TagihanDisplayItem bill, RoutedEventHandler onClick)
-        {
-            var item = new MenuItem { Header = header, Tag = bill };
-            item.Click += onClick;
-            return item;
         }
 
         private static MenuItem CreatePaymentMenuItem(string header, Transaksi transaction, RoutedEventHandler onClick)
@@ -556,7 +612,7 @@ namespace ClassFinance.Views
         {
             if (_currentUser is not Bendahara bendahara)
             {
-                MessageBox.Show("Hanya Bendahara yang dapat mencatat pembayaran.", "Akses ditolak");
+                AppMessageBox.Show(_mainWindow, "Hanya Bendahara yang dapat mencatat pembayaran.", "Akses ditolak");
                 return;
             }
 

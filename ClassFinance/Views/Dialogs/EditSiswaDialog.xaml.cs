@@ -43,6 +43,7 @@ namespace ClassFinance.Views.Dialogs
                 return;
             }
 
+            DataStore.Instance.UpdateStudentTransactionDescriptions(_siswa.Id, _siswa.Name, name);
             _siswa.Name = name;
             _siswa.Nis = nis;
             _siswa.Username = $"siswa-{nis}";

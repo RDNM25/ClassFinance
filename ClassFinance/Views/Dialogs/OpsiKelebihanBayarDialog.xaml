@@ -9,8 +9,10 @@
 
             <TextBlock Text="Pilih tindakan untuk kelebihan dana:" Margin="0,0,0,8"/>
 
-            <RadioButton x:Name="SimpanRadio" Content="Simpan sebagai Saldo Titipan siswa untuk tagihan berikutnya" Foreground="{DynamicResource TextDark}" IsChecked="True" Margin="0,0,0,8"/>
-            <RadioButton x:Name="KembalikanRadio" Content="Kembalikan tunai sebagai uang kembalian (Refund)" Foreground="{DynamicResource TextDark}" Margin="0,0,0,16"/>
+            <RadioButton x:Name="SimpanRadio" Content="Simpan sebagai Saldo Titipan siswa untuk tagihan berikutnya"
+                         Style="{StaticResource CheckmarkRadioButton}" IsChecked="True" Margin="0,0,0,8" />
+            <RadioButton x:Name="KembalikanRadio" Content="Kembalikan tunai sebagai uang kembalian (Refund)"
+                         Style="{StaticResource CheckmarkRadioButton}" Margin="0,0,0,16" />
 
             <Grid>
                 <Grid.ColumnDefinitions>
