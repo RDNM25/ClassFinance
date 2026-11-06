@@ -3,18 +3,22 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using ClassFinance.Models;
 
 namespace ClassFinance.Services
 {
-    /// <summary>Application data loaded from and persisted to the local MariaDB database.</summary>
+    /// <summary>Application data synchronized with the KasMate API.</summary>
     public sealed class DataStore : INotifyPropertyChanged
     {
         private static readonly Lazy<DataStore> _instance = new(() => new DataStore());
         public static DataStore Instance => _instance.Value;
 
-        private readonly MariaDbDataRepository _repository = new();
+        private readonly ApiDataRepository _repository = new();
+        private readonly SemaphoreSlim _saveLock = new(1, 1);
         private bool _initialized;
+        private DatabaseSnapshot _persistedSnapshot;
 
         public ObservableCollection<User> Users { get; } = new();
         public ObservableCollection<Kelas> KelasList { get; } = new();
@@ -25,6 +29,7 @@ namespace ClassFinance.Services
         public ObservableCollection<Notifikasi> NotifikasiList { get; } = new();
 
         public int TransactionRevision { get; private set; }
+        public int DataRevision { get; private set; }
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler DataChanged;
 
@@ -49,17 +54,39 @@ namespace ClassFinance.Services
             TransaksiList.CollectionChanged += TransaksiList_CollectionChanged;
         }
 
-        public void Initialize()
+        public async Task InitializeAsync()
         {
-            if (_initialized) return;
-            _repository.Load(this);
+            // Called after API authentication, so data is fetched asynchronously without
+            // blocking the login screen or exposing password hashes to the desktop app.
+            var idCounters = await _repository.LoadAsync(this);
+
+            SetNextIds(idCounters);
+            _persistedSnapshot = DatabaseSnapshot.Capture(this);
             _initialized = true;
+            DataRevision++;
         }
 
-        public void SaveChanges()
+        public async Task SaveChangesAsync()
         {
             if (!_initialized) throw new InvalidOperationException("Database has not been initialized.");
-            _repository.Save(this);
+
+            await _saveLock.WaitAsync();
+            try
+            {
+                var currentSnapshot = DatabaseSnapshot.Capture(this);
+                var changes = _persistedSnapshot.Diff(currentSnapshot);
+                if (!changes.IsEmpty)
+                {
+                    await _repository.ApplyAsync(changes);
+                    _persistedSnapshot = currentSnapshot;
+                }
+            }
+            finally
+            {
+                _saveLock.Release();
+            }
+
+            DataRevision++;
             DataChanged?.Invoke(this, EventArgs.Empty);
         }
 
@@ -84,15 +111,15 @@ namespace ClassFinance.Services
             }
         }
 
-        internal void SetNextIds()
+        internal void SetNextIds(ApiIdCounters counters)
         {
-            _userId = Math.Max(Users.Select(u => u.Id).DefaultIfEmpty(0).Max(), Users.OfType<Siswa>().Select(s => s.Id).DefaultIfEmpty(0).Max()) + 1;
-            _kelasId = KelasList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
-            _weeklyScheduleId = JadwalTagihanMingguanList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
-            _tagihanId = TagihanList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
-            _tagihanSiswaId = TagihanSiswaList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
-            _transaksiId = TransaksiList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
-            _notifId = NotifikasiList.Select(x => x.Id).DefaultIfEmpty(0).Max() + 1;
+            _userId = Math.Max(counters.MaxUserId, Users.Select(u => u.Id).DefaultIfEmpty(0).Max()) + 1;
+            _kelasId = Math.Max(counters.MaxClassId, KelasList.Select(x => x.Id).DefaultIfEmpty(0).Max()) + 1;
+            _weeklyScheduleId = Math.Max(counters.MaxScheduleId, JadwalTagihanMingguanList.Select(x => x.Id).DefaultIfEmpty(0).Max()) + 1;
+            _tagihanId = Math.Max(counters.MaxBillId, TagihanList.Select(x => x.Id).DefaultIfEmpty(0).Max()) + 1;
+            _tagihanSiswaId = Math.Max(counters.MaxBillStudentId, TagihanSiswaList.Select(x => x.Id).DefaultIfEmpty(0).Max()) + 1;
+            _transaksiId = Math.Max(counters.MaxTransactionId, TransaksiList.Select(x => x.Id).DefaultIfEmpty(0).Max()) + 1;
+            _notifId = Math.Max(counters.MaxNotificationId, NotifikasiList.Select(x => x.Id).DefaultIfEmpty(0).Max()) + 1;
         }
 
         private void TransaksiList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -101,7 +128,7 @@ namespace ClassFinance.Services
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TransactionRevision)));
         }
 
-        public Transaksi TambahTransaksi(int kelasId, JenisTransaksi type, decimal amount, DateTime date,
+        public Transaksi CreateTransaction(int kelasId, JenisTransaksi type, decimal amount, DateTime date,
             string description, int? tagihanSiswaId, string createdBy, string proofFile = null, int? siswaId = null,
             bool affectsKas = true, MetodeTransaksi metode = MetodeTransaksi.Tunai)
         {
@@ -113,11 +140,20 @@ namespace ClassFinance.Services
                 Metode = metode
             };
             TransaksiList.Add(t);
-            SaveChanges();
             return t;
         }
 
-        public void HapusSiswa(int siswaId)
+        public async Task<Transaksi> TambahTransaksiAsync(int kelasId, JenisTransaksi type, decimal amount, DateTime date,
+            string description, int? tagihanSiswaId, string createdBy, string proofFile = null, int? siswaId = null,
+            bool affectsKas = true, MetodeTransaksi metode = MetodeTransaksi.Tunai)
+        {
+            var transaction = CreateTransaction(kelasId, type, amount, date, description, tagihanSiswaId,
+                createdBy, proofFile, siswaId, affectsKas, metode);
+            await SaveChangesAsync();
+            return transaction;
+        }
+
+        public async Task HapusSiswaAsync(int siswaId)
         {
             var siswa = Users.OfType<Siswa>().FirstOrDefault(s => s.Id == siswaId);
             if (siswa == null) return;
@@ -128,16 +164,14 @@ namespace ClassFinance.Services
                 transaction.SiswaId = null;
                 transaction.TagihanSiswaId = null;
             }
-            _repository.DeleteStudent(siswaId);
             Users.Remove(siswa);
             entries.ForEach(x => TagihanSiswaList.Remove(x));
             NotifikasiList.Where(x => x.UserId == siswaId).ToList().ForEach(x => NotifikasiList.Remove(x));
-            SaveChanges();
+            await SaveChangesAsync();
         }
 
-        public void DeleteTransaction(int transactionId)
+        public void RemoveTransaction(int transactionId)
         {
-            _repository.DeleteTransaction(transactionId);
             var item = TransaksiList.FirstOrDefault(x => x.Id == transactionId);
             if (item != null) TransaksiList.Remove(item);
         }

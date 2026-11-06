@@ -70,6 +70,46 @@
     <SolidColorBrush x:Key="StudentAddBorder" Color="#FB7185" />
     <SolidColorBrush x:Key="StudentAddHoverBackground" Color="#00F0F1F5" />
     <SolidColorBrush x:Key="StudentAddPressedBackground" Color="#E11D48" />
+    <Style x:Key="RoundedProgressBar" TargetType="ProgressBar">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Grid x:Name="TemplateRoot" MinHeight="4" ClipToBounds="True">
+                        <Border x:Name="PART_Track" Background="{TemplateBinding Background}" CornerRadius="4" />
+                        <Border x:Name="PART_Indicator" Background="{TemplateBinding Foreground}"
+                                HorizontalAlignment="Left" CornerRadius="4" />
+                        <Border x:Name="IndeterminateIndicator" Width="64"
+                                Background="{TemplateBinding Foreground}" HorizontalAlignment="Left"
+                                CornerRadius="4" Visibility="Collapsed">
+                            <Border.RenderTransform>
+                                <TranslateTransform x:Name="IndeterminateOffset" X="-64" />
+                            </Border.RenderTransform>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsIndeterminate" Value="True">
+                            <Setter TargetName="PART_Indicator" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="IndeterminateIndicator" Property="Visibility" Value="Visible" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="IndeterminateProgressStoryboard">
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetName="IndeterminateOffset"
+                                                         Storyboard.TargetProperty="X" From="-64" To="344"
+                                                         Duration="0:0:1.25" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <StopStoryboard BeginStoryboardName="IndeterminateProgressStoryboard" />
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="ProgressBar" BasedOn="{StaticResource RoundedProgressBar}" />
     <ControlTemplate x:Key="CalendarNavigationButtonTemplate" TargetType="Button">
         <Border x:Name="navBorder" Background="{TemplateBinding Background}"
                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
@@ -841,7 +881,7 @@
                         <Border.Background>
                             <SolidColorBrush x:Name="bgBrush" Color="#00F43F5E" />
                         </Border.Background>
-                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"
                                           TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -898,7 +938,7 @@
                         <Border.Background>
                             <SolidColorBrush x:Name="bgBrush" Color="#F43F5E" />
                         </Border.Background>
-                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"
                                           TextElement.Foreground="{TemplateBinding Foreground}" />
                     </Border>
                     <ControlTemplate.Triggers>
@@ -924,6 +964,20 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!--  Shared table column header typography across pages  -->
+    <Style x:Key="TableHeaderText" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource TextGray}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style x:Key="FlatTableHeaderRow" TargetType="Border">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Padding" Value="12,10" />
     </Style>
 
     <!--  Text box style  -->
@@ -1432,6 +1486,29 @@
                 </Setter>
             </Trigger>
         </Style.Triggers>
+    </Style>
+
+    <LinearGradientBrush x:Key="TopMetricFadeMask" StartPoint="1,0" EndPoint="0,1">
+        <GradientStop Color="#FF000000" Offset="0" />
+        <GradientStop Color="#00000000" Offset="1" />
+    </LinearGradientBrush>
+
+    <Style x:Key="TopMetricCard" TargetType="Border" BasedOn="{StaticResource Card}">
+        <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="14" />
+        <Setter Property="Padding" Value="18" />
+        <Setter Property="Effect" Value="{x:Null}" />
+        <Setter Property="behaviors:HoverLiftBehavior.IsEnabled" Value="True" />
+    </Style>
+
+    <Style x:Key="TopMetricIconFrame" TargetType="Border">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="CornerRadius" Value="9" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 
     <Style x:Key="ListRow" TargetType="Border" BasedOn="{StaticResource Card}">

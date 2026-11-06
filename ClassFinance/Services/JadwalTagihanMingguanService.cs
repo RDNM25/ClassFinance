@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ClassFinance.Models;
 
 namespace ClassFinance.Services
 {
     public static class JadwalTagihanMingguanService
     {
-        public static List<Tagihan> PastikanMingguTerbuat(int kelasId, DateTime today)
+        public static async Task<List<Tagihan>> PastikanMingguTerbuatAsync(int kelasId, DateTime today)
         {
             var store = DataStore.Instance;
             var schedule = store.JadwalTagihanMingguanList.FirstOrDefault(x => x.KelasId == kelasId);
@@ -45,7 +46,7 @@ namespace ClassFinance.Services
                 schedule.EndsOn.HasValue && schedule.EndsOn.Value.Date < schedule.StartsOn.Date)
             {
                 if (hasChanges)
-                    store.SaveChanges();
+                    await store.SaveChangesAsync();
                 return new List<Tagihan>();
             }
 
@@ -75,19 +76,21 @@ namespace ClassFinance.Services
             if (created.Count == 0 && !hasChanges)
                 return created;
 
-            store.SaveChanges();
-
             if (created.Count == 0)
+            {
+                await store.SaveChangesAsync();
                 return created;
+            }
 
             // Apply any stored student credit to the oldest open balances, just as when a bill is created manually.
             var systemRecorder = new Bendahara { Name = "KasMate" };
-            foreach (var student in store.Users.OfType<Siswa>().Where(x => x.KelasId == kelasId && x.SaldoTitipan > 0).ToList())
-                systemRecorder.ProsesSaldoTitipanBerikutnya(student.Id, student.SaldoTitipan, DateTime.Now);
+            systemRecorder.ApplyStoredCreditForClass(kelasId, DateTime.Now);
 
             var current = created.Where(x => x.PeriodStart?.Date == currentWeek).ToList();
             foreach (var bill in current)
-                Notifikasi.KirimUntukTagihanBaru(kelasId, bill.Id);
+                Notifikasi.TambahkanUntukTagihanBaru(kelasId, bill.Id);
+
+            await store.SaveChangesAsync();
 
             return created;
         }

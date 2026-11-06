@@ -1,11 +1,11 @@
-<Page x:Class="ClassFinance.Views.DashboardPage"
+<UserControl x:Class="ClassFinance.Views.DashboardPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:conv="clr-namespace:ClassFinance.Converters"
       xmlns:behaviors="clr-namespace:ClassFinance.Behaviors"
-      Title="Ringkasan" Background="{DynamicResource PageBackground}"
+      Background="{DynamicResource PageBackground}"
       TextElement.Foreground="{DynamicResource TextDark}" SizeChanged="Page_SizeChanged">
-    <Page.Resources>
+    <UserControl.Resources>
         <Style x:Key="PanelCard" TargetType="Border" BasedOn="{StaticResource Card}">
             <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
             <Setter Property="BorderThickness" Value="1" />
@@ -18,9 +18,9 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="MetricCard" TargetType="Border" BasedOn="{StaticResource PanelCard}">
-            <Setter Property="Height" Value="150" />
-            <Setter Property="behaviors:HoverLiftBehavior.IsEnabled" Value="True" />
+        <Style x:Key="MetricCard" TargetType="Border" BasedOn="{StaticResource TopMetricCard}">
+            <Setter Property="Height" Value="172" />
+            <Setter Property="Padding" Value="20" />
         </Style>
         <Style x:Key="DashboardThemeActionButton" TargetType="Button" BasedOn="{StaticResource ThemeActionButton}">
             <Setter Property="Template">
@@ -151,9 +151,9 @@
             </Setter>
         </Style>
         <Style x:Key="MetricIconFrame" TargetType="Border">
-            <Setter Property="Width" Value="34" />
-            <Setter Property="Height" Value="34" />
-            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="CornerRadius" Value="9" />
             <Setter Property="Background" Value="{DynamicResource WarningBadgeBackground}" />
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -162,8 +162,8 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{DynamicResource TextGray}" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="12,7" />
-            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Padding" Value="13,8" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="BorderBrush" Value="Transparent" />
@@ -198,8 +198,8 @@
             </Setter>
         </Style>
         <Style x:Key="FollowUpRow" TargetType="Border" BasedOn="{StaticResource ListRow}">
-            <Setter Property="Padding" Value="11,9" />
-            <Setter Property="Margin" Value="0,4,0,3" />
+            <Setter Property="Padding" Value="13,11" />
+            <Setter Property="Margin" Value="0,6,0,5" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
             <Style.Triggers>
@@ -212,114 +212,148 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-    </Page.Resources>
+    </UserControl.Resources>
 
     <ScrollViewer x:Name="DashboardScrollViewer" VerticalScrollBarVisibility="Auto"
-                  HorizontalScrollBarVisibility="Disabled" Padding="28,0,28,28">
-        <StackPanel x:Name="DashboardContent" MaxWidth="1320" Width="{Binding ViewportWidth, ElementName=DashboardScrollViewer}"
-                    HorizontalAlignment="Center" Margin="0,24,0,0">
-            <Grid x:Name="DashboardHeaderGrid" Margin="0,0,0,22">
+                  HorizontalScrollBarVisibility="Disabled" Padding="24,0,24,30">
+        <StackPanel x:Name="DashboardContent" MaxWidth="1600" Width="{Binding ViewportWidth, ElementName=DashboardScrollViewer}"
+                    HorizontalAlignment="Center" Margin="0,28,0,0">
+            <Grid x:Name="DashboardHeaderGrid" Margin="0,0,0,26">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel x:Name="DashboardIntro" VerticalAlignment="Center">
-                    <TextBlock Text="KASMATE  /  RINGKASAN" FontSize="10" Foreground="{DynamicResource AccentText}"
-                               Margin="0,0,0,5" />
-                    <TextBlock x:Name="TitleText" Text="Ringkasan Keuangan Kas" FontSize="25" FontWeight="Medium"
+                    <TextBlock x:Name="TitleText" Text="Ringkasan Keuangan Kas" FontSize="29" FontWeight="Medium"
                                Foreground="{DynamicResource TextDark}" />
-                    <TextBlock x:Name="SubtitleText" Text="Kondisi kas kelas" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="0,5,0,0" />
                 </StackPanel>
                 <WrapPanel x:Name="HeaderActions" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
                     <Button x:Name="TambahSiswaButton" Content="+ Tambah siswa" Style="{StaticResource DashboardThemeActionButton}"
-                            FontSize="12" Padding="13,8" Margin="0,0,8,0" Click="TambahSiswaButton_Click" />
+                            FontSize="13" Padding="15,10" Margin="0,0,8,0" Click="TambahSiswaButton_Click" />
                     <Button x:Name="BuatTagihanButton" Content="Buat tagihan" Style="{StaticResource DashboardWhiteActionButton}"
-                            FontSize="12" Padding="13,8" Margin="0,0,8,0" Click="BuatTagihanButton_Click" />
+                            FontSize="13" Padding="15,10" Margin="0,0,8,0" Click="BuatTagihanButton_Click" />
                     <Button x:Name="TarikKasButton" Content="Tarik kas" Style="{StaticResource PrimaryButton}"
-                            FontSize="12" Padding="13,8" Click="TarikKasButton_Click" />
+                            FontSize="13" Padding="15,10" Click="TarikKasButton_Click" />
                 </WrapPanel>
             </Grid>
 
             <Grid x:Name="SummaryCardsGrid" Width="{Binding ActualWidth, ElementName=DashboardContent}"
-                  HorizontalAlignment="Stretch" Margin="0,0,0,16">
+                  HorizontalAlignment="Stretch" Margin="0,0,0,20">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="16" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Border x:Name="BalanceCard" Grid.Column="0" Style="{StaticResource MetricCard}" VerticalAlignment="Top">
-                    <Grid Margin="-20">
-                        <Border CornerRadius="12" Background="{DynamicResource CashFlowIncomeFill}" IsHitTestVisible="False">
-                            <Border.OpacityMask>
-                                <LinearGradientBrush StartPoint="1,0" EndPoint="0.15,1">
-                                    <GradientStop Color="#FF000000" Offset="0" />
-                                    <GradientStop Color="#00000000" Offset="0.95" />
-                                </LinearGradientBrush>
-                            </Border.OpacityMask>
-                        </Border>
+                    <Grid Margin="-20" ClipToBounds="True">
+                        <Grid IsHitTestVisible="False">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="1" CornerRadius="14" Background="{DynamicResource CashFlowIncomeFill}"
+                                    Opacity="0.55">
+                                <Border.OpacityMask>
+                                    <StaticResource ResourceKey="TopMetricFadeMask" />
+                                </Border.OpacityMask>
+                            </Border>
+                        </Grid>
+                        <Border Height="3" VerticalAlignment="Bottom" Background="{DynamicResource IncomeColor}"
+                                CornerRadius="0,0,14,14" />
                         <StackPanel Margin="20">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Kas tersedia" FontSize="12" FontWeight="Medium"
+                            <TextBlock Text="SALDO KAS TERSEDIA" FontSize="10" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextGray}" VerticalAlignment="Center" />
                             <Border Grid.Column="1" Style="{StaticResource MetricIconFrame}"
-                                    Background="{DynamicResource ElevatedCardBackground}">
+                                    Background="{DynamicResource CashFlowIncomeFill}">
                                 <Path Data="M3,7 C3,5.9 3.9,5 5,5 L19,5 C20.1,5 21,5.9 21,7 L21,18 C21,19.1 20.1,20 19,20 L5,20 C3.9,20 3,19.1 3,18 Z M3,9 L21,9 M16,14 L18,14"
                                       Stroke="{DynamicResource IncomeColor}" StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                       Fill="Transparent" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                         </Grid>
-                        <TextBlock x:Name="SaldoText" Text="Rp 0" FontSize="27" FontWeight="Medium"
-                                   Margin="0,14,0,0" Foreground="{DynamicResource TextDark}" />
+                        <TextBlock x:Name="SaldoText" Text="Rp 0" FontSize="26" FontWeight="SemiBold"
+                                   Margin="0,12,0,0" Foreground="{DynamicResource TextDark}" />
                         </StackPanel>
                     </Grid>
                 </Border>
                 <Border x:Name="StudentCountCard" Grid.Column="2" Style="{StaticResource MetricCard}" VerticalAlignment="Top">
-                    <StackPanel>
+                    <Grid Margin="-20" ClipToBounds="True">
+                        <Grid IsHitTestVisible="False">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="1" CornerRadius="14" Background="{DynamicResource CashFlowIncomeFill}"
+                                    Opacity="0.55">
+                                <Border.OpacityMask>
+                                    <StaticResource ResourceKey="TopMetricFadeMask" />
+                                </Border.OpacityMask>
+                            </Border>
+                        </Grid>
+                        <Border Height="3" VerticalAlignment="Bottom" Background="{DynamicResource IncomeColor}"
+                                CornerRadius="0,0,14,14" />
+                        <StackPanel Margin="20">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Total siswa aktif" FontSize="12" FontWeight="Medium"
+                            <TextBlock Text="TOTAL SISWA AKTIF" FontSize="10" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextGray}" VerticalAlignment="Center" />
-                            <Border Grid.Column="1" Style="{StaticResource MetricIconFrame}" Background="{DynamicResource ElevatedCardBackground}">
+                            <Border Grid.Column="1" Style="{StaticResource MetricIconFrame}" Background="{DynamicResource CashFlowIncomeFill}">
                                 <Path Data="M12,12 C14.2,12 16,10.2 16,8 C16,5.8 14.2,4 12,4 C9.8,4 8,5.8 8,8 C8,10.2 9.8,12 12,12 Z M4,20 C4,16.7 7.6,14 12,14 C16.4,14 20,16.7 20,20 M18,5 C19.7,5.5 21,7.1 21,9 C21,10.8 19.8,12.3 18.2,12.9 M18,15 C20.4,15.7 22,17.5 22,20"
-                                      Stroke="{DynamicResource TextGray}" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Stroke="{DynamicResource IncomeColor}" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                       Fill="Transparent" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                         </Grid>
-                        <TextBlock x:Name="TotalSiswaText" Text="0" FontSize="27" FontWeight="Medium"
-                                   Margin="0,14,0,0" Foreground="{DynamicResource TextDark}" />
-                        <TextBlock x:Name="WeeklyPaymentSummaryText" Text="Belum ada tagihan minggu ini" FontSize="9"
+                        <TextBlock x:Name="TotalSiswaText" Text="0" FontSize="26" FontWeight="SemiBold"
+                                   Margin="0,12,0,0" Foreground="{DynamicResource TextDark}" />
+                        <TextBlock x:Name="WeeklyPaymentSummaryText" Text="Belum ada tagihan minggu ini" FontSize="11"
                                    Foreground="{DynamicResource TextGray}" TextTrimming="CharacterEllipsis"
                                    Margin="0,4,0,0" />
-                        <Border x:Name="WeeklyPaymentProgressTrack" Height="6" CornerRadius="3"
+                        <Border x:Name="WeeklyPaymentProgressTrack" Height="8" CornerRadius="4"
                                 Background="{DynamicResource SubtleBackground}" Margin="0,5,0,0" ClipToBounds="True">
                             <Border x:Name="WeeklyPaidProgressFill" Background="{DynamicResource StatusGreen}"
-                                    CornerRadius="3" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5">
+                                    CornerRadius="4" HorizontalAlignment="Stretch" RenderTransformOrigin="0,0.5">
                                 <Border.RenderTransform>
                                     <ScaleTransform ScaleX="0" ScaleY="1" />
                                 </Border.RenderTransform>
                             </Border>
                         </Border>
-                    </StackPanel>
+                        </StackPanel>
+                    </Grid>
                 </Border>
                 <Border x:Name="UnpaidCountCard" Grid.Column="4" Style="{StaticResource MetricCard}" VerticalAlignment="Top">
-                    <StackPanel>
+                    <Grid Margin="-20" ClipToBounds="True">
+                        <Grid IsHitTestVisible="False">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="1" CornerRadius="14" Background="{DynamicResource StatusRed}"
+                                    Opacity="0.08">
+                                <Border.OpacityMask>
+                                    <StaticResource ResourceKey="TopMetricFadeMask" />
+                                </Border.OpacityMask>
+                            </Border>
+                        </Grid>
+                        <Border Height="3" VerticalAlignment="Bottom" Background="{DynamicResource StatusRed}"
+                                CornerRadius="0,0,14,14" />
+                        <StackPanel Margin="20">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Tagihan belum lunas" FontSize="12" FontWeight="Medium"
+                            <TextBlock Text="TAGIHAN BELUM LUNAS" FontSize="10" FontWeight="SemiBold"
                                        Foreground="{DynamicResource TextGray}" VerticalAlignment="Center" />
                             <Border Grid.Column="1" Style="{StaticResource MetricIconFrame}" Background="{DynamicResource WarningBadgeBackground}">
                                 <Path Data="M12,3 L22,20 L2,20 Z M12,9 L12,14 M12,17 L12,17.1"
@@ -327,50 +361,57 @@
                                       Fill="Transparent" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                         </Grid>
-                        <TextBlock x:Name="BelumLunasText" Text="Rp 0" FontSize="25" FontWeight="Medium"
-                                   Margin="0,9,0,3" Foreground="{DynamicResource StatusRed}" />
-                        <TextBlock x:Name="UnpaidCaptionText" Text="Sisa pembayaran siswa" FontSize="10" Foreground="{DynamicResource TextGray}" />
+                        <TextBlock x:Name="BelumLunasText" Text="Rp 0" FontSize="26" FontWeight="SemiBold"
+                                   Margin="0,12,0,3" Foreground="{DynamicResource StatusRed}" />
+                        <TextBlock x:Name="UnpaidCaptionText" Text="Sisa pembayaran siswa" FontSize="11" Foreground="{DynamicResource TextGray}" />
                     </StackPanel>
+                    </Grid>
                 </Border>
                 <Border x:Name="ExpenseCard" Grid.Column="6" Style="{StaticResource MetricCard}" VerticalAlignment="Top">
-                    <Grid Margin="-20">
-                        <Border CornerRadius="12" Background="{DynamicResource CashFlowExpenseFill}" IsHitTestVisible="False">
-                            <Border.OpacityMask>
-                                <LinearGradientBrush StartPoint="1,0" EndPoint="0.15,1">
-                                    <GradientStop Color="#FF000000" Offset="0" />
-                                    <GradientStop Color="#00000000" Offset="0.95" />
-                                </LinearGradientBrush>
-                            </Border.OpacityMask>
-                        </Border>
+                    <Grid Margin="-20" ClipToBounds="True">
+                        <Grid IsHitTestVisible="False">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="1" CornerRadius="14" Background="{DynamicResource StatusRed}"
+                                    Opacity="0.08">
+                                <Border.OpacityMask>
+                                    <StaticResource ResourceKey="TopMetricFadeMask" />
+                                </Border.OpacityMask>
+                            </Border>
+                        </Grid>
+                        <Border Height="3" VerticalAlignment="Bottom" Background="{DynamicResource StatusRed}"
+                                CornerRadius="0,0,14,14" />
                         <StackPanel Margin="20">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Pengeluaran bulan ini" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TextGray}"
+                            <TextBlock Text="PENGELUARAN BULAN INI" FontSize="10" FontWeight="SemiBold" Foreground="{DynamicResource TextGray}"
                                        TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-                            <Border Grid.Column="1" Style="{StaticResource MetricIconFrame}" Background="{DynamicResource ElevatedCardBackground}">
+                            <Border Grid.Column="1" Style="{StaticResource MetricIconFrame}" Background="{DynamicResource WarningBadgeBackground}">
                                 <Path Data="M6,3 L18,3 L18,21 L12,17 L6,21 Z M9,8 L15,8 M9,12 L15,12"
-                                      Stroke="{DynamicResource TextGray}" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Stroke="{DynamicResource StatusRed}" StrokeThickness="1.5" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                       Fill="Transparent" Width="20" Height="20" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Border>
                         </Grid>
-                        <TextBlock x:Name="ExpenseMonthText" Text="Rp 0" FontSize="25" FontWeight="Medium"
-                                   Margin="0,9,0,3" Foreground="{DynamicResource TextDark}" />
-                        <TextBlock x:Name="ExpenseTransactionCountText" Text="0 transaksi bulan ini" FontSize="10" Foreground="{DynamicResource TextGray}" />
+                        <TextBlock x:Name="ExpenseMonthText" Text="Rp 0" FontSize="26" FontWeight="SemiBold"
+                                   Margin="0,12,0,3" Foreground="{DynamicResource TextDark}" />
+                        <TextBlock x:Name="ExpenseTransactionCountText" Text="0 transaksi bulan ini" FontSize="11" Foreground="{DynamicResource TextGray}" />
                         </StackPanel>
                     </Grid>
                 </Border>
             </Grid>
 
-            <Grid x:Name="AnalyticsGrid" Margin="0,0,0,16">
+            <Grid x:Name="AnalyticsGrid" Margin="0,0,0,18">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2.1*" />
-                    <ColumnDefinition Width="16" />
+                    <ColumnDefinition Width="18" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <Border x:Name="CashFlowCard" Grid.Column="0" Style="{StaticResource PanelCard}" Padding="20,18">
+                <Border x:Name="CashFlowCard" Grid.Column="0" Style="{StaticResource PanelCard}" Padding="22,20">
                     <StackPanel>
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
@@ -378,11 +419,11 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <StackPanel>
-                                <TextBlock Text="Arus kas" FontSize="17" FontWeight="Medium" Foreground="{DynamicResource TextDark}" />
-                                <TextBlock x:Name="CashFlowSubtitleText" Text="Pemasukan dan pengeluaran, 6 minggu terakhir" FontSize="10"
+                                <TextBlock Text="Arus kas" FontSize="19" FontWeight="Medium" Foreground="{DynamicResource TextDark}" />
+                                <TextBlock x:Name="CashFlowSubtitleText" Text="Pemasukan dan pengeluaran, 6 minggu terakhir" FontSize="11"
                                            Foreground="{DynamicResource TextGray}" Margin="0,3,0,0" />
                             </StackPanel>
-                            <ComboBox x:Name="CashFlowPeriodCombo" Grid.Column="1" Width="116" Height="32" FontSize="10"
+                            <ComboBox x:Name="CashFlowPeriodCombo" Grid.Column="1" Width="128" Height="36" FontSize="11"
                                       Padding="14,4,28,4" Style="{StaticResource RoundedComboBox}" SelectedIndex="0"
                                       SelectionChanged="CashFlowPeriodCombo_SelectionChanged" VerticalAlignment="Center">
                                 <ComboBoxItem Content="6 minggu" Tag="Weeks" />
@@ -390,7 +431,7 @@
                                 <ComboBoxItem Content="1 tahun" Tag="Year" />
                             </ComboBox>
                         </Grid>
-                        <Grid Height="220">
+                        <Grid Height="280">
                             <Canvas x:Name="CashFlowCanvas" Background="Transparent"
                                     SizeChanged="CashFlowCanvas_SizeChanged"
                                     MouseMove="CashFlowCanvas_MouseMove" MouseLeave="CashFlowCanvas_MouseLeave">
@@ -417,15 +458,15 @@
                         </Grid>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
                             <Ellipse Width="8" Height="8" Fill="{DynamicResource CashFlowPrimaryColor}" VerticalAlignment="Center" Margin="0,0,7,0" />
-                            <TextBlock Text="Pemasukan" FontSize="11" Foreground="{DynamicResource TextGray}" Margin="0,0,20,0" />
+                            <TextBlock Text="Pemasukan" FontSize="12" Foreground="{DynamicResource TextGray}" Margin="0,0,20,0" />
                             <Ellipse Width="8" Height="8" Fill="{DynamicResource CashFlowSecondaryColor}" VerticalAlignment="Center" Margin="0,0,7,0" />
-                            <TextBlock Text="Pengeluaran" FontSize="11" Foreground="{DynamicResource TextGray}" />
+                            <TextBlock Text="Pengeluaran" FontSize="12" Foreground="{DynamicResource TextGray}" />
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
                 <Grid x:Name="RightRail" Grid.Column="2">
-                    <Border x:Name="StudentsCard" Style="{StaticResource PanelCard}" Padding="17,16">
+                    <Border x:Name="StudentsCard" Style="{StaticResource PanelCard}" Padding="20,18">
                         <StackPanel>
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
@@ -433,19 +474,19 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Text="Perlu perhatian" FontSize="16" FontWeight="Medium"
+                                    <TextBlock Text="Perlu perhatian" FontSize="19" FontWeight="Medium"
                                                Foreground="{DynamicResource TextDark}" />
-                                    <TextBlock Text="Siswa dengan pembayaran mingguan yang belum lunas" FontSize="10"
+                                    <TextBlock Text="Siswa dengan pembayaran mingguan yang belum lunas" FontSize="11"
                                                Foreground="{DynamicResource TextGray}" Margin="0,3,0,0" TextWrapping="Wrap" />
                                 </StackPanel>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="10,0,0,0">
-                                    <Border Background="{DynamicResource ElevatedCardBackground}" CornerRadius="9" Padding="8,3"
+                                    <Border Background="{DynamicResource ElevatedCardBackground}" CornerRadius="9" Padding="9,4"
                                             Margin="0,0,5,0">
-                                        <TextBlock x:Name="TotalStudentCountBadgeText" Text="0 Siswa" FontSize="9"
+                                        <TextBlock x:Name="TotalStudentCountBadgeText" Text="0 Siswa" FontSize="10"
                                                    Foreground="{DynamicResource TextGray}" VerticalAlignment="Center" />
                                     </Border>
-                                    <Border Background="{DynamicResource WarningBadgeBackground}" CornerRadius="9" Padding="8,3">
-                                        <TextBlock x:Name="AttentionStudentCountText" Text="0 Belum Lunas" FontSize="9"
+                                    <Border Background="{DynamicResource WarningBadgeBackground}" CornerRadius="9" Padding="9,4">
+                                        <TextBlock x:Name="AttentionStudentCountText" Text="0 Belum Lunas" FontSize="10"
                                                    Foreground="{DynamicResource WarningBadgeForeground}" VerticalAlignment="Center" />
                                     </Border>
                                 </StackPanel>
@@ -462,12 +503,12 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <StackPanel VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Name}" FontSize="12" Foreground="{DynamicResource TextDark}" TextTrimming="CharacterEllipsis" />
-                                                    <TextBlock Text="{Binding Nis, StringFormat='NIS {0}'}" FontSize="10" Foreground="{DynamicResource TextGray}" Margin="0,2,0,0" />
+                                                    <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{DynamicResource TextDark}" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding Nis, StringFormat='NIS {0}'}" FontSize="11" Foreground="{DynamicResource TextGray}" Margin="0,3,0,0" />
                                                 </StackPanel>
                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="8,0,0,0">
-                                                    <TextBlock Text="{Binding OutstandingText}" FontSize="11" Foreground="{DynamicResource StatusRed}" TextAlignment="Right" />
-                                                    <TextBlock Text="{Binding FollowUpLabel}" FontSize="9" Foreground="{DynamicResource TextGray}" Margin="0,2,0,0" TextAlignment="Right" />
+                                                    <TextBlock Text="{Binding OutstandingText}" FontSize="12" Foreground="{DynamicResource StatusRed}" TextAlignment="Right" />
+                                                    <TextBlock Text="{Binding FollowUpLabel}" FontSize="10" Foreground="{DynamicResource TextGray}" Margin="0,3,0,0" TextAlignment="Right" />
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
@@ -484,7 +525,7 @@
                 </Grid>
             </Grid>
 
-            <Border x:Name="RecentTransactionsCard" Style="{StaticResource PanelCard}" Padding="18,17">
+            <Border x:Name="RecentTransactionsCard" Style="{StaticResource PanelCard}" Padding="22,20">
                 <StackPanel>
                     <Grid Margin="0,0,0,14">
                         <Grid.ColumnDefinitions>
@@ -492,9 +533,8 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="Transaksi terbaru" FontSize="17" FontWeight="Medium"
+                            <TextBlock Text="Transaksi terbaru" FontSize="19" FontWeight="Medium"
                                        Foreground="{DynamicResource TextDark}" />
-                            <TextBlock Text="Aktivitas kas kelas yang tercatat" FontSize="10" Foreground="{DynamicResource TextGray}" Margin="0,3,0,0" />
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                             <Border Background="{DynamicResource SubtleBackground}" CornerRadius="9" Padding="3">
@@ -510,44 +550,44 @@
                         </StackPanel>
                     </Grid>
 
-                    <Grid Margin="0,0,0,5">
+                    <Grid Margin="0,0,0,7">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="108" />
+                            <ColumnDefinition Width="116" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="105" />
-                            <ColumnDefinition Width="138" />
+                            <ColumnDefinition Width="112" />
+                            <ColumnDefinition Width="150" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="TANGGAL &amp; JAM" FontSize="9" Foreground="{DynamicResource TextGray}" />
-                        <TextBlock Grid.Column="1" Text="KETERANGAN" FontSize="9" Foreground="{DynamicResource TextGray}" />
-                        <TextBlock Grid.Column="2" Text="JENIS" FontSize="9" Foreground="{DynamicResource TextGray}" />
-                        <TextBlock Grid.Column="3" Text="JUMLAH" FontSize="9" Foreground="{DynamicResource TextGray}" TextAlignment="Right" />
+                        <TextBlock Text="TANGGAL &amp; JAM" Style="{StaticResource TableHeaderText}" />
+                        <TextBlock Grid.Column="1" Text="KETERANGAN" Style="{StaticResource TableHeaderText}" />
+                        <TextBlock Grid.Column="2" Text="JENIS" Style="{StaticResource TableHeaderText}" />
+                        <TextBlock Grid.Column="3" Text="JUMLAH" Style="{StaticResource TableHeaderText}" TextAlignment="Right" />
                     </Grid>
                     <Border Height="1" Background="{DynamicResource BorderColor}" Margin="0,0,0,5" />
 
                     <ItemsControl x:Name="TransaksiItems">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid MinHeight="46">
+                                <Grid MinHeight="58">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="108" />
+                                        <ColumnDefinition Width="116" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="105" />
-                                        <ColumnDefinition Width="138" />
+                                        <ColumnDefinition Width="112" />
+                                        <ColumnDefinition Width="150" />
                                     </Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding DateText}" FontSize="11" Foreground="{DynamicResource TextDark}" />
-                                        <TextBlock Text="{Binding TimeText}" FontSize="10" Foreground="{DynamicResource TextGray}" Margin="0,2,0,0" />
+                                        <TextBlock Text="{Binding DateText}" FontSize="12" Foreground="{DynamicResource TextDark}" />
+                                        <TextBlock Text="{Binding TimeText}" FontSize="11" Foreground="{DynamicResource TextGray}" Margin="0,3,0,0" />
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
-                                        <TextBlock Text="{Binding Description}" FontSize="11" Foreground="{DynamicResource TextDark}"
+                                        <TextBlock Text="{Binding Description}" FontSize="12" Foreground="{DynamicResource TextDark}"
                                                    TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Text="{Binding PaymentMethodText}" FontSize="9" Foreground="{DynamicResource TextGray}" Margin="0,2,0,0" />
+                                        <TextBlock Text="{Binding PaymentMethodText}" FontSize="10" Foreground="{DynamicResource TextGray}" Margin="0,3,0,0" />
                                     </StackPanel>
                                     <Border Grid.Column="2" Background="{Binding TypeBackground}" CornerRadius="7" Padding="8,4"
                                             HorizontalAlignment="Left" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding TypeLabel}" FontSize="9" Foreground="{Binding TypeBrush}" />
+                                        <TextBlock Text="{Binding TypeLabel}" FontSize="10" Foreground="{Binding TypeBrush}" />
                                     </Border>
-                                    <TextBlock Grid.Column="3" Text="{Binding AmountText}" FontSize="11" Foreground="{Binding AmountBrush}"
+                                    <TextBlock Grid.Column="3" Text="{Binding AmountText}" FontSize="12" Foreground="{Binding AmountBrush}"
                                                TextAlignment="Right" VerticalAlignment="Center" />
                                     <Border Grid.ColumnSpan="4" Height="1" Background="{DynamicResource BorderColor}"
                                             VerticalAlignment="Bottom" Opacity="0.65" />
@@ -568,4 +608,4 @@
             </Border>
         </StackPanel>
     </ScrollViewer>
-</Page>
+</UserControl>

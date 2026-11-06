@@ -1,0 +1,26 @@
+$kind: http-request
+name: Login
+order: 1000
+url: 'http://localhost/KasMateAPI/auth/login.php'
+method: POST
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      const data = pm.response.json();
+      if (data.success && data.data && data.data.token) {
+          pm.environment.set("token", data.data.token);
+          console.log("Token saved to environment.");
+      } else {
+          console.error("Login failed:", data.error);
+      }

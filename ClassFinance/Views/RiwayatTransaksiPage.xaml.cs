@@ -43,7 +43,7 @@ namespace ClassFinance.Views
         public string AmountPaidDisplay => AmountPaid > 0 ? $"Rp {AmountPaid:N0}" : string.Empty;
     }
 
-    public partial class RiwayatTransaksiPage : Page
+    public partial class RiwayatTransaksiPage : UserControl
     {
         private readonly User _currentUser;
         private readonly MainWindow _mainWindow;
@@ -77,9 +77,9 @@ namespace ClassFinance.Views
                 TitleText.Text = siswa != null
                     ? $"Status Tagihan — {siswa.Name}"
                     : "Status Tagihan";
+                TransactionFilterBar.Visibility = Visibility.Collapsed;
                 FilterCombo.Visibility = Visibility.Collapsed;
                 DateFilterPanel.Visibility = Visibility.Collapsed;
-                SummaryScopeText.Visibility = Visibility.Collapsed;
                 TambahButton.Visibility = Visibility.Collapsed;
                 SummaryRow.Visibility = Visibility.Collapsed;
             }
@@ -87,6 +87,8 @@ namespace ClassFinance.Views
             {
                 TambahButton.Visibility = currentUser is Bendahara ? Visibility.Visible : Visibility.Collapsed;
                 FilterCombo.SelectionChanged += FilterCombo_SelectionChanged;
+                MethodFilterCombo.SelectionChanged += MethodFilterCombo_SelectionChanged;
+                SearchTextBox.TextChanged += SearchTextBox_TextChanged;
             }
 
             Refresh();
@@ -103,10 +105,12 @@ namespace ClassFinance.Views
                 if (!string.IsNullOrWhiteSpace(_nis))
                     TitleText.Text = $"Status Tagihan — {siswa.Name}";
                 RefreshTagihanStatus(siswa);
+                _mainWindow.MarkPageDataCurrent(this);
                 return;
             }
 
             RefreshTransaksi();
+            _mainWindow.MarkPageDataCurrent(this);
         }
 
         private void RiwayatTransaksiPage_Loaded(object sender, RoutedEventArgs e)
@@ -116,8 +120,9 @@ namespace ClassFinance.Views
 
             DataStore.Instance.DataChanged += DataStore_DataChanged;
             _dataStoreSubscribed = true;
-            Refresh();
         }
+
+        public void RefreshForNavigation() => Refresh();
 
         private void RiwayatTransaksiPage_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -135,42 +140,130 @@ namespace ClassFinance.Views
 
             if (!Dispatcher.CheckAccess())
             {
-                Dispatcher.BeginInvoke(new Action(Refresh));
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    Refresh();
+                    _mainWindow.MarkPageDataCurrent(this);
+                }));
                 return;
             }
 
             Refresh();
+            _mainWindow.MarkPageDataCurrent(this);
         }
 
         private void RefreshTransaksi()
         {
-            var all = DataStore.Instance.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
+            var store = DataStore.Instance;
+            var all = store.KelasList.First(k => k.Id == _kelasId).GetRiwayatTransaksi();
 
             var dateFiltered = all.Where(t =>
                 (!DateFilterPicker.SelectedDate.HasValue || t.Date.Date == DateFilterPicker.SelectedDate.Value.Date)).ToList();
 
-            var filtered = FilterCombo.SelectedIndex switch
+            IEnumerable<Transaksi> typeFiltered = FilterCombo.SelectedIndex switch
             {
                 1 => dateFiltered.Where(t => t.Type == JenisTransaksi.Masuk).ToList(),
                 2 => dateFiltered.Where(t => t.Type == JenisTransaksi.Keluar).ToList(),
                 _ => dateFiltered
             };
 
+            IEnumerable<Transaksi> methodFiltered = MethodFilterCombo.SelectedIndex switch
+            {
+                1 => typeFiltered.Where(t => t.Metode == MetodeTransaksi.Tunai),
+                2 => typeFiltered.Where(t => t.Metode == MetodeTransaksi.Qris),
+                3 => typeFiltered.Where(t => t.Metode == MetodeTransaksi.Tf),
+                _ => typeFiltered
+            };
+
+            var studentsById = store.Users.OfType<Siswa>().ToDictionary(student => student.Id);
+            var studentIdsByBillEntry = store.TagihanSiswaList
+                .GroupBy(entry => entry.Id)
+                .ToDictionary(group => group.Key, group => group.First().SiswaId);
+            var searchText = SearchTextBox.Text?.Trim();
+            if (!string.IsNullOrEmpty(searchText))
+            {
+                var idId = CultureInfo.GetCultureInfo("id-ID");
+                var invariant = CultureInfo.InvariantCulture;
+                methodFiltered = methodFiltered.Where(transaction =>
+                {
+                    int? studentId = transaction.SiswaId;
+                    if (!studentId.HasValue && transaction.TagihanSiswaId.HasValue &&
+                        studentIdsByBillEntry.TryGetValue(transaction.TagihanSiswaId.Value, out var linkedStudentId))
+                        studentId = linkedStudentId;
+
+                    var studentText = studentId.HasValue && studentsById.TryGetValue(studentId.Value, out var student)
+                        ? $"{student.Name} {student.Nis}"
+                        : string.Empty;
+                    var searchableText = string.Join(" ",
+                        transaction.Description,
+                        transaction.Type == JenisTransaksi.Masuk ? "Kas masuk pemasukan" : "Kas keluar pengeluaran",
+                        transaction.Metode.ToDisplayLabel(),
+                        $"Rp {transaction.Amount.ToString("N0", idId)}",
+                        transaction.Amount.ToString("0.##", invariant),
+                        studentText);
+                    return searchableText.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) >= 0;
+                });
+            }
+
+            var filtered = methodFiltered.ToList();
+
             var totalEarned = filtered.Where(t => t.Type == JenisTransaksi.Masuk && t.AffectsKas).Sum(t => t.Amount);
             var totalSpent = filtered.Where(t => t.Type == JenisTransaksi.Keluar && t.AffectsKas).Sum(t => t.Amount);
+            var earnedCount = filtered.Count(t => t.Type == JenisTransaksi.Masuk && t.AffectsKas);
+            var spentCount = filtered.Count(t => t.Type == JenisTransaksi.Keluar && t.AffectsKas);
             var currentKas = all.Where(t => t.AffectsKas)
                 .Sum(t => t.Type == JenisTransaksi.Masuk ? t.Amount : -t.Amount);
+
+            var paymentFacts = store.TransaksiList
+                .Where(transaction => transaction.TagihanSiswaId.HasValue)
+                .GroupBy(transaction => transaction.TagihanSiswaId.Value)
+                .ToDictionary(group => group.Key, group => new
+                {
+                    HasRefund = group.Any(transaction => transaction.IsRefund),
+                    TotalPaid = group.Where(transaction => transaction.Type == JenisTransaksi.Masuk)
+                        .Sum(transaction => transaction.Amount)
+                });
+            var billAmountsByEntry = store.TagihanSiswaList
+                .Join(store.TagihanList, entry => entry.TagihanId, bill => bill.Id,
+                    (entry, bill) => new { entry.Id, bill.Amount })
+                .ToDictionary(item => item.Id, item => item.Amount);
+            bool canManage = _currentUser is Bendahara;
+
+            bool CanEditAmount(Transaksi transaction)
+            {
+                if (!canManage || transaction.IsRefund || transaction.Type != JenisTransaksi.Masuk)
+                    return false;
+                if (!transaction.TagihanSiswaId.HasValue)
+                    return true;
+                return paymentFacts.TryGetValue(transaction.TagihanSiswaId.Value, out var facts) &&
+                    billAmountsByEntry.TryGetValue(transaction.TagihanSiswaId.Value, out var billAmount) &&
+                    !facts.HasRefund && facts.TotalPaid <= billAmount;
+            }
+
+            bool CanDelete(Transaksi transaction)
+            {
+                if (!canManage)
+                    return false;
+                if (transaction.Type != JenisTransaksi.Masuk || !transaction.TagihanSiswaId.HasValue)
+                    return true;
+                return paymentFacts.TryGetValue(transaction.TagihanSiswaId.Value, out var facts) &&
+                    billAmountsByEntry.TryGetValue(transaction.TagihanSiswaId.Value, out var billAmount) &&
+                    !facts.HasRefund && facts.TotalPaid <= billAmount;
+            }
+
             TotalKasText.Text = $"Rp {currentKas:N0}";
             TotalEarnedText.Text = $"Rp {totalEarned:N0}";
             TotalSpentText.Text = $"Rp {totalSpent:N0}";
+            TotalEarnedCaptionText.Text = $"{earnedCount} transaksi dalam filter";
+            TotalSpentCaptionText.Text = $"{spentCount} transaksi dalam filter";
 
             TransaksiItems.ItemsSource = filtered.Select(t => new TransaksiDisplayItem
             {
                 Transaksi = t,
                 TagihanName = null,
                 CanMarkRefundPaid = _currentUser is Bendahara && t.IsPendingRefund,
-                CanEditAmount = CanEditTransactionAmount(t),
-                CanDelete = CanDeleteTransaction(t)
+                CanEditAmount = CanEditAmount(t),
+                CanDelete = CanDelete(t)
             }).ToList();
             TransactionListHeader.Visibility = Visibility.Visible;
             TransactionHeaderSeparator.Visibility = Visibility.Visible;
@@ -182,6 +275,7 @@ namespace ClassFinance.Views
 
             EmptyText.Text = "Belum ada transaksi.";
             EmptyText.Visibility = filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
+            _mainWindow.MarkPageDataCurrent(this);
         }
 
         private void RefreshTagihanStatus(Siswa siswa)
@@ -224,6 +318,7 @@ namespace ClassFinance.Views
 
             EmptyText.Text = "Belum ada tagihan.";
             EmptyText.Visibility = tagihanList.Any() ? Visibility.Collapsed : Visibility.Visible;
+            _mainWindow.MarkPageDataCurrent(this);
         }
 
         private Siswa FindSiswaByNis(string nis) =>
@@ -233,6 +328,10 @@ namespace ClassFinance.Views
                     .FirstOrDefault(s => s.KelasId == _kelasId && s.Nis == nis);
 
         private void FilterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) => Refresh();
+
+        private void MethodFilterCombo_SelectionChanged(object sender, SelectionChangedEventArgs e) => RefreshTransaksi();
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e) => RefreshTransaksi();
 
         private void DateFilter_Changed(object sender, SelectionChangedEventArgs e) => RefreshTransaksi();
 
@@ -248,7 +347,7 @@ namespace ClassFinance.Views
             _mainWindow.ShowModal(dialog);
         }
 
-        private void MarkRefundPaid_Click(object sender, RoutedEventArgs e)
+        private async void MarkRefundPaid_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser is Bendahara && sender is FrameworkElement element && element.Tag is Transaksi transaksi)
             {
@@ -257,8 +356,15 @@ namespace ClassFinance.Views
                         "Konfirmasi penyelesaian refund", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
                     return;
 
-                ((Bendahara)_currentUser).TandaiRefundDibayar(transaksi.Id);
-                RefreshTransaksi();
+                try
+                {
+                    await ((Bendahara)_currentUser).TandaiRefundDibayarAsync(transaksi.Id);
+                    RefreshTransaksi();
+                }
+                catch (Exception exception)
+                {
+                    AppMessageBox.Show(_mainWindow, exception.Message, "Refund tidak dapat diselesaikan", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 
@@ -307,7 +413,7 @@ namespace ClassFinance.Views
             }
         }
 
-        private void DeleteTransaction_Click(object sender, RoutedEventArgs e)
+        private async void DeleteTransaction_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser is not Bendahara bendahara || sender is not FrameworkElement element || element.Tag is not Transaksi transaksi)
                 return;
@@ -321,10 +427,10 @@ namespace ClassFinance.Views
 
             try
             {
-                bendahara.HapusTransaksi(transaksi.Id);
+                await bendahara.HapusTransaksiAsync(transaksi.Id);
                 Refresh();
             }
-            catch (InvalidOperationException exception)
+            catch (Exception exception)
             {
                 AppMessageBox.Show(_mainWindow, exception.Message, "Transaksi tidak dapat dihapus", MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -387,7 +493,7 @@ namespace ClassFinance.Views
         {
             if (sender is FrameworkElement fe && fe.Tag is Tagihan tagihan)
             {
-                _mainWindow.NavigateTo(new TagihanPage(_currentUser, _mainWindow, tagihan.Id));
+                _mainWindow.NavigateTo(() => new TagihanPage(_currentUser, _mainWindow, tagihan.Id));
             }
         }
     }

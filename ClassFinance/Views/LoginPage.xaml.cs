@@ -1,22 +1,31 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Net.Http;
+using System.Threading.Tasks;
 using ClassFinance.Services;
 
 namespace ClassFinance.Views
 {
-    public partial class LoginPage : Page
+    public partial class LoginPage : UserControl
     {
         private readonly MainWindow _mainWindow;
         private bool _isPasswordVisible;
         private bool _isSyncingPassword;
+        private bool _isSigningIn;
 
         public LoginPage(MainWindow mainWindow)
         {
             InitializeComponent();
             _mainWindow = mainWindow;
-            PasswordBoxInput.KeyDown += (s, e) => { if (e.Key == Key.Enter) DoLogin(); };
-            VisiblePasswordBox.KeyDown += (s, e) => { if (e.Key == Key.Enter) DoLogin(); };
+            PasswordBoxInput.KeyDown += async (s, e) =>
+            {
+                if (e.Key == Key.Enter) { e.Handled = true; await DoLoginAsync(); }
+            };
+            VisiblePasswordBox.KeyDown += async (s, e) =>
+            {
+                if (e.Key == Key.Enter) { e.Handled = true; await DoLoginAsync(); }
+            };
             PasswordBoxInput.PasswordChanged += (s, e) =>
             {
                 if (_isSyncingPassword)
@@ -35,10 +44,13 @@ namespace ClassFinance.Views
                 PasswordBoxInput.Password = VisiblePasswordBox.Text;
                 _isSyncingPassword = false;
             };
-            UsernameBox.KeyDown += (s, e) => { if (e.Key == Key.Enter) DoLogin(); };
+            UsernameBox.KeyDown += async (s, e) =>
+            {
+                if (e.Key == Key.Enter) { e.Handled = true; await DoLoginAsync(); }
+            };
         }
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e) => DoLogin();
+        private async void LoginButton_Click(object sender, RoutedEventArgs e) => await DoLoginAsync();
 
         private void TogglePasswordVisibility_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -74,18 +86,47 @@ namespace ClassFinance.Views
             }
         }
 
-        private void DoLogin()
+        private async Task DoLoginAsync()
         {
-            var password = _isPasswordVisible ? VisiblePasswordBox.Text : PasswordBoxInput.Password;
-            var user = AuthService.Login(UsernameBox.Text.Trim(), password);
-            if (user == null)
-            {
-                ErrorText.Text = "Username atau password salah.";
-                ErrorText.Visibility = Visibility.Visible;
+            if (_isSigningIn)
                 return;
-            }
 
-            _mainWindow.ShowShell(user);
+            var password = _isPasswordVisible ? VisiblePasswordBox.Text : PasswordBoxInput.Password;
+            _isSigningIn = true;
+            LoginButton.IsEnabled = false;
+            LoginButton.Content = "Memeriksa akun...";
+            ErrorText.Visibility = Visibility.Collapsed;
+            try
+            {
+                var username = UsernameBox.Text.Trim();
+                var user = await AuthService.LoginAsync(username, password);
+                if (user == null)
+                {
+                    ErrorText.Text = "Username atau password salah.";
+                    ErrorText.Visibility = Visibility.Visible;
+                    return;
+                }
+
+                LoginButton.Content = "Memuat data...";
+                await DataStore.Instance.InitializeAsync();
+                await _mainWindow.ShowShellAsync(user);
+            }
+            catch (HttpRequestException)
+            {
+                ErrorText.Text = "Tidak dapat menghubungi backend KasMate. Pastikan Apache dan MySQL XAMPP aktif serta migrasi API sudah diimpor.";
+                ErrorText.Visibility = Visibility.Visible;
+            }
+            catch (Exception exception)
+            {
+                ErrorText.Text = exception.Message;
+                ErrorText.Visibility = Visibility.Visible;
+            }
+            finally
+            {
+                _isSigningIn = false;
+                LoginButton.IsEnabled = true;
+                LoginButton.Content = "Masuk";
+            }
         }
     }
 }

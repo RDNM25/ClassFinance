@@ -1,7 +1,7 @@
-<Page x:Class="ClassFinance.Views.LoginPage"
+<UserControl x:Class="ClassFinance.Views.LoginPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" TextElement.Foreground="{DynamicResource TextDark}"
-      Title="Masuk" Background="{DynamicResource PageBackground}">
+      Background="{DynamicResource PageBackground}">
     <Grid>
         <Border HorizontalAlignment="Center" VerticalAlignment="Center" Width="420"
                 Background="{DynamicResource SurfaceBackground}" CornerRadius="18">
@@ -75,9 +75,10 @@
                     <TextBlock x:Name="ErrorText" Foreground="{DynamicResource AccentText}" FontSize="12"
                                Margin="4,0,0,12" Visibility="Collapsed" TextWrapping="Wrap" />
 
-                    <Button Content="Masuk" Style="{StaticResource PrimaryButton}" Click="LoginButton_Click" Margin="0,6,0,4" />
+                    <Button x:Name="LoginButton" Content="Masuk" Style="{StaticResource PrimaryButton}"
+                            Click="LoginButton_Click" Margin="0,6,0,4" />
                 </StackPanel>
             </StackPanel>
         </Border>
     </Grid>
-</Page>
+</UserControl>

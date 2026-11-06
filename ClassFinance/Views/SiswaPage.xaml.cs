@@ -69,7 +69,7 @@ namespace ClassFinance.Views
         public bool IsCurrent { get; init; }
     }
 
-    public partial class SiswaPage : Page
+    public partial class SiswaPage : UserControl
     {
         private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
         private const int StudentsPerPage = 5;
@@ -99,6 +99,10 @@ namespace ClassFinance.Views
             TambahButton.Visibility = canManage ? Visibility.Visible : Visibility.Collapsed;
             Refresh();
         }
+
+        public void RefreshAfterWeeklyBillingUpdate() => Refresh();
+
+        public void RefreshForNavigation() => Refresh();
 
         private void Refresh()
         {
@@ -163,6 +167,7 @@ namespace ClassFinance.Views
             }
 
             ApplyFilter();
+            _mainWindow.MarkPageDataCurrent(this);
         }
 
         private void UpdateWeekSelector(JadwalTagihanMingguan schedule, DateTime currentWeekStart)
@@ -452,7 +457,7 @@ namespace ClassFinance.Views
             _mainWindow.ShowModal(dialog);
         }
 
-        private void Hapus_Click(object sender, RoutedEventArgs e)
+        private async void Hapus_Click(object sender, RoutedEventArgs e)
         {
             if (_currentUser is not Bendahara || sender is not FrameworkElement element || element.Tag is not Siswa siswa)
                 return;
@@ -461,8 +466,15 @@ namespace ClassFinance.Views
                 MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (confirm == MessageBoxResult.Yes)
             {
-                DataStore.Instance.HapusSiswa(siswa.Id);
-                Refresh();
+                try
+                {
+                    await DataStore.Instance.HapusSiswaAsync(siswa.Id);
+                    Refresh();
+                }
+                catch (Exception exception)
+                {
+                    AppMessageBox.Show(_mainWindow, exception.Message, "Siswa tidak dapat dihapus", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 

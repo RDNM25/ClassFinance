@@ -25,7 +25,7 @@ namespace ClassFinance.Views.Dialogs
             DatePickerInput.SelectedDate = DateTime.Now;
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
             var description = DescriptionBox.Text.Trim();
 
@@ -64,7 +64,16 @@ namespace ClassFinance.Views.Dialogs
                 ? parsedMethod
                 : MetodeTransaksi.Tunai;
 
-            _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue, method);
+            try
+            {
+                await _bendahara.TambahPengeluaranAsync(_kelasId, description, amount, dateValue, method);
+            }
+            catch (Exception exception)
+            {
+                ErrorText.Text = exception.Message;
+                ErrorText.Visibility = Visibility.Visible;
+                return;
+            }
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();

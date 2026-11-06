@@ -1,15 +1,15 @@
-<Page x:Class="ClassFinance.Views.SiswaPage"
+<UserControl x:Class="ClassFinance.Views.SiswaPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:conv="clr-namespace:ClassFinance.Converters"
       TextElement.Foreground="{DynamicResource TextDark}"
-      Title="Data Siswa" Background="{DynamicResource PageBackground}">
-    <Page.Resources>
+      Background="{DynamicResource PageBackground}">
+    <UserControl.Resources>
         <conv:RupiahConverter x:Key="Rupiah" />
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Style x:Key="StudentRosterRow" TargetType="Border" BasedOn="{StaticResource Card}">
-            <Setter Property="Padding" Value="12,10" />
-            <Setter Property="Margin" Value="0,2" />
+            <Setter Property="Padding" Value="15,13" />
+            <Setter Property="Margin" Value="0,4" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
             <Setter Property="Effect" Value="{x:Null}" />
@@ -90,13 +90,13 @@
             <Setter Property="FontSize" Value="17" />
         </Style>
         <Style x:Key="WeekNavigationArrowButton" TargetType="Button">
-            <Setter Property="Width" Value="28" />
-            <Setter Property="Height" Value="28" />
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{DynamicResource AccentText}" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontSize" Value="21" />
             <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="Cursor" Value="Hand" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -119,21 +119,19 @@
                 </Setter.Value>
             </Setter>
         </Style>
-    </Page.Resources>
+    </UserControl.Resources>
 
     <ScrollViewer x:Name="SiswaScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                  Padding="28,0,28,30">
-        <StackPanel MaxWidth="1320" Width="{Binding ViewportWidth, ElementName=SiswaScrollViewer}"
-                    HorizontalAlignment="Center" Margin="0,24,0,0">
-            <Grid Margin="0,0,0,20">
+                  Padding="24,0,24,30">
+        <StackPanel MaxWidth="1600" Width="{Binding ViewportWidth, ElementName=SiswaScrollViewer}"
+                    HorizontalAlignment="Center" Margin="0,28,0,0">
+            <Grid Margin="0,0,0,26">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="KASMATE  /  DATA SISWA" FontSize="10"
-                               Foreground="{DynamicResource AccentText}" Margin="0,0,0,5" />
-                    <TextBlock Text="Data Siswa" FontSize="24" FontWeight="Medium"
+                    <TextBlock Text="Data Siswa" FontSize="29" FontWeight="Medium"
                                Foreground="{DynamicResource TextDark}" />
                 </StackPanel>
                 <Button x:Name="TambahButton" Grid.Column="1" Content="+ Tambah Siswa"
@@ -141,58 +139,70 @@
                         VerticalAlignment="Center" />
             </Grid>
 
-            <Grid Margin="0,0,0,20">
+            <Grid Margin="0,0,0,24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="14" />
+                    <ColumnDefinition Width="18" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Border Grid.Column="0" Style="{StaticResource Card}" Padding="20" Height="150">
-                    <Grid Margin="-20">
-                        <Border CornerRadius="12" Background="{DynamicResource CashFlowIncomeFill}" IsHitTestVisible="False">
-                            <Border.OpacityMask>
-                                <LinearGradientBrush StartPoint="1,0" EndPoint="0.15,1">
-                                    <GradientStop Color="#FF000000" Offset="0" />
-                                    <GradientStop Color="#00000000" Offset="0.95" />
-                                </LinearGradientBrush>
-                            </Border.OpacityMask>
-                        </Border>
-                        <Grid Margin="20">
+                <Border Grid.Column="0" Style="{StaticResource TopMetricCard}" Padding="18" Height="176">
+                    <Grid Margin="-18" ClipToBounds="True">
+                        <Grid IsHitTestVisible="False">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="1" CornerRadius="14" Background="{DynamicResource CashFlowIncomeFill}"
+                                    Opacity="0.55">
+                                <Border.OpacityMask>
+                                    <StaticResource ResourceKey="TopMetricFadeMask" />
+                                </Border.OpacityMask>
+                            </Border>
+                        </Grid>
+                        <Border Height="3" VerticalAlignment="Bottom" Background="{DynamicResource IncomeColor}"
+                                CornerRadius="0,0,14,14" />
+                        <Grid Margin="18">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <Border Width="34" Height="34" CornerRadius="10" Background="{DynamicResource ElevatedCardBackground}"
-                                        Margin="0,0,10,0">
+                            <Grid VerticalAlignment="Center">
+                                <TextBlock Text="SISWA TERDAFTAR" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextGray}" VerticalAlignment="Center" />
+                                <Border Style="{StaticResource TopMetricIconFrame}"
+                                        Background="{DynamicResource CashFlowIncomeFill}">
                                     <Path Data="M12,12 C14.2,12 16,10.2 16,8 C16,5.8 14.2,4 12,4 C9.8,4 8,5.8 8,8 C8,10.2 9.8,12 12,12 Z M4,20 C4,16.7 7.6,14 12,14 C16.4,14 20,16.7 20,20"
-                                          Stroke="{DynamicResource TextGray}" StrokeThickness="1.5" Fill="Transparent"
+                                          Stroke="{DynamicResource IncomeColor}" StrokeThickness="1.5" Fill="Transparent"
                                           Width="19" Height="19" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 </Border>
-                                <TextBlock Text="Siswa terdaftar" FontSize="11" FontWeight="Medium"
-                                           Foreground="{DynamicResource TextGray}" VerticalAlignment="Center" />
-                            </StackPanel>
+                            </Grid>
                             <StackPanel Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Bottom" Margin="0,13,0,0">
-                                <TextBlock x:Name="StudentCountText" Text="0" FontSize="30" FontWeight="Medium"
+                                <TextBlock x:Name="StudentCountText" Text="0" FontSize="38" FontWeight="Medium"
                                            Foreground="{DynamicResource TextDark}" />
-                                <TextBlock Text="Siswa" FontSize="12" Foreground="{DynamicResource TextGray}"
+                                <TextBlock Text="Siswa" FontSize="13" Foreground="{DynamicResource TextGray}"
                                            VerticalAlignment="Bottom" Margin="8,0,0,4" />
                             </StackPanel>
                         </Grid>
                     </Grid>
                 </Border>
 
-                <Border Grid.Column="2" Style="{StaticResource Card}" Padding="20" Height="150">
-                    <Grid Margin="-20">
-                        <Border CornerRadius="12" Background="{DynamicResource CashFlowExpenseFill}" IsHitTestVisible="False">
-                            <Border.OpacityMask>
-                                <LinearGradientBrush StartPoint="1,0" EndPoint="0.15,1">
-                                    <GradientStop Color="#FF000000" Offset="0" />
-                                    <GradientStop Color="#00000000" Offset="0.95" />
-                                </LinearGradientBrush>
-                            </Border.OpacityMask>
-                        </Border>
-                        <Grid Margin="20">
+                <Border Grid.Column="2" Style="{StaticResource TopMetricCard}" Padding="18" Height="176">
+                    <Grid Margin="-18" ClipToBounds="True">
+                        <Grid IsHitTestVisible="False">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="1" CornerRadius="14" Background="{DynamicResource StatusRed}"
+                                    Opacity="0.08">
+                                <Border.OpacityMask>
+                                    <StaticResource ResourceKey="TopMetricFadeMask" />
+                                </Border.OpacityMask>
+                            </Border>
+                        </Grid>
+                        <Border Height="3" VerticalAlignment="Bottom" Background="{DynamicResource StatusRed}"
+                                CornerRadius="0,0,14,14" />
+                        <Grid Margin="18">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -200,16 +210,20 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Border Width="190" Height="34" HorizontalAlignment="Left"
+                                <TextBlock Text="STATUS KAS MINGGU INI" FontSize="10" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextGray}" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" Margin="0,0,10,0" />
+                                <Border Grid.Column="1" Width="216" Height="42" HorizontalAlignment="Right"
                                         Background="{DynamicResource SubtleBackground}"
                                         BorderBrush="{DynamicResource BorderColor}" BorderThickness="1"
                                         CornerRadius="9" Padding="3,2">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="28" />
+                                            <ColumnDefinition Width="32" />
                                             <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="28" />
+                                            <ColumnDefinition Width="32" />
                                         </Grid.ColumnDefinitions>
                                         <Button x:Name="PreviousWeekButton" Content="‹"
                                                 Style="{StaticResource WeekNavigationArrowButton}"
@@ -217,7 +231,7 @@
                                                 Click="PreviousWeekButton_Click" />
                                         <ComboBox x:Name="WeekSelectorComboBox" Grid.Column="1"
                                                   Style="{StaticResource RoundedComboBox}"
-                                                  Height="28" Padding="2,0,24,0" FontSize="9" FontWeight="Medium"
+                                                  Height="36" Padding="2,0,26,0" FontSize="10" FontWeight="Medium"
                                                   Background="Transparent" BorderThickness="0"
                                                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                                                   Tag="WeekSelector"
@@ -240,14 +254,14 @@
                                 <StackPanel Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                                     <Border x:Name="WeekOverdueBadge" Background="{DynamicResource WarningBadgeBackground}"
                                             CornerRadius="7" Padding="7,3" HorizontalAlignment="Right">
-                                        <TextBlock x:Name="WeekOverdueText" Text="0 Tertunggak" FontSize="9"
+                                    <TextBlock x:Name="WeekOverdueText" Text="0 Tertunggak" FontSize="10"
                                                    Foreground="{DynamicResource StatusRed}" />
                                     </Border>
-                                    <TextBlock x:Name="WeekOutstandingText" Text="Rp 0" FontSize="16" FontWeight="Medium"
+                                    <TextBlock x:Name="WeekOutstandingText" Text="Rp 0" FontSize="19" FontWeight="Medium"
                                                Foreground="{DynamicResource StatusRed}" Margin="0,5,0,0"
                                                TextAlignment="Right" HorizontalAlignment="Right" />
                                 </StackPanel>
-                                <TextBlock x:Name="WeekPaidText" Grid.Column="0" Text="0 / 0 lunas" FontSize="16"
+                                <TextBlock x:Name="WeekPaidText" Grid.Column="0" Text="0 / 0 lunas" FontSize="19"
                                            FontWeight="Medium" Foreground="{DynamicResource TextDark}" VerticalAlignment="Bottom"
                                            HorizontalAlignment="Left" Margin="0,0,10,2" />
                             </Grid>
@@ -256,64 +270,84 @@
                 </Border>
             </Grid>
 
-            <Border Style="{StaticResource Card}" Padding="12" Margin="0,0,0,12">
+            <Border Style="{StaticResource Card}" Padding="15" Margin="0,0,0,15">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="12" />
-                        <ColumnDefinition Width="170" />
-                        <ColumnDefinition Width="12" />
-                        <ColumnDefinition Width="190" />
+                        <ColumnDefinition Width="200" />
+                        <ColumnDefinition Width="14" />
+                        <ColumnDefinition Width="218" />
                     </Grid.ColumnDefinitions>
                     <Border Grid.Column="0" Background="{DynamicResource ElevatedCardBackground}"
                             BorderBrush="{DynamicResource BorderColor}" BorderThickness="1"
-                            CornerRadius="14" Height="38" VerticalAlignment="Center">
+                            CornerRadius="14" Height="45" VerticalAlignment="Center">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="38" />
+                            <ColumnDefinition Width="44" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="⌕" FontSize="18" Foreground="{DynamicResource TextGray}"
+                            <TextBlock Grid.Column="0" Text="⌕" FontSize="20" Foreground="{DynamicResource TextGray}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center" />
                             <TextBox x:Name="SearchBox" Grid.Column="1" Background="Transparent" BorderThickness="0"
-                                     Padding="0,6,10,6" VerticalContentAlignment="Center" FontSize="11"
-                                     Tag="Cari nama atau NIS siswa..." TextChanged="SearchBox_TextChanged" />
+                                     Padding="0,7,12,7" VerticalContentAlignment="Center" FontSize="12"
+                                     AutomationProperties.Name="Cari siswa berdasarkan nama atau NIS"
+                                     TextChanged="SearchBox_TextChanged" />
+                            <TextBlock Grid.Column="1" Text="Cari nama atau NIS siswa..."
+                                       Foreground="{DynamicResource TextGray}" FontSize="12"
+                                       VerticalAlignment="Center" IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Text, ElementName=SearchBox}" Value="" />
+                                                    <Condition Binding="{Binding IsKeyboardFocused, ElementName=SearchBox}" Value="False" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                         </Grid>
                     </Border>
                     <ComboBox x:Name="FilterCombo" Grid.Column="2" Style="{StaticResource RoundedComboBox}"
-                              Height="38" SelectedIndex="0" SelectionChanged="FilterCombo_SelectionChanged">
+                              Height="45" SelectedIndex="0" SelectionChanged="FilterCombo_SelectionChanged">
                         <ComboBoxItem Content="Semua siswa" Tag="All" />
                         <ComboBoxItem Content="Belum lunas" Tag="Unpaid" />
                         <ComboBoxItem Content="Lunas" Tag="Paid" />
                         <ComboBoxItem Content="Belum ada tagihan" Tag="NoBill" />
                     </ComboBox>
                     <ComboBox x:Name="SortCombo" Grid.Column="4" Style="{StaticResource RoundedComboBox}"
-                              Height="38" SelectedIndex="1" SelectionChanged="SortCombo_SelectionChanged">
+                              Height="45" SelectedIndex="1" SelectionChanged="SortCombo_SelectionChanged">
                         <ComboBoxItem Content="Tunggakan terbanyak" Tag="Unpaid" />
                         <ComboBoxItem Content="Nama A–Z" Tag="Name" />
                     </ComboBox>
                 </Grid>
             </Border>
 
-            <Border Style="{StaticResource Card}" Padding="14">
+            <Border Style="{StaticResource Card}" Padding="12,17,17,17">
                 <StackPanel>
-                    <Border Background="{DynamicResource ElevatedCardBackground}" CornerRadius="9" Padding="10,9" Margin="0,0,0,7">
+                    <Border Style="{StaticResource FlatTableHeaderRow}" Padding="13,12" Margin="0">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="42" />
+                                <ColumnDefinition Width="50" />
                                 <ColumnDefinition Width="2.2*" />
                                 <ColumnDefinition Width="1.45*" />
                                 <ColumnDefinition Width="1.15*" />
-                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="1.45*" />
-                                <ColumnDefinition Width="34" />
+                                <ColumnDefinition Width="40" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="1" Text="SISWA &amp; IDENTITAS" FontSize="9" Foreground="{DynamicResource TextGray}" />
-                            <TextBlock Grid.Column="2" Text="STATUS KAS" FontSize="9" Foreground="{DynamicResource TextGray}" />
-                            <TextBlock Grid.Column="3" Text="TOTAL TERBAYAR" FontSize="9" Foreground="{DynamicResource TextGray}" TextAlignment="Left" Margin="8,0,0,0" />
-                            <TextBlock Grid.Column="5" Text="TERAKHIR BAYAR" FontSize="9" Foreground="{DynamicResource TextGray}" Margin="10,0,0,0" />
+                            <TextBlock Grid.Column="1" Text="SISWA &amp; IDENTITAS" Style="{StaticResource TableHeaderText}" />
+                            <TextBlock Grid.Column="2" Text="STATUS KAS" Style="{StaticResource TableHeaderText}" />
+                            <TextBlock Grid.Column="3" Text="TOTAL TERBAYAR" Style="{StaticResource TableHeaderText}" TextAlignment="Left" Margin="8,0,0,0" />
+                            <TextBlock Grid.Column="5" Text="TERAKHIR BAYAR" Style="{StaticResource TableHeaderText}" Margin="10,0,0,0" />
                         </Grid>
                     </Border>
+                    <Border Height="1" Background="{DynamicResource BorderColor}" Margin="0,0,0,2" />
 
                     <ItemsControl x:Name="SiswaItems">
                         <ItemsControl.ItemTemplate>
@@ -323,37 +357,37 @@
                                         MouseLeftButtonUp="SiswaRow_Click" KeyDown="SiswaRow_KeyDown">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="42" />
+                                            <ColumnDefinition Width="50" />
                                             <ColumnDefinition Width="2.2*" />
                                             <ColumnDefinition Width="1.45*" />
                                             <ColumnDefinition Width="1.15*" />
-                                            <ColumnDefinition Width="12" />
+                                            <ColumnDefinition Width="16" />
                                             <ColumnDefinition Width="1.45*" />
-                                            <ColumnDefinition Width="34" />
+                                            <ColumnDefinition Width="40" />
                                         </Grid.ColumnDefinitions>
-                                        <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource PrimaryRedLight}"
+                                        <Border Width="42" Height="42" CornerRadius="10" Background="{DynamicResource PrimaryRedLight}"
                                                 VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Initials}" FontSize="10" FontWeight="Medium"
+                                            <TextBlock Text="{Binding Initials}" FontSize="11" FontWeight="Medium"
                                                        Foreground="{DynamicResource AccentText}" HorizontalAlignment="Center"
                                                        VerticalAlignment="Center" />
                                         </Border>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="5,0,8,0">
-                                            <TextBlock Text="{Binding Siswa.Name}" FontSize="12" FontWeight="Medium"
+                                            <TextBlock Text="{Binding Siswa.Name}" FontSize="14" FontWeight="Medium"
                                                        Foreground="{DynamicResource TextDark}" TextTrimming="CharacterEllipsis" />
-                                            <TextBlock Text="{Binding Siswa.Nis, StringFormat='NIS: {0}'}" FontSize="10"
+                                            <TextBlock Text="{Binding Siswa.Nis, StringFormat='NIS: {0}'}" FontSize="11"
                                                        Foreground="{DynamicResource TextGray}" Margin="0,3,0,0" />
                                         </StackPanel>
                                         <Border Grid.Column="2" Background="{Binding StatusBackground}" CornerRadius="9"
                                                 Padding="8,4" HorizontalAlignment="Left" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding StatusText}" FontSize="9" Foreground="{Binding StatusForeground}"
+                                                <TextBlock Text="{Binding StatusText}" FontSize="10" Foreground="{Binding StatusForeground}"
                                                        TextTrimming="CharacterEllipsis" />
                                         </Border>
                                         <TextBlock Grid.Column="3" Text="{Binding TotalDibayar, Converter={StaticResource Rupiah}}"
-                                                   FontSize="11" FontWeight="Medium" Foreground="{DynamicResource TextDark}"
+                                                   FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TextDark}"
                                                    TextAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" />
                                         <StackPanel Grid.Column="5" VerticalAlignment="Center" Margin="10,0,6,0">
-                                            <TextBlock Text="{Binding LastPaymentDateText}" FontSize="10" Foreground="{DynamicResource TextDark}" />
-                                            <TextBlock Text="{Binding LastPaymentMethodText}" FontSize="9" Foreground="{DynamicResource TextGray}"
+                                            <TextBlock Text="{Binding LastPaymentDateText}" FontSize="11" Foreground="{DynamicResource TextDark}" />
+                                            <TextBlock Text="{Binding LastPaymentMethodText}" FontSize="10" Foreground="{DynamicResource TextGray}"
                                                        Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
                                         </StackPanel>
                                         <Button Grid.Column="6" Content="•••" Style="{StaticResource OverflowDotsButton}"
@@ -408,4 +442,4 @@
             </Border>
         </StackPanel>
     </ScrollViewer>
-</Page>
+</UserControl>

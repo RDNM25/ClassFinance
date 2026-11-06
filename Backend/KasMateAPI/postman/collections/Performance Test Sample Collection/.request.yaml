@@ -1,0 +1,14 @@
+$kind: http-request
+name: ""
+url: http://localhost/KasMateAPI
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"username\": \"testuser\",\r
+
+    \  \"password\": \"TestPass123!\"\r
+
+    }"
+order: 1000

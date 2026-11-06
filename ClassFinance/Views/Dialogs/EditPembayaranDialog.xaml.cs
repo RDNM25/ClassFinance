@@ -22,7 +22,7 @@ namespace ClassFinance.Views.Dialogs
             AmountBox.Text = transaksi.Amount.ToString("0.##", CultureInfo.InvariantCulture);
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
             if (!decimal.TryParse(AmountBox.Text.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) || amount <= 0)
             {
@@ -33,11 +33,11 @@ namespace ClassFinance.Views.Dialogs
 
             try
             {
-                _bendahara.UbahNominalTransaksi(_transaksi.Id, amount);
+                await _bendahara.UbahNominalTransaksiAsync(_transaksi.Id, amount);
                 _onSaved?.Invoke();
                 _mainWindow.CloseModal();
             }
-            catch (InvalidOperationException exception)
+            catch (Exception exception)
             {
                 ErrorText.Text = exception.Message;
                 ErrorText.Visibility = Visibility.Visible;

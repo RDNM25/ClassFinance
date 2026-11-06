@@ -23,7 +23,7 @@ namespace ClassFinance.Views.Dialogs
             DatePickerInput.SelectedDate = DateTime.Now;
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
             var description = DescriptionBox.Text.Trim();
             // DatePicker only stores a date (no time-of-day -- WPF normalizes it to midnight
@@ -47,10 +47,19 @@ namespace ClassFinance.Views.Dialogs
                 return;
             }
 
-            if (MasukRadio.IsChecked == true)
-                _bendahara.TambahPemasukan(_kelasId, description, amount, dateValue, metode: method);
-            else
-                _bendahara.TambahPengeluaran(_kelasId, description, amount, dateValue, method);
+            try
+            {
+                if (MasukRadio.IsChecked == true)
+                    await _bendahara.TambahPemasukanAsync(_kelasId, description, amount, dateValue, metode: method);
+                else
+                    await _bendahara.TambahPengeluaranAsync(_kelasId, description, amount, dateValue, method);
+            }
+            catch (Exception exception)
+            {
+                ErrorText.Text = exception.Message;
+                ErrorText.Visibility = Visibility.Visible;
+                return;
+            }
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();

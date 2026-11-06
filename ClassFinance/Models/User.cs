@@ -1,5 +1,3 @@
-using System;
-
 namespace ClassFinance.Models
 {
     /// <summary>
@@ -11,21 +9,7 @@ namespace ClassFinance.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Username { get; set; }
-        public string PasswordHash { get; set; }
         public Role Role { get; set; }
-
-        public bool VerifyPassword(string password)
-        {
-            if (string.IsNullOrWhiteSpace(PasswordHash)) return false;
-            try
-            {
-                return BCrypt.Net.BCrypt.Verify(password, PasswordHash);
-            }
-            catch (ArgumentException)
-            {
-                return false;
-            }
-        }
 
         /// <summary>Polymorphic title shown at the top of each role's dashboard.</summary>
         public abstract string GetDashboardTitle();

@@ -21,7 +21,7 @@ namespace ClassFinance.Views.Dialogs
             _onSaved = onSaved;
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
             var name = NameBox.Text.Trim();
             var nis = NisBox.Text.Trim();
@@ -46,14 +46,20 @@ namespace ClassFinance.Views.Dialogs
                 Name = name,
                 Nis = nis,
                 KelasId = _kelasId,
-                // Students are roster entries only and never log in, but the base
-                // User model still requires these -- filled with unusable placeholders
-                // that are never shown or checked against anywhere.
+                // Students are roster entries and do not authenticate to the staff API.
                 Username = $"siswa-{nis}",
-                PasswordHash = Guid.NewGuid().ToString("N")
             };
             DataStore.Instance.Users.Add(siswa);
-            DataStore.Instance.SaveChanges();
+            try
+            {
+                await DataStore.Instance.SaveChangesAsync();
+            }
+            catch (Exception exception)
+            {
+                ErrorText.Text = exception.Message;
+                ErrorText.Visibility = Visibility.Visible;
+                return;
+            }
 
             _onSaved?.Invoke();
             _mainWindow.CloseModal();

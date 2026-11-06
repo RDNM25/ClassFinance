@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Threading.Tasks;
 using ClassFinance.Models;
 
 namespace ClassFinance.Views.Dialogs
@@ -33,21 +34,27 @@ namespace ClassFinance.Views.Dialogs
             InfoText.Text = $"Nominal bayar (Rp {_totalBayar:N0}) melebihi sisa tagihan. Terdapat kelebihan dana sebesar Rp {kelebihan:N0}.";
         }
 
-        private void Process_Click(object sender, RoutedEventArgs e)
+        private async void Process_Click(object sender, RoutedEventArgs e)
         {
             decimal kelebihan = _totalBayar - _tagihan.AmountDue;
-
-            // Add that result (amountForKas) to the total kas by recording the payment for the exact due amount
-            _bendahara.CatatPembayaran(_tagihan.Id, _totalBayar, _metode, date: _paymentDate);
-
-            // Handle the overpayment based on user selection
-            if (SimpanRadio.IsChecked == true)
+            try
             {
-                _bendahara.SimpanKelebihan(_siswa.Id, kelebihan, _paymentDate, _metode);
+                // Record the received payment, then handle its excess according to the selected option.
+                await _bendahara.CatatPembayaranAsync(_tagihan.Id, _totalBayar, _metode, date: _paymentDate);
+
+                if (SimpanRadio.IsChecked == true)
+                {
+                    await _bendahara.SimpanKelebihanAsync(_siswa.Id, kelebihan, _paymentDate, _metode);
+                }
+                else if (KembalikanRadio.IsChecked == true)
+                {
+                    await _bendahara.KembalikanDanaAsync(_siswa.KelasId, _siswa.Id, kelebihan, _tagihan.Id, _paymentDate, _metode);
+                }
             }
-            else if (KembalikanRadio.IsChecked == true)
+            catch (Exception exception)
             {
-                _bendahara.KembalikanDana(_siswa.KelasId, _siswa.Id, kelebihan, _tagihan.Id, _paymentDate, _metode);
+                AppMessageBox.Show(_mainWindow, exception.Message, "Pembayaran tidak dapat disimpan", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             _onSaved?.Invoke();

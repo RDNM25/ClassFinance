@@ -23,7 +23,7 @@ namespace ClassFinance.Views.Dialogs
             NisBox.Text = siswa.Nis ?? string.Empty;
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
             var name = NameBox.Text.Trim();
             var nis = NisBox.Text.Trim();
@@ -47,7 +47,16 @@ namespace ClassFinance.Views.Dialogs
             _siswa.Name = name;
             _siswa.Nis = nis;
             _siswa.Username = $"siswa-{nis}";
-            DataStore.Instance.SaveChanges();
+            try
+            {
+                await DataStore.Instance.SaveChangesAsync();
+            }
+            catch (Exception exception)
+            {
+                ErrorText.Text = exception.Message;
+                ErrorText.Visibility = Visibility.Visible;
+                return;
+            }
             _onSaved?.Invoke();
             _mainWindow.CloseModal();
         }

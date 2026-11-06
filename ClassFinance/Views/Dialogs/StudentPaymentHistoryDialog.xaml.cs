@@ -124,6 +124,8 @@ namespace ClassFinance.Views.Dialogs
             EmptyHistoryText.Visibility = paymentItems.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        public void RefreshAfterWeeklyBillingUpdate() => Refresh();
+
         private static string FormatPeriod(DateTime? start, DateTime? end)
         {
             if (!start.HasValue || !end.HasValue)

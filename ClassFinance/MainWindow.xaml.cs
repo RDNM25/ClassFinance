@@ -3,12 +3,15 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
 using System.Windows.Controls.Primitives;
 using System.Windows.Threading;
 using System.Globalization;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using ClassFinance.Models;
 using ClassFinance.Services;
 using ClassFinance.Views;
@@ -17,6 +20,49 @@ using ClassFinance.Behaviors;
 
 namespace ClassFinance
 {
+    internal sealed class GridLengthAnimation : AnimationTimeline
+    {
+        public static readonly DependencyProperty FromProperty = DependencyProperty.Register(
+            nameof(From), typeof(GridLength), typeof(GridLengthAnimation),
+            new PropertyMetadata(new GridLength(0)));
+        public static readonly DependencyProperty ToProperty = DependencyProperty.Register(
+            nameof(To), typeof(GridLength), typeof(GridLengthAnimation),
+            new PropertyMetadata(new GridLength(0)));
+        public static readonly DependencyProperty EasingFunctionProperty = DependencyProperty.Register(
+            nameof(EasingFunction), typeof(IEasingFunction), typeof(GridLengthAnimation));
+
+        public GridLength From
+        {
+            get => (GridLength)GetValue(FromProperty);
+            set => SetValue(FromProperty, value);
+        }
+
+        public GridLength To
+        {
+            get => (GridLength)GetValue(ToProperty);
+            set => SetValue(ToProperty, value);
+        }
+
+        public IEasingFunction EasingFunction
+        {
+            get => (IEasingFunction)GetValue(EasingFunctionProperty);
+            set => SetValue(EasingFunctionProperty, value);
+        }
+
+        public override Type TargetPropertyType => typeof(GridLength);
+
+        protected override Freezable CreateInstanceCore() => new GridLengthAnimation();
+
+        public override object GetCurrentValue(object defaultOriginValue, object defaultDestinationValue,
+            AnimationClock animationClock)
+        {
+            var progress = animationClock.CurrentProgress ?? 1d;
+            progress = EasingFunction?.Ease(progress) ?? progress;
+            var value = From.Value + (To.Value - From.Value) * progress;
+            return new GridLength(value, GridUnitType.Pixel);
+        }
+    }
+
     public sealed class TopBarNotificationDisplay
     {
         public string Title { get; init; }
@@ -30,42 +76,77 @@ namespace ClassFinance
 
     public partial class MainWindow : Window
     {
-        private Page _currentPage;
+        private UserControl _currentPage;
+        private readonly Dictionary<string, UserControl> _pageCache = new(StringComparer.Ordinal);
+        private readonly Dictionary<string, int> _pageCacheRevisions = new(StringComparer.Ordinal);
         private User _currentUser;
         private bool _isDarkMode;
+        private bool _isSidebarCollapsed;
+        private bool _sidebarExpandedContentPending;
+        private int _sidebarTransitionVersion;
         private bool _suppressNotificationToggle;
         private bool _suppressProfileToggle;
+        private bool _suppressDateCalendarToggle;
+        private readonly DispatcherTimer _weeklyBillingTimer = new() { Interval = TimeSpan.FromMinutes(1) };
+        private readonly DispatcherTimer _topBarDateTimer = new();
+        private DateTime? _weeklyBillsCheckedForWeek;
+        private bool _isCheckingWeeklyBills;
+        private CancellationTokenSource _pageNavigationCts;
+        private DateTime _pageLoadingStartedAt;
         private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
 
         public MainWindow()
         {
             ButtonHoverAnimationBehavior.Register();
             InitializeComponent();
+            _weeklyBillingTimer.Tick += WeeklyBillingTimer_Tick;
+            _topBarDateTimer.Tick += TopBarDateTimer_Tick;
+            UpdateTopBarDate();
+            ScheduleNextTopBarDateRefresh();
             Deactivated += MainWindow_Deactivated;
+            DateCalendarPopup.CustomPopupPlacementCallback = PlaceDateCalendarPopup;
             NotificationPopup.CustomPopupPlacementCallback = PlacePopupAlignedRight;
-            ProfilePopup.CustomPopupPlacementCallback = PlacePopupAlignedRight;
+            ProfilePopup.CustomPopupPlacementCallback = PlaceProfilePopup;
             _isDarkMode = LoadDarkModePreference();
             ApplyTheme();
+            Loaded += MainWindow_Loaded;
+        }
+
+        private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            Loaded -= MainWindow_Loaded;
+            Closed += MainWindow_Closed;
             try
             {
-                DataStore.Instance.Initialize();
+                // Paint the startup screen before checking the API and MariaDB connection.
+                await Dispatcher.InvokeAsync(static () => { }, DispatcherPriority.ApplicationIdle);
+                await KasMateApiClient.Instance.CheckHealthAsync();
             }
             catch (Exception exception)
             {
+                StartupLoadingOverlay.Visibility = Visibility.Collapsed;
                 AppMessageBox.Show(this,
-                    $"Tidak dapat terhubung ke database kasmate. Pastikan MySQL/MariaDB XAMPP aktif dan database sudah dimigrasikan.\n\n{exception.Message}",
+                    $"Tidak dapat terhubung ke backend KasMate. Pastikan Apache dan MySQL/MariaDB XAMPP aktif, lalu periksa URL API dan migrasi database.\n\n{exception.Message}",
                     "Koneksi Database Gagal", MessageBoxButton.OK, MessageBoxImage.Error, AppMessageIcon.Database);
                 Close();
                 return;
             }
+
             DataStore.Instance.DataChanged += DataStore_DataChanged;
-            Closed += MainWindow_Closed;
+            StartupLoadingOverlay.Visibility = Visibility.Collapsed;
             ShowLogin();
         }
 
         private static string ThemePreferencePath => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "ClassFinance", "dark-mode.pref");
+
+        private static string ProfileImagePath(int userId) => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "ClassFinance", "ProfileImages", $"user-{userId}.png");
+
+        internal bool IsDarkMode => _isDarkMode;
+        internal string CurrentProfileImagePath => _currentUser == null ? null : ProfileImagePath(_currentUser.Id);
 
         private bool LoadDarkModePreference()
         {
@@ -105,7 +186,12 @@ namespace ClassFinance
 
         private void ThemeToggleButton_Click(object sender, RoutedEventArgs e)
         {
-            _isDarkMode = !_isDarkMode;
+            SetThemeMode(!_isDarkMode);
+        }
+
+        internal void SetThemeMode(bool darkMode)
+        {
+            _isDarkMode = darkMode;
             ApplyTheme();
             SaveDarkModePreference();
         }
@@ -234,6 +320,17 @@ namespace ClassFinance
 
         public void ShowLogin()
         {
+            CancelPageNavigation();
+            _pageCache.Clear();
+            _pageCacheRevisions.Clear();
+            _weeklyBillingTimer.Stop();
+            _weeklyBillsCheckedForWeek = null;
+            _sidebarTransitionVersion++;
+            _sidebarExpandedContentPending = false;
+            SidebarColumn.BeginAnimation(ColumnDefinition.WidthProperty, null);
+            ProfileButton.BeginAnimation(FrameworkElement.WidthProperty, null);
+            ResetSidebarContentOpacity();
+            _isSidebarCollapsed = false;
             SidebarColumn.Width = new GridLength(0);
             SidebarBorder.Visibility = Visibility.Collapsed;
             TopBarBorder.Visibility = Visibility.Collapsed;
@@ -242,58 +339,273 @@ namespace ClassFinance
 
             _currentUser = null;
             _currentPage = new LoginPage(this);
-
-            ContentFrame.Navigate(_currentPage);
-            ClearNavigationHistory();
+            PresentPage(_currentPage);
         }
 
-        public void ShowShell(User user)
+        public async Task ShowShellAsync(User user)
         {
             // Save the logged-in user so we can pass it to the Dashboard later
             _currentUser = user;
 
-            try
-            {
-                foreach (var schedule in DataStore.Instance.JadwalTagihanMingguanList.Where(x => x.IsActive).ToList())
-                    JadwalTagihanMingguanService.PastikanMingguTerbuat(schedule.KelasId, DateTime.Today);
-            }
-            catch (Exception exception)
-            {
-                AppMessageBox.Show(this,
-                    $"Jadwal tagihan mingguan tidak dapat diperbarui. Data yang sudah tersimpan tetap tersedia.\n\n{exception.Message}",
-                    "Jadwal Mingguan", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-
-            SidebarColumn.Width = new GridLength(230);
             SidebarBorder.Visibility = Visibility.Visible;
             TopBarBorder.Visibility = Visibility.Visible;
-            SidebarUserText.Text = $"{user.Name} \u2022 {user.Role}";
+            SetSidebarCollapsed(false);
+            SidebarUserText.Text = GetSidebarClassLabel(user);
             UpdateTopBar();
             BuildNav(user);
 
-            _currentPage = new DashboardPage(user, this);
+            await NavigateToPageAsync(() => new DashboardPage(user, this), typeof(DashboardPage), "dashboard");
 
-            ContentFrame.Navigate(_currentPage);
-            ClearNavigationHistory();
-            UpdateNavHighlight();
+            // Show the dashboard immediately, then reconcile the current week's bills
+            // asynchronously so first login does not wait on several database writes.
+            await EnsureCurrentWeekBillsAsync(showError: true);
+            _weeklyBillingTimer.Start();
         }
 
-        public void NavigateTo(Page page, bool recordHistory = true)
-        {
-            _currentPage = page;
-            ContentFrame.Navigate(_currentPage);
-            UpdateNavHighlight();
-        }
+        private async void WeeklyBillingTimer_Tick(object sender, EventArgs e) =>
+            await EnsureCurrentWeekBillsAsync(showError: false);
 
-        private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
+        private async Task EnsureCurrentWeekBillsAsync(bool showError)
         {
-            if (e.Content is UIElement pageContent)
+            var currentWeek = JadwalTagihanMingguanService.MondayOf(DateTime.Today);
+            if (_weeklyBillsCheckedForWeek == currentWeek || _isCheckingWeeklyBills)
+                return;
+
+            _isCheckingWeeklyBills = true;
+            try
             {
-                var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180))
+                var createdCount = 0;
+                foreach (var schedule in DataStore.Instance.JadwalTagihanMingguanList
+                             .Where(item => item.IsActive).ToList())
                 {
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    var createdBills = await JadwalTagihanMingguanService
+                        .PastikanMingguTerbuatAsync(schedule.KelasId, DateTime.Today);
+                    createdCount += createdBills.Count;
+                }
+
+                _weeklyBillsCheckedForWeek = currentWeek;
+                if (createdCount == 0)
+                    return;
+
+                RefreshTopBarNotifications();
+                switch (_currentPage)
+                {
+                    case DashboardPage dashboardPage:
+                        dashboardPage.RefreshAfterWeeklyBillingUpdate();
+                        break;
+                    case SiswaPage siswaPage:
+                        siswaPage.RefreshAfterWeeklyBillingUpdate();
+                        break;
+                    case TagihanPage tagihanPage:
+                        tagihanPage.RefreshAfterWeeklyBillingUpdate();
+                        break;
+                }
+
+                if (ModalHost.Content is StudentPaymentHistoryDialog paymentHistoryDialog)
+                    paymentHistoryDialog.RefreshAfterWeeklyBillingUpdate();
+            }
+            catch (Exception exception)
+            {
+                if (showError)
+                {
+                    AppMessageBox.Show(this,
+                        $"Jadwal tagihan mingguan tidak dapat diperbarui. Data yang sudah tersimpan tetap tersedia.\n\n{exception.Message}",
+                        "Jadwal Mingguan", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"Jadwal mingguan belum dapat diperbarui: {exception}");
+                }
+            }
+            finally
+            {
+                _isCheckingWeeklyBills = false;
+            }
+        }
+
+        public void NavigateTo<TControl>(Func<TControl> pageFactory, string cacheKey = null) where TControl : UserControl
+        {
+            _ = NavigateToPageAsync(() => pageFactory(), typeof(TControl), cacheKey);
+        }
+
+        private async Task NavigateToPageAsync(Func<UserControl> pageFactory, Type pageType, string cacheKey)
+        {
+            _pageNavigationCts?.Cancel();
+            var navigationCts = new CancellationTokenSource();
+            _pageNavigationCts = navigationCts;
+            var canReuseImmediately = !string.IsNullOrWhiteSpace(cacheKey) &&
+                _pageCache.ContainsKey(cacheKey) &&
+                _pageCacheRevisions.TryGetValue(cacheKey, out var currentRevision) &&
+                currentRevision == DataStore.Instance.DataRevision;
+            if (canReuseImmediately)
+                HidePageSkeleton();
+            else
+                ShowPageSkeleton(pageType);
+
+            try
+            {
+                // Let WPF paint the placeholder before constructing the next page.
+                await Dispatcher.InvokeAsync(static () => { }, DispatcherPriority.ApplicationIdle);
+                navigationCts.Token.ThrowIfCancellationRequested();
+                SetPageLoadingProgress(24);
+
+                UserControl page = null;
+                var isCached = !string.IsNullOrWhiteSpace(cacheKey) && _pageCache.TryGetValue(cacheKey, out page);
+                if (!isCached)
+                {
+                    page = pageFactory();
+                    if (!string.IsNullOrWhiteSpace(cacheKey))
+                    {
+                        _pageCache[cacheKey] = page;
+                        _pageCacheRevisions[cacheKey] = DataStore.Instance.DataRevision;
+                    }
+                }
+
+                if (page == null)
+                    throw new InvalidOperationException("Halaman tidak tersedia.");
+
+                if (ReferenceEquals(_currentPage, page) && page.IsLoaded)
+                {
+                    SetPageLoadingProgress(100);
+                    return;
+                }
+
+                if (isCached && (!_pageCacheRevisions.TryGetValue(cacheKey, out var cachedRevision) ||
+                                 cachedRevision != DataStore.Instance.DataRevision))
+                {
+                    RefreshCachedPage(page);
+                    _pageCacheRevisions[cacheKey] = DataStore.Instance.DataRevision;
+                }
+                SetPageLoadingProgress(52);
+
+                var pageLoaded = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+                RoutedEventHandler loadedHandler = null;
+                loadedHandler = (_, _) =>
+                {
+                    page.Loaded -= loadedHandler;
+                    pageLoaded.TrySetResult(true);
                 };
-                pageContent.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+                page.Loaded += loadedHandler;
+
+                _currentPage = page;
+                PresentPage(page);
+                UpdateNavHighlight();
+                SetPageLoadingProgress(76);
+
+                await pageLoaded.Task.WaitAsync(navigationCts.Token);
+                SetPageLoadingProgress(100);
+            }
+            catch (OperationCanceledException) when (navigationCts.IsCancellationRequested)
+            {
+                // A newer navigation replaced this one.
+            }
+            catch (Exception exception)
+            {
+                if (ReferenceEquals(_pageNavigationCts, navigationCts))
+                    AppMessageBox.Show(this, exception.Message, "Halaman tidak dapat dimuat",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                if (ReferenceEquals(_pageNavigationCts, navigationCts))
+                {
+                    if (!canReuseImmediately)
+                    {
+                        var minimumVisibleTime = TimeSpan.FromMilliseconds(300);
+                        var elapsed = DateTime.UtcNow - _pageLoadingStartedAt;
+                        if (elapsed < minimumVisibleTime)
+                            await Task.Delay(minimumVisibleTime - elapsed);
+                    }
+
+                    if (ReferenceEquals(_pageNavigationCts, navigationCts))
+                    {
+                        HidePageSkeleton();
+                        _pageNavigationCts = null;
+                    }
+                }
+                navigationCts.Dispose();
+            }
+        }
+
+        private void ShowPageSkeleton(Type pageType)
+        {
+            _pageLoadingStartedAt = DateTime.UtcNow;
+            PageLoadingOverlay.BeginAnimation(OpacityProperty, null);
+            PageLoadingOverlay.Opacity = 1;
+            PageSkeletonContent.ContentTemplate = pageType == typeof(SiswaPage)
+                ? (DataTemplate)FindResource("StudentsSkeletonTemplate")
+                : pageType == typeof(RiwayatTransaksiPage)
+                    ? (DataTemplate)FindResource("HistorySkeletonTemplate")
+                    : pageType == typeof(TagihanPage)
+                        ? (DataTemplate)FindResource("TagihanSkeletonTemplate")
+                        : (DataTemplate)FindResource("DashboardSkeletonTemplate");
+            PageLoadingOverlay.Visibility = Visibility.Visible;
+            PageLoadingBar.Value = 6;
+            PageLoadingBar.Visibility = Visibility.Visible;
+            StartSkeletonPulse(PageSkeletonContent);
+        }
+
+        private void SetPageLoadingProgress(double progress)
+        {
+            if (PageLoadingBar.Visibility == Visibility.Visible)
+                PageLoadingBar.Value = Math.Clamp(progress, PageLoadingBar.Minimum, PageLoadingBar.Maximum);
+        }
+
+        private void HidePageSkeleton()
+        {
+            StopSkeletonPulse(PageSkeletonContent);
+            PageLoadingOverlay.Visibility = Visibility.Collapsed;
+            PageLoadingBar.Visibility = Visibility.Collapsed;
+        }
+
+        private static void StartSkeletonPulse(UIElement skeletonContent)
+        {
+            var pulse = new DoubleAnimation(0.68, 0.96, TimeSpan.FromMilliseconds(900))
+            {
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+            skeletonContent.BeginAnimation(OpacityProperty, pulse);
+        }
+
+        private static void StopSkeletonPulse(UIElement skeletonContent)
+        {
+            skeletonContent.BeginAnimation(OpacityProperty, null);
+            skeletonContent.Opacity = 1;
+        }
+
+        private void CancelPageNavigation()
+        {
+            var pending = _pageNavigationCts;
+            _pageNavigationCts = null;
+            pending?.Cancel();
+            HidePageSkeleton();
+        }
+
+        private void PresentPage(UserControl page)
+        {
+            page.BeginAnimation(UIElement.OpacityProperty, null);
+            page.Opacity = 0;
+            ContentHost.Content = page;
+            var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(180))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+            page.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+        }
+
+        public void MarkPageDataCurrent(UserControl page)
+        {
+            if (page == null || !ReferenceEquals(_currentPage, page))
+                return;
+
+            foreach (var cachedPage in _pageCache)
+            {
+                if (!ReferenceEquals(cachedPage.Value, page))
+                    continue;
+
+                _pageCacheRevisions[cachedPage.Key] = DataStore.Instance.DataRevision;
+                return;
             }
         }
 
@@ -303,15 +615,37 @@ namespace ClassFinance
             if (_currentUser == null)
                 return;
 
-            TopBarDateText.Text = DateTime.Today.ToString("dddd, d MMM yyyy", IdId);
+            UpdateTopBarDate();
             TopBarProfileNameText.Text = string.IsNullOrWhiteSpace(_currentUser.Name)
                 ? _currentUser.Username
                 : _currentUser.Name;
             TopBarProfileRoleText.Text = GetRoleLabel(_currentUser.Role);
             ProfileMenuNameText.Text = TopBarProfileNameText.Text;
-            ProfileMenuUsernameText.Text = GetRoleLabel(_currentUser.Role);
+            var username = string.IsNullOrWhiteSpace(_currentUser.Username) ? string.Empty : _currentUser.Username;
+            ProfileMenuUsernameText.Text = string.IsNullOrEmpty(username)
+                ? GetRoleLabel(_currentUser.Role)
+                : $"{username} · {GetRoleLabel(_currentUser.Role)}";
             TopBarProfileInitialsText.Text = GetProfileInitials(_currentUser.Name, _currentUser.Role);
+            ProfileMenuInitialsText.Text = TopBarProfileInitialsText.Text;
+            RefreshProfileAvatar();
             RefreshTopBarNotifications();
+        }
+
+        private void UpdateTopBarDate() =>
+            TopBarDateText.Text = DateTime.Today.ToString("dddd, d MMM yyyy", IdId);
+
+        private void ScheduleNextTopBarDateRefresh()
+        {
+            var now = DateTime.Now;
+            _topBarDateTimer.Stop();
+            _topBarDateTimer.Interval = now.Date.AddDays(1) - now;
+            _topBarDateTimer.Start();
+        }
+
+        private void TopBarDateTimer_Tick(object sender, EventArgs e)
+        {
+            UpdateTopBarDate();
+            ScheduleNextTopBarDateRefresh();
         }
 
         private static string GetRoleLabel(Role role) => role switch
@@ -321,7 +655,21 @@ namespace ClassFinance
             _ => "Siswa"
         };
 
-        private static string GetProfileInitials(string name, Role role)
+        private static string GetSidebarClassLabel(User user)
+        {
+            var classId = user switch
+            {
+                Siswa student => student.KelasId,
+                WaliKelas waliKelas => waliKelas.KelasId,
+                _ => DataStore.Instance.KelasList.FirstOrDefault()?.Id ?? 0
+            };
+            var kelas = DataStore.Instance.KelasList.FirstOrDefault(item => item.Id == classId);
+            return kelas == null
+                ? "Data kelas tidak tersedia"
+                : $"Kelas {kelas.Name}\nTahun ajaran {kelas.AcademicYear}";
+        }
+
+        internal static string GetProfileInitials(string name, Role role)
         {
             var parts = (name ?? string.Empty).Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length > 1)
@@ -331,6 +679,85 @@ namespace ClassFinance
             if (parts.Length == 1)
                 return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpperInvariant();
             return "CF";
+        }
+
+        internal void ApplyProfileUsername(string username)
+        {
+            if (_currentUser == null || string.IsNullOrWhiteSpace(username))
+                return;
+
+            _currentUser.Username = username;
+            var storedUser = DataStore.Instance.Users.FirstOrDefault(user =>
+                user.Id == _currentUser.Id && user.Role == _currentUser.Role);
+            if (storedUser != null)
+                storedUser.Username = username;
+
+            UpdateTopBar();
+        }
+
+        internal void SaveProfilePicture(string sourcePath)
+        {
+            if (_currentUser == null)
+                throw new InvalidOperationException("Sign in before changing the profile photo.");
+            if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
+                throw new FileNotFoundException("The selected profile photo could not be found.", sourcePath);
+
+            var image = LoadProfileBitmap(sourcePath, 512);
+            var longestSide = Math.Max(image.PixelWidth, image.PixelHeight);
+            BitmapSource imageToSave = image;
+            if (longestSide > 256)
+            {
+                var scale = 256d / longestSide;
+                var resized = new TransformedBitmap(image, new ScaleTransform(scale, scale));
+                resized.Freeze();
+                imageToSave = resized;
+            }
+
+            var destination = ProfileImagePath(_currentUser.Id);
+            Directory.CreateDirectory(Path.GetDirectoryName(destination));
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(imageToSave));
+            using (var stream = File.Create(destination))
+                encoder.Save(stream);
+
+            RefreshProfileAvatar();
+        }
+
+        private static BitmapImage LoadProfileBitmap(string path, int decodePixelWidth)
+        {
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.DecodePixelWidth = decodePixelWidth;
+            image.UriSource = new Uri(path, UriKind.Absolute);
+            image.EndInit();
+            image.Freeze();
+            return image;
+        }
+
+        private void RefreshProfileAvatar()
+        {
+            BitmapImage image = null;
+            var path = CurrentProfileImagePath;
+            if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+            {
+                try
+                {
+                    image = LoadProfileBitmap(path, 256);
+                }
+                catch (Exception exception) when (exception is IOException or NotSupportedException or FormatException)
+                {
+                    image = null;
+                }
+            }
+
+            var hasImage = image != null;
+            TopBarProfileImage.Source = image;
+            TopBarProfileImage.Visibility = hasImage ? Visibility.Visible : Visibility.Collapsed;
+            TopBarProfileInitialsText.Visibility = hasImage ? Visibility.Collapsed : Visibility.Visible;
+            ProfileMenuImage.Source = image;
+            ProfileMenuImage.Visibility = hasImage ? Visibility.Visible : Visibility.Collapsed;
+            ProfileMenuInitialsText.Visibility = hasImage ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void RefreshTopBarNotifications()
@@ -388,6 +815,7 @@ namespace ClassFinance
                 return;
             }
 
+            DateCalendarPopup.IsOpen = false;
             ProfilePopup.IsOpen = false;
             RefreshTopBarNotifications();
             NotificationPopup.IsOpen = !NotificationPopup.IsOpen;
@@ -402,8 +830,48 @@ namespace ClassFinance
                 return;
             }
 
+            DateCalendarPopup.IsOpen = false;
             NotificationPopup.IsOpen = false;
             ProfilePopup.IsOpen = !ProfilePopup.IsOpen;
+        }
+
+        private void TopBarDateButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_suppressDateCalendarToggle)
+            {
+                _suppressDateCalendarToggle = false;
+                e.Handled = true;
+                return;
+            }
+
+            NotificationPopup.IsOpen = false;
+            ProfilePopup.IsOpen = false;
+            TopBarCalendar.DisplayDate = DateTime.Today;
+            TopBarCalendar.DisplayMode = CalendarMode.Month;
+            DateCalendarPopup.IsOpen = !DateCalendarPopup.IsOpen;
+        }
+
+        private void ProfileSettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            ProfilePopup.IsOpen = false;
+            if (_currentUser != null)
+                ShowModal(new ProfileSettingsDialog(_currentUser, this));
+        }
+
+        private void ProfilePopup_Opened(object sender, EventArgs e) => AnimateProfileChevron(180);
+
+        private void ProfilePopup_Closed(object sender, EventArgs e) => AnimateProfileChevron(0);
+
+        private void AnimateProfileChevron(double angle)
+        {
+            if (ProfileChevron.RenderTransform is not RotateTransform rotation)
+                return;
+
+            var animation = new DoubleAnimation(rotation.Angle, angle, TimeSpan.FromMilliseconds(150))
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+            rotation.BeginAnimation(RotateTransform.AngleProperty, animation);
         }
 
         private void MainWindow_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -412,13 +880,23 @@ namespace ClassFinance
                 return;
 
             var source = e.OriginalSource as DependencyObject;
+            var onDateCalendarPopup = IsWithin(source, DateCalendarPopup.Child);
             var onNotificationPopup = IsWithin(source, NotificationPopup.Child);
             var onProfilePopup = IsWithin(source, ProfilePopup.Child);
-            if (onNotificationPopup || onProfilePopup)
+            if (onDateCalendarPopup || onNotificationPopup || onProfilePopup)
                 return;
 
+            var onDateButton = IsWithin(source, TopBarDateButton);
             var onNotificationButton = IsWithin(source, NotificationButton);
             var onProfileButton = IsWithin(source, ProfileButton);
+
+            if (DateCalendarPopup.IsOpen && onDateButton)
+            {
+                DateCalendarPopup.IsOpen = false;
+                SuppressNextDateCalendarToggle();
+                e.Handled = true;
+                return;
+            }
 
             if (NotificationPopup.IsOpen && onNotificationButton)
             {
@@ -436,6 +914,8 @@ namespace ClassFinance
                 return;
             }
 
+            if (!onDateButton)
+                DateCalendarPopup.IsOpen = false;
             if (!onNotificationButton)
                 NotificationPopup.IsOpen = false;
             if (!onProfileButton)
@@ -444,9 +924,10 @@ namespace ClassFinance
 
         private void MainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key != Key.Escape || (!NotificationPopup.IsOpen && !ProfilePopup.IsOpen))
+            if (e.Key != Key.Escape || (!DateCalendarPopup.IsOpen && !NotificationPopup.IsOpen && !ProfilePopup.IsOpen))
                 return;
 
+            DateCalendarPopup.IsOpen = false;
             NotificationPopup.IsOpen = false;
             ProfilePopup.IsOpen = false;
             e.Handled = true;
@@ -454,6 +935,7 @@ namespace ClassFinance
 
         private void MainWindow_Deactivated(object sender, EventArgs e)
         {
+            DateCalendarPopup.IsOpen = false;
             NotificationPopup.IsOpen = false;
             ProfilePopup.IsOpen = false;
         }
@@ -468,6 +950,12 @@ namespace ClassFinance
         {
             _suppressProfileToggle = true;
             Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => _suppressProfileToggle = false));
+        }
+
+        private void SuppressNextDateCalendarToggle()
+        {
+            _suppressDateCalendarToggle = true;
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() => _suppressDateCalendarToggle = false));
         }
 
         private static bool IsWithin(DependencyObject element, DependencyObject ancestor)
@@ -492,6 +980,20 @@ namespace ClassFinance
                 PopupPrimaryAxis.Vertical)
         ];
 
+        private static CustomPopupPlacement[] PlaceDateCalendarPopup(Size popupSize, Size targetSize, Point offset) =>
+        [
+            new CustomPopupPlacement(
+                new Point(0, targetSize.Height + 7),
+                PopupPrimaryAxis.Vertical)
+        ];
+
+        private static CustomPopupPlacement[] PlaceProfilePopup(Size popupSize, Size targetSize, Point offset) =>
+        [
+            new CustomPopupPlacement(
+                new Point(-10, -popupSize.Height - 7),
+                PopupPrimaryAxis.Vertical)
+        ];
+
         private void DataStore_DataChanged(object sender, EventArgs e)
         {
             if (!Dispatcher.CheckAccess())
@@ -503,14 +1005,30 @@ namespace ClassFinance
             RefreshTopBarNotifications();
         }
 
-        private void MainWindow_Closed(object sender, EventArgs e) =>
-            DataStore.Instance.DataChanged -= DataStore_DataChanged;
-
-        private void ClearNavigationHistory()
+        private void MainWindow_Closed(object sender, EventArgs e)
         {
-            // Clears the built-in frame history so the native mouse back-buttons don't mess up our custom logic
-            while (ContentFrame.CanGoBack)
-                ContentFrame.RemoveBackEntry();
+            _weeklyBillingTimer.Stop();
+            _topBarDateTimer.Stop();
+            DataStore.Instance.DataChanged -= DataStore_DataChanged;
+        }
+
+        private static void RefreshCachedPage(UserControl page)
+        {
+            switch (page)
+            {
+                case DashboardPage dashboard:
+                    dashboard.RefreshForNavigation();
+                    break;
+                case SiswaPage students:
+                    students.RefreshForNavigation();
+                    break;
+                case TagihanPage bills:
+                    bills.RefreshForNavigation();
+                    break;
+                case RiwayatTransaksiPage history:
+                    history.RefreshForNavigation();
+                    break;
+            }
         }
 
         private void BuildNav(User user)
@@ -518,10 +1036,10 @@ namespace ClassFinance
             NavPanel.Children.Clear();
 
             // Separate the icon and text into two distinct strings
-            AddNavButton("\uE80F", "Ringkasan", typeof(DashboardPage), () => NavigateTo(new DashboardPage(user, this)));
-            AddNavButton("\uE716", "Data Siswa", typeof(SiswaPage), () => NavigateTo(new SiswaPage(user, this)));
-            AddNavButton("\uE81C", "Riwayat Transaksi", typeof(RiwayatTransaksiPage), () => NavigateTo(new RiwayatTransaksiPage(user, this)));
-            AddNavButton("\uE8A5", "Tagihan Mingguan", typeof(TagihanPage), () => NavigateTo(new TagihanPage(user, this)));
+            AddNavButton("\uE80F", "Ringkasan", typeof(DashboardPage), () => NavigateTo(() => new DashboardPage(user, this), "dashboard"));
+            AddNavButton("\uE716", "Data Siswa", typeof(SiswaPage), () => NavigateTo(() => new SiswaPage(user, this), "students"));
+            AddNavButton("\uE81C", "Riwayat Transaksi", typeof(RiwayatTransaksiPage), () => NavigateTo(() => new RiwayatTransaksiPage(user, this), "history"));
+            AddNavButton("\uE8A5", "Tagihan Mingguan", typeof(TagihanPage), () => NavigateTo(() => new TagihanPage(user, this), "bills"));
 
             UpdateNavHighlight();
         }
@@ -548,7 +1066,178 @@ namespace ClassFinance
                 {
                     bool isActive = _currentPage != null && _currentPage.GetType() == pageType;
                     button.Style = (Style)FindResource(isActive ? "SidebarButtonActive" : "SidebarButton");
+                    if (_isSidebarCollapsed || _sidebarExpandedContentPending)
+                    {
+                        button.ContentTemplate = (DataTemplate)FindResource("SidebarIconOnlyTemplate");
+                        button.HorizontalContentAlignment = HorizontalAlignment.Center;
+                        button.Padding = new Thickness(0);
+                        button.MinHeight = 44;
+                        if (button.Content is string[] labels && labels.Length > 1)
+                            button.ToolTip = labels[1];
+                    }
+                    else
+                    {
+                        button.ClearValue(ContentControl.ContentTemplateProperty);
+                        button.ClearValue(Control.HorizontalContentAlignmentProperty);
+                        button.ClearValue(Control.PaddingProperty);
+                        button.ClearValue(Control.MinHeightProperty);
+                        button.ClearValue(FrameworkElement.ToolTipProperty);
+                    }
                 }
+            }
+        }
+
+        private void SidebarLogo_Click(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton != MouseButton.Left)
+                return;
+
+            SetSidebarCollapsed(!_isSidebarCollapsed);
+            e.Handled = true;
+        }
+
+        private void SidebarLogo_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key is not (Key.Enter or Key.Space))
+                return;
+
+            SetSidebarCollapsed(!_isSidebarCollapsed);
+            e.Handled = true;
+        }
+
+        private void SetSidebarCollapsed(bool collapsed)
+        {
+            var currentSidebarWidth = SidebarColumn.ActualWidth;
+            var currentProfileWidth = ProfileButton.ActualWidth;
+            var targetSidebarWidth = collapsed ? 76d : 230d;
+            var animateSidebar = SidebarBorder.IsVisible && Math.Abs(currentSidebarWidth - targetSidebarWidth) > 0.5;
+            var deferExpandedContent = !collapsed && animateSidebar;
+            var transitionVersion = ++_sidebarTransitionVersion;
+
+            _isSidebarCollapsed = collapsed;
+            _sidebarExpandedContentPending = deferExpandedContent;
+            ResetSidebarContentOpacity();
+            SidebarColumn.Width = new GridLength(targetSidebarWidth);
+            if (animateSidebar)
+            {
+                var sidebarAnimation = new GridLengthAnimation
+                {
+                    From = new GridLength(currentSidebarWidth),
+                    To = new GridLength(targetSidebarWidth),
+                    Duration = TimeSpan.FromMilliseconds(220),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+                if (deferExpandedContent)
+                    sidebarAnimation.Completed += (_, _) => CompleteSidebarExpand(transitionVersion);
+                SidebarColumn.BeginAnimation(ColumnDefinition.WidthProperty, sidebarAnimation);
+            }
+            else
+            {
+                SidebarColumn.BeginAnimation(ColumnDefinition.WidthProperty, null);
+            }
+
+            var logoSize = collapsed ? 48 : 64;
+            SidebarBrandHeader.Margin = collapsed ? new Thickness(0, 0, 0, 14) : new Thickness(16, 0, 12, 18);
+            SidebarLogoColumn.Width = collapsed
+                ? new GridLength(1, GridUnitType.Star)
+                : new GridLength(64);
+            SidebarLabelColumn.Width = collapsed
+                ? new GridLength(0)
+                : new GridLength(1, GridUnitType.Star);
+            SidebarLogoBorder.Width = logoSize;
+            SidebarLogoBorder.Height = logoSize;
+            SidebarLogoBorder.Margin = new Thickness(0);
+            SidebarLogoBorder.HorizontalAlignment = collapsed ? HorizontalAlignment.Center : HorizontalAlignment.Left;
+            SidebarLogoClip.Rect = new Rect(0, 0, logoSize, logoSize);
+            SidebarLogoClip.RadiusX = collapsed ? 13 : 16;
+            SidebarLogoClip.RadiusY = collapsed ? 13 : 16;
+            SidebarLogoImage.Width = collapsed ? 68 : 90;
+            SidebarLogoImage.Height = collapsed ? 68 : 90;
+            SidebarBrandText.Visibility = collapsed || deferExpandedContent ? Visibility.Collapsed : Visibility.Visible;
+            SidebarUserText.Visibility = collapsed || deferExpandedContent ? Visibility.Collapsed : Visibility.Visible;
+
+            var targetProfileWidth = collapsed ? 48d : targetSidebarWidth - 20d;
+            ProfileButton.Width = collapsed ? targetProfileWidth : double.NaN;
+            if (SidebarBorder.IsVisible && currentProfileWidth > 0 &&
+                Math.Abs(currentProfileWidth - targetProfileWidth) > 0.5)
+            {
+                ProfileButton.BeginAnimation(FrameworkElement.WidthProperty, new DoubleAnimation(
+                    currentProfileWidth, targetProfileWidth, TimeSpan.FromMilliseconds(200))
+                {
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+                    FillBehavior = FillBehavior.Stop
+                });
+            }
+            else
+            {
+                ProfileButton.BeginAnimation(FrameworkElement.WidthProperty, null);
+            }
+            ProfileButton.HorizontalAlignment = collapsed ? HorizontalAlignment.Center : HorizontalAlignment.Stretch;
+            ProfileButton.HorizontalContentAlignment = collapsed ? HorizontalAlignment.Center : HorizontalAlignment.Stretch;
+            ProfileButton.Margin = collapsed ? new Thickness(14, 12, 14, 8) : new Thickness(10, 12, 10, 8);
+            ProfileButton.Padding = collapsed ? new Thickness(0) : new Thickness(10, 6, 10, 6);
+            ProfileAvatarColumn.Width = new GridLength(collapsed ? 48 : 34);
+            ProfileTextColumn.Width = collapsed ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
+            ProfileChevronColumn.Width = new GridLength(collapsed ? 0 : 14);
+            ProfileAvatarBorder.HorizontalAlignment = collapsed ? HorizontalAlignment.Center : HorizontalAlignment.Left;
+            TopBarProfileNameText.Visibility = collapsed || deferExpandedContent ? Visibility.Collapsed : Visibility.Visible;
+            TopBarProfileRoleText.Visibility = collapsed || deferExpandedContent ? Visibility.Collapsed : Visibility.Visible;
+            ProfileChevron.Visibility = collapsed || deferExpandedContent ? Visibility.Collapsed : Visibility.Visible;
+
+            var toggleLabel = collapsed ? "Luaskan sidebar" : "Ciutkan sidebar";
+            SidebarLogoBorder.ToolTip = toggleLabel;
+            UpdateNavHighlight();
+        }
+
+        private void CompleteSidebarExpand(int transitionVersion)
+        {
+            if (transitionVersion != _sidebarTransitionVersion || _isSidebarCollapsed || !SidebarBorder.IsVisible)
+                return;
+
+            _sidebarExpandedContentPending = false;
+            SidebarBrandText.Visibility = Visibility.Visible;
+            SidebarUserText.Visibility = Visibility.Visible;
+            TopBarProfileNameText.Visibility = Visibility.Visible;
+            TopBarProfileRoleText.Visibility = Visibility.Visible;
+            ProfileChevron.Visibility = Visibility.Visible;
+            UpdateNavHighlight();
+            FadeInSidebarContent();
+        }
+
+        private void ResetSidebarContentOpacity()
+        {
+            UIElement[] elements =
+            {
+                SidebarBrandText, SidebarUserText, NavPanel,
+                TopBarProfileNameText, TopBarProfileRoleText, ProfileChevron
+            };
+
+            foreach (var element in elements)
+            {
+                element.BeginAnimation(UIElement.OpacityProperty, null);
+                element.Opacity = 1;
+            }
+        }
+
+        private void FadeInSidebarContent()
+        {
+            UIElement[] elements =
+            {
+                SidebarBrandText, SidebarUserText, NavPanel,
+                TopBarProfileNameText, TopBarProfileRoleText, ProfileChevron
+            };
+
+            foreach (var element in elements)
+            {
+                element.BeginAnimation(UIElement.OpacityProperty, null);
+                element.Opacity = 0;
+                element.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation
+                {
+                    To = 1,
+                    Duration = TimeSpan.FromMilliseconds(260),
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+                    FillBehavior = FillBehavior.HoldEnd
+                });
             }
         }
 

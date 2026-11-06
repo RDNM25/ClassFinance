@@ -23,7 +23,7 @@
                         <Border x:Name="buttonSurface" Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="12" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"
                                               TextElement.Foreground="{TemplateBinding Foreground}" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -70,6 +70,495 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="TopBarCalendarArrowButton" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource ElevatedCardBackground}" />
+            <Setter Property="Foreground" Value="{DynamicResource TextDark}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="buttonSurface" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="buttonSurface" Property="Background" Value="{DynamicResource ButtonHoverBackground}" />
+                                <Setter TargetName="buttonSurface" Property="BorderBrush" Value="{DynamicResource PrimaryRed}" />
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryRed}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="buttonSurface" Property="Background" Value="{DynamicResource PrimaryRed}" />
+                                <Setter TargetName="buttonSurface" Property="BorderBrush" Value="{DynamicResource PrimaryRed}" />
+                                <Setter Property="Foreground" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.45" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TopBarCalendarTitleButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{DynamicResource TextDark}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="8,4" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="titleSurface" Background="{TemplateBinding Background}" CornerRadius="7"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              TextElement.Foreground="{TemplateBinding Foreground}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="titleSurface" Property="Background" Value="{DynamicResource ButtonHoverBackground}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="titleSurface" Property="Background" Value="{DynamicResource PrimaryRedLight}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="TopBarCalendarItemStyle" TargetType="{x:Type CalendarItem}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CalendarItem}">
+                        <ControlTemplate.Resources>
+                            <DataTemplate x:Key="{x:Static CalendarItem.DayTitleTemplateResourceKey}">
+                                <TextBlock Text="{Binding}" FontSize="9" FontWeight="Normal"
+                                           Foreground="{DynamicResource TextGray}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </ControlTemplate.Resources>
+                        <Grid x:Name="PART_Root" Background="Transparent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0" Margin="2,0,2,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="PART_PreviousButton" Grid.Column="0" Width="30" Height="28"
+                                        Margin="2" Padding="0" Content="‹" FontSize="17"
+                                        Style="{StaticResource TopBarCalendarArrowButton}" Focusable="False"
+                                        AutomationProperties.Name="Bulan sebelumnya" />
+                                <Button x:Name="PART_HeaderButton" Grid.Column="1" Margin="2,2,4,2"
+                                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                                        Style="{StaticResource TopBarCalendarTitleButton}"
+                                        FontSize="12" FontWeight="Medium"
+                                        Focusable="False" />
+                                <Button x:Name="PART_NextButton" Grid.Column="2" Width="30" Height="28"
+                                        Margin="2" Padding="0" Content="›" FontSize="17"
+                                        Style="{StaticResource TopBarCalendarArrowButton}" Focusable="False"
+                                        AutomationProperties.Name="Bulan berikutnya" />
+                            </Grid>
+                            <Border Grid.Row="1" Height="1" Margin="2,0,2,4"
+                                    Background="{DynamicResource BorderColor}" Opacity="0.65" />
+                            <Grid x:Name="PART_MonthView" Grid.Row="2" Margin="0,0,0,2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                            <Grid x:Name="PART_YearView" Grid.Row="2" Visibility="Hidden">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" /><RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                            <Rectangle x:Name="PART_DisabledVisual" Grid.RowSpan="3"
+                                       Fill="{DynamicResource SurfaceBackground}" Opacity="0.55"
+                                       Visibility="Collapsed" IsHitTestVisible="False" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="PART_DisabledVisual" Property="Visibility" Value="Visible" />
+                            </Trigger>
+                            <DataTrigger Binding="{Binding DisplayMode, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Calendar}}}"
+                                         Value="Year">
+                                <Setter TargetName="PART_MonthView" Property="Visibility" Value="Hidden" />
+                                <Setter TargetName="PART_YearView" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding DisplayMode, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Calendar}}}"
+                                         Value="Decade">
+                                <Setter TargetName="PART_MonthView" Property="Visibility" Value="Hidden" />
+                                <Setter TargetName="PART_YearView" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <DataTemplate x:Key="SidebarIconOnlyTemplate">
+            <TextBlock Text="{Binding [0]}" FontFamily="Segoe MDL2 Assets" FontSize="16"
+                       Width="20" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </DataTemplate>
+        <Style x:Key="SkeletonLine" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource SubtleBackground}" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Height" Value="8" />
+        </Style>
+        <Style x:Key="SkeletonStrongLine" TargetType="Border" BasedOn="{StaticResource SkeletonLine}">
+            <Setter Property="Background" Value="{DynamicResource ElevatedCardBackground}" />
+        </Style>
+        <Style x:Key="SkeletonCard" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource CardBackground}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource BorderColor}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="12" />
+        </Style>
+
+        <DataTemplate x:Key="MetricSkeletonTemplate">
+            <Border Style="{StaticResource SkeletonCard}" Height="150" Padding="18">
+                <Grid>
+                    <Border Style="{StaticResource SkeletonLine}" Width="92" HorizontalAlignment="Left" VerticalAlignment="Top" />
+                    <Border Style="{StaticResource SkeletonStrongLine}" Width="132" Height="24" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,25,0,0" />
+                    <Border Style="{StaticResource SkeletonLine}" Width="102" HorizontalAlignment="Left" VerticalAlignment="Bottom" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="AttentionRowSkeletonTemplate">
+            <Border Style="{StaticResource SkeletonCard}" CornerRadius="9" Padding="11,9" Margin="0,4,0,3">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <Border Style="{StaticResource SkeletonStrongLine}" Width="104" HorizontalAlignment="Left" />
+                        <Border Style="{StaticResource SkeletonLine}" Width="70" Height="7" Margin="0,6,0,0" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <Border Style="{StaticResource SkeletonStrongLine}" Width="74" HorizontalAlignment="Right" />
+                        <Border Style="{StaticResource SkeletonLine}" Width="56" Height="7" Margin="0,6,0,0" HorizontalAlignment="Right" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="LedgerRowSkeletonTemplate">
+            <Grid MinHeight="46">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="108" /><ColumnDefinition Width="*" /><ColumnDefinition Width="105" /><ColumnDefinition Width="138" /></Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center">
+                    <Border Style="{StaticResource SkeletonStrongLine}" Width="62" HorizontalAlignment="Left" />
+                    <Border Style="{StaticResource SkeletonLine}" Width="40" Height="7" Margin="0,5,0,0" HorizontalAlignment="Left" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,10,0">
+                    <Border Style="{StaticResource SkeletonStrongLine}" Width="176" HorizontalAlignment="Left" />
+                    <Border Style="{StaticResource SkeletonLine}" Width="92" Height="7" Margin="0,5,0,0" HorizontalAlignment="Left" />
+                </StackPanel>
+                <Border Grid.Column="2" Width="64" Height="20" CornerRadius="7" Background="{DynamicResource ElevatedCardBackground}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                <Border Grid.Column="3" Width="76" Height="10" Style="{StaticResource SkeletonStrongLine}" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                <Border Grid.ColumnSpan="4" Height="1" Background="{DynamicResource BorderColor}" VerticalAlignment="Bottom" Opacity="0.65" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="StudentRowSkeletonTemplate">
+            <Border Style="{StaticResource SkeletonCard}" CornerRadius="10" Padding="12,10" Margin="0,2">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="42" /><ColumnDefinition Width="2.2*" /><ColumnDefinition Width="1.45*" /><ColumnDefinition Width="1.15*" /><ColumnDefinition Width="12" /><ColumnDefinition Width="1.45*" /><ColumnDefinition Width="34" /></Grid.ColumnDefinitions>
+                    <Border Width="34" Height="34" CornerRadius="9" Background="{DynamicResource ElevatedCardBackground}" VerticalAlignment="Center" />
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="5,0,8,0">
+                        <Border Style="{StaticResource SkeletonStrongLine}" Width="112" HorizontalAlignment="Left" />
+                        <Border Style="{StaticResource SkeletonLine}" Width="76" Height="7" Margin="0,6,0,0" HorizontalAlignment="Left" />
+                    </StackPanel>
+                    <Border Grid.Column="2" Width="91" Height="19" CornerRadius="7" Background="{DynamicResource ElevatedCardBackground}" VerticalAlignment="Center" HorizontalAlignment="Left" />
+                    <Border Grid.Column="3" Width="65" Height="9" Style="{StaticResource SkeletonStrongLine}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="8,0,0,0" />
+                    <StackPanel Grid.Column="5" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <Border Style="{StaticResource SkeletonStrongLine}" Width="71" HorizontalAlignment="Left" />
+                        <Border Style="{StaticResource SkeletonLine}" Width="45" Height="7" Margin="0,6,0,0" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="WeekCardSkeletonTemplate">
+            <Border Width="248" Height="132" Margin="0,0,12,0" Style="{StaticResource SkeletonCard}" Padding="15">
+                <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                    <Border Style="{StaticResource SkeletonStrongLine}" Width="110" HorizontalAlignment="Left" />
+                    <Border Grid.Row="1" Style="{StaticResource SkeletonLine}" Width="138" Margin="0,10,0,0" HorizontalAlignment="Left" />
+                    <StackPanel Grid.Row="2">
+                        <Border Style="{StaticResource SkeletonLine}" Width="180" Height="7" HorizontalAlignment="Left" />
+                        <Border Style="{StaticResource SkeletonStrongLine}" Width="102" Height="9" Margin="0,7,0,0" HorizontalAlignment="Left" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="DashboardSkeletonTemplate">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel MaxWidth="1320" Margin="28,24,28,28" HorizontalAlignment="Center">
+                    <Grid Margin="0,0,0,22">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel VerticalAlignment="Center">
+                            <Border Style="{StaticResource SkeletonLine}" Width="108" Height="7" HorizontalAlignment="Left" />
+                            <Border Style="{StaticResource SkeletonStrongLine}" Width="248" Height="22" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                            <Border Style="{StaticResource SkeletonLine}" Width="142" Height="8" Margin="0,7,0,0" HorizontalAlignment="Left" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Width="91" Height="34" Margin="0,0,8,0" CornerRadius="9" Background="{DynamicResource ElevatedCardBackground}" />
+                            <Border Width="98" Height="34" Margin="0,0,8,0" CornerRadius="9" Background="{DynamicResource ElevatedCardBackground}" />
+                            <Border Width="78" Height="34" CornerRadius="9" Background="{DynamicResource PrimaryRedLight}" />
+                        </StackPanel>
+                    </Grid>
+                    <UniformGrid Columns="4" Margin="0,0,0,16">
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" Margin="0,0,12,0" />
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" Margin="0,0,12,0" />
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" Margin="0,0,12,0" />
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" />
+                    </UniformGrid>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="2.1*" /><ColumnDefinition Width="14" /><ColumnDefinition Width="1*" /></Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" Height="318" Style="{StaticResource SkeletonCard}" Padding="20">
+                            <Grid>
+                                <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                                <StackPanel>
+                                    <Border Style="{StaticResource SkeletonStrongLine}" Width="98" Height="13" HorizontalAlignment="Left" />
+                                    <Border Style="{StaticResource SkeletonLine}" Width="204" Height="7" Margin="0,7,0,0" HorizontalAlignment="Left" />
+                                </StackPanel>
+                                <Grid Grid.Row="1" Margin="0,22,0,14">
+                                    <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="*" /><RowDefinition Height="*" /><RowDefinition Height="*" /></Grid.RowDefinitions>
+                                    <Border Grid.Row="0" Height="1" Background="{DynamicResource SubtleBackground}" VerticalAlignment="Center" />
+                                    <Border Grid.Row="1" Height="1" Background="{DynamicResource SubtleBackground}" VerticalAlignment="Center" />
+                                    <Border Grid.Row="2" Height="1" Background="{DynamicResource SubtleBackground}" VerticalAlignment="Center" />
+                                    <Border Grid.Row="3" Height="1" Background="{DynamicResource SubtleBackground}" VerticalAlignment="Center" />
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                                        <Border Width="18" Height="43" Margin="0,0,18,0" CornerRadius="4,4,0,0" Background="{DynamicResource ElevatedCardBackground}" />
+                                        <Border Width="18" Height="70" Margin="0,0,18,0" CornerRadius="4,4,0,0" Background="{DynamicResource ElevatedCardBackground}" />
+                                        <Border Width="18" Height="55" Margin="0,0,18,0" CornerRadius="4,4,0,0" Background="{DynamicResource ElevatedCardBackground}" />
+                                        <Border Width="18" Height="88" Margin="0,0,18,0" CornerRadius="4,4,0,0" Background="{DynamicResource ElevatedCardBackground}" />
+                                        <Border Width="18" Height="63" Margin="0,0,18,0" CornerRadius="4,4,0,0" Background="{DynamicResource ElevatedCardBackground}" />
+                                        <Border Width="18" Height="78" CornerRadius="4,4,0,0" Background="{DynamicResource ElevatedCardBackground}" />
+                                    </StackPanel>
+                                </Grid>
+                                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Border Style="{StaticResource SkeletonLine}" Width="65" Height="7" Margin="0,0,16,0" />
+                                    <Border Style="{StaticResource SkeletonLine}" Width="70" Height="7" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Grid.Column="2" Height="318" Style="{StaticResource SkeletonCard}" Padding="17">
+                            <StackPanel>
+                                <Border Style="{StaticResource SkeletonStrongLine}" Width="118" Height="13" HorizontalAlignment="Left" />
+                                <Border Style="{StaticResource SkeletonLine}" Width="176" Height="7" Margin="0,8,0,10" HorizontalAlignment="Left" />
+                                <ContentControl Content=" " ContentTemplate="{StaticResource AttentionRowSkeletonTemplate}" />
+                                <ContentControl Content=" " ContentTemplate="{StaticResource AttentionRowSkeletonTemplate}" />
+                                <ContentControl Content=" " ContentTemplate="{StaticResource AttentionRowSkeletonTemplate}" />
+                                <Border Style="{StaticResource SkeletonLine}" Width="112" Height="7" Margin="0,12,0,0" HorizontalAlignment="Right" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                    <Border Style="{StaticResource SkeletonCard}" Padding="18,17">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <Border Style="{StaticResource SkeletonStrongLine}" Width="148" Height="13" HorizontalAlignment="Left" />
+                                    <Border Style="{StaticResource SkeletonLine}" Width="194" Height="7" Margin="0,7,0,0" HorizontalAlignment="Left" />
+                                </StackPanel>
+                                <Border Grid.Column="1" Width="174" Height="30" CornerRadius="8" Background="{DynamicResource ElevatedCardBackground}" />
+                            </Grid>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="108" /><ColumnDefinition Width="*" /><ColumnDefinition Width="105" /><ColumnDefinition Width="138" /></Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource SkeletonLine}" Width="58" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="1" Style="{StaticResource SkeletonLine}" Width="94" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="2" Style="{StaticResource SkeletonLine}" Width="48" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="3" Style="{StaticResource SkeletonLine}" Width="55" Height="7" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource BorderColor}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
+
+        <DataTemplate x:Key="StudentsSkeletonTemplate">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel MaxWidth="1320" Margin="28,24,28,30" HorizontalAlignment="Center">
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <Border Style="{StaticResource SkeletonLine}" Width="104" Height="7" HorizontalAlignment="Left" />
+                            <Border Style="{StaticResource SkeletonStrongLine}" Width="142" Height="22" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Width="122" Height="36" CornerRadius="9" Background="{DynamicResource PrimaryRedLight}" />
+                    </Grid>
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="14" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                        <ContentControl Grid.Column="0" Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" />
+                        <ContentControl Grid.Column="2" Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" />
+                    </Grid>
+                    <Border Style="{StaticResource SkeletonCard}" Padding="12" Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="12" /><ColumnDefinition Width="170" /><ColumnDefinition Width="12" /><ColumnDefinition Width="190" /></Grid.ColumnDefinitions>
+                            <Border Height="38" CornerRadius="12" Background="{DynamicResource ElevatedCardBackground}" />
+                            <Border Grid.Column="2" Height="38" CornerRadius="9" Background="{DynamicResource SubtleBackground}" />
+                            <Border Grid.Column="4" Height="38" CornerRadius="9" Background="{DynamicResource SubtleBackground}" />
+                        </Grid>
+                    </Border>
+                    <Border Style="{StaticResource SkeletonCard}" Padding="14">
+                        <StackPanel>
+                            <Border Height="34" CornerRadius="9" Background="{DynamicResource ElevatedCardBackground}" Margin="0,0,0,7" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource StudentRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource StudentRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource StudentRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource StudentRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource StudentRowSkeletonTemplate}" />
+                            <Grid Margin="0,10,0,0">
+                                <Border Style="{StaticResource SkeletonLine}" Width="94" HorizontalAlignment="Left" />
+                                <Border Style="{StaticResource SkeletonLine}" Width="82" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
+
+        <DataTemplate x:Key="HistorySkeletonTemplate">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="32,28,32,28">
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource SkeletonStrongLine}" Width="206" Height="23" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <Border Grid.Column="2" Width="154" Height="36" CornerRadius="9" Background="{DynamicResource SubtleBackground}" Margin="0,0,12,0" />
+                        <Border Grid.Column="3" Width="132" Height="36" CornerRadius="9" Background="{DynamicResource PrimaryRedLight}" />
+                    </Grid>
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="190" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource SkeletonLine}" Width="47" Height="8" VerticalAlignment="Center" Margin="0,0,8,0" />
+                        <Border Grid.Column="1" Height="42" CornerRadius="9" Background="{DynamicResource SubtleBackground}" />
+                        <Border Grid.Column="2" Width="98" Height="34" CornerRadius="9" Background="{DynamicResource ElevatedCardBackground}" Margin="12,0,0,0" />
+                    </Grid>
+                    <Border Style="{StaticResource SkeletonLine}" Width="328" Height="8" Margin="0,0,0,12" HorizontalAlignment="Left" />
+                    <UniformGrid Columns="3" Margin="0,0,0,20">
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" Margin="0,0,18,0" />
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" Margin="0,0,18,0" />
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" />
+                    </UniformGrid>
+                    <Border Style="{StaticResource SkeletonCard}" Padding="18">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="112" /><ColumnDefinition Width="*" /><ColumnDefinition Width="118" /><ColumnDefinition Width="132" /></Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource SkeletonLine}" Width="52" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="1" Style="{StaticResource SkeletonLine}" Width="90" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="2" Style="{StaticResource SkeletonLine}" Width="42" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="3" Style="{StaticResource SkeletonLine}" Width="50" Height="7" HorizontalAlignment="Right" />
+                            </Grid>
+                            <Border Height="1" Background="{DynamicResource BorderColor}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource LedgerRowSkeletonTemplate}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
+
+        <DataTemplate x:Key="TagihanSkeletonTemplate">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="30,24,30,32">
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <Border Style="{StaticResource SkeletonStrongLine}" Width="222" Height="27" HorizontalAlignment="Left" />
+                            <Border Style="{StaticResource SkeletonLine}" Width="274" Height="8" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                        </StackPanel>
+                        <Border Grid.Column="1" Width="112" Height="38" CornerRadius="8" Background="{DynamicResource PrimaryRedLight}" VerticalAlignment="Center" />
+                    </Grid>
+                    <UniformGrid Columns="4" Margin="0,0,0,20">
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" Margin="0,0,10,0" />
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" Margin="0,0,10,0" />
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" Margin="0,0,10,0" />
+                        <ContentControl Content=" " ContentTemplate="{StaticResource MetricSkeletonTemplate}" />
+                    </UniformGrid>
+                    <Border Style="{StaticResource SkeletonCard}" Padding="18" Margin="0,0,0,20">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <Border Style="{StaticResource SkeletonStrongLine}" Width="140" Height="16" HorizontalAlignment="Left" />
+                                    <Border Style="{StaticResource SkeletonLine}" Width="184" Height="8" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                                </StackPanel>
+                                <Border Grid.Column="1" Width="166" Height="34" CornerRadius="9" Background="{DynamicResource SubtleBackground}" />
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" Height="132" ClipToBounds="True">
+                                <ContentControl Content=" " ContentTemplate="{StaticResource WeekCardSkeletonTemplate}" />
+                                <ContentControl Content=" " ContentTemplate="{StaticResource WeekCardSkeletonTemplate}" />
+                                <ContentControl Content=" " ContentTemplate="{StaticResource WeekCardSkeletonTemplate}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource SkeletonCard}" Padding="18">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <Border Style="{StaticResource SkeletonStrongLine}" Width="148" Height="16" HorizontalAlignment="Left" />
+                                    <Border Style="{StaticResource SkeletonLine}" Width="178" Height="8" Margin="0,8,0,0" HorizontalAlignment="Left" />
+                                </StackPanel>
+                                <Border Grid.Column="1" Width="170" Height="34" CornerRadius="9" Background="{DynamicResource SubtleBackground}" />
+                            </Grid>
+                            <Grid Margin="0,0,0,7">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="2.1*" /><ColumnDefinition Width="1.05*" /><ColumnDefinition Width="0.95*" /><ColumnDefinition Width="0.95*" /><ColumnDefinition Width="1.35*" /><ColumnDefinition Width="1.5*" /></Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource SkeletonLine}" Width="84" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="1" Style="{StaticResource SkeletonLine}" Width="42" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="2" Style="{StaticResource SkeletonLine}" Width="62" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="3" Style="{StaticResource SkeletonLine}" Width="34" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="4" Style="{StaticResource SkeletonLine}" Width="70" Height="7" HorizontalAlignment="Left" />
+                                <Border Grid.Column="5" Style="{StaticResource SkeletonLine}" Width="30" Height="7" HorizontalAlignment="Right" />
+                            </Grid>
+                            <ContentControl Content=" " ContentTemplate="{StaticResource StudentRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource StudentRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource StudentRowSkeletonTemplate}" />
+                            <ContentControl Content=" " ContentTemplate="{StaticResource StudentRowSkeletonTemplate}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -80,21 +569,71 @@
         <!--  Sidebar (shown after login)  -->
         <Border x:Name="SidebarBorder" Grid.Column="0" Background="{DynamicResource SidebarBackground}"
                 BorderBrush="{DynamicResource BorderColor}" BorderThickness="0,0,1,0" Visibility="Collapsed">
-            <DockPanel LastChildFill="False" Margin="0,20,0,20">
+            <DockPanel LastChildFill="False" Margin="0,20,0,0">
                 <StackPanel DockPanel.Dock="Top">
-                    <Border Width="100" Height="100" ClipToBounds="True" Margin="20,0,0,10" HorizontalAlignment="Left">
+                    <Grid x:Name="SidebarBrandHeader" Margin="16,0,12,18">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="SidebarLogoColumn" Width="64" />
+                            <ColumnDefinition x:Name="SidebarLabelColumn" Width="*" />
+                        </Grid.ColumnDefinitions>
+                    <Border x:Name="SidebarLogoBorder" Width="64" Height="64" ClipToBounds="True"
+                            HorizontalAlignment="Left" Cursor="Hand" Focusable="True"
+                            ToolTip="Ciutkan sidebar" AutomationProperties.Name="Ciutkan atau luaskan sidebar"
+                            MouseLeftButtonUp="SidebarLogo_Click" KeyDown="SidebarLogo_KeyDown">
                         <Border.Clip>
-                            <RectangleGeometry Rect="0,0,100,100" RadiusX="19" RadiusY="19" />
+                            <RectangleGeometry x:Name="SidebarLogoClip" Rect="0,0,64,64" RadiusX="16" RadiusY="16" />
                         </Border.Clip>
-                        <Image Source="/Assets/kasmate-logo.jpeg" Width="140" Height="140" Stretch="Uniform"
+                        <Image x:Name="SidebarLogoImage" Source="/Assets/kasmate-logo.jpeg" Width="90" Height="90" Stretch="Uniform"
                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
-                    <TextBlock Text="KasMate" Foreground="White" FontSize="15" Margin="20,4,0,2" />
-                    <TextBlock x:Name="SidebarUserText" Text="" Foreground="White" FontSize="12" Margin="20,0,0,20" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="12,0,0,0">
+                            <TextBlock x:Name="SidebarBrandText" Text="KasMate" Foreground="White" FontSize="15" />
+                            <TextBlock x:Name="SidebarUserText" Text="" Foreground="White" FontSize="10"
+                                       TextWrapping="Wrap" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Grid>
 
                     <StackPanel x:Name="NavPanel" Margin="0,10,0,0" />
                 </StackPanel>
-
+                <Button x:Name="ProfileButton" DockPanel.Dock="Bottom" Margin="10,12,10,8" MinWidth="0" Height="48"
+                        Padding="10,6" HorizontalContentAlignment="Stretch"
+                        Style="{StaticResource ShellTopBarButton}" Click="ProfileButton_Click"
+                        ToolTip="Menu akun" AutomationProperties.Name="Menu akun">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="ProfileAvatarColumn" Width="34" />
+                            <ColumnDefinition x:Name="ProfileTextColumn" Width="*" />
+                            <ColumnDefinition x:Name="ProfileChevronColumn" Width="14" />
+                        </Grid.ColumnDefinitions>
+                        <Border Width="30" Height="30" CornerRadius="9" Background="{DynamicResource PrimaryRed}"
+                                VerticalAlignment="Center" HorizontalAlignment="Left" x:Name="ProfileAvatarBorder">
+                            <Grid>
+                                <Image x:Name="TopBarProfileImage" Width="30" Height="30" Stretch="UniformToFill"
+                                       Visibility="Collapsed">
+                                    <Image.Clip>
+                                        <RectangleGeometry Rect="0,0,30,30" RadiusX="9" RadiusY="9" />
+                                    </Image.Clip>
+                                </Image>
+                                <TextBlock x:Name="TopBarProfileInitialsText" Text="AB" FontSize="9" FontWeight="Medium"
+                                           Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,3,0">
+                            <TextBlock x:Name="TopBarProfileNameText" Text="Arung" FontSize="10" FontWeight="Medium"
+                                       Foreground="{DynamicResource TextDark}" TextTrimming="CharacterEllipsis" />
+                            <TextBlock x:Name="TopBarProfileRoleText" Text="Bendahara" FontSize="8"
+                                       Foreground="{DynamicResource TextGray}" Margin="0,1,0,0" />
+                        </StackPanel>
+                        <Path x:Name="ProfileChevron" Grid.Column="2" Data="M4,7 L8,11 L12,7" Stroke="{DynamicResource TextGray}"
+                              StrokeThickness="1.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                              Width="12" Height="12" Stretch="Uniform" VerticalAlignment="Center"
+                              RenderTransformOrigin="0.5,0.5">
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="0" />
+                            </Path.RenderTransform>
+                        </Path>
+                    </Grid>
+                </Button>
             </DockPanel>
         </Border>
 
@@ -114,9 +653,10 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <Border Background="{DynamicResource ElevatedCardBackground}" BorderBrush="{DynamicResource BorderColor}"
-                            BorderThickness="1" CornerRadius="10" Padding="11,6" VerticalAlignment="Center"
-                            HorizontalAlignment="Left">
+                    <Button x:Name="TopBarDateButton" Style="{StaticResource ShellTopBarButton}"
+                            Padding="11,6" VerticalAlignment="Center" HorizontalAlignment="Left"
+                            Click="TopBarDateButton_Click" ToolTip="Buka kalender"
+                            AutomationProperties.Name="Buka kalender">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <Path Data="M4,5 L20,5 L20,20 L4,20 Z M8,3 L8,7 M16,3 L16,7 M4,9 L20,9"
                                   Stroke="{DynamicResource AccentText}" StrokeThickness="1.5" StrokeStartLineCap="Round"
@@ -125,7 +665,7 @@
                             <TextBlock x:Name="TopBarDateText" Text="Rabu, 4 Nov 2026" FontSize="10" FontWeight="Medium"
                                        Foreground="{DynamicResource TextDark}" VerticalAlignment="Center" />
                         </StackPanel>
-                    </Border>
+                    </Button>
 
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                         <Button x:Name="NotificationButton" Width="40" Height="40" Padding="0"
@@ -140,35 +680,24 @@
                                          Stroke="{DynamicResource ElevatedCardBackground}" StrokeThickness="1" Visibility="Collapsed" />
                             </Grid>
                         </Button>
-
-                        <Button x:Name="ProfileButton" Margin="8,0,0,0" MinWidth="154" Height="42"
-                                Padding="5,4" Style="{StaticResource ShellTopBarButton}"
-                                Click="ProfileButton_Click" ToolTip="Menu akun" AutomationProperties.Name="Menu akun">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="30" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="12" />
-                                </Grid.ColumnDefinitions>
-                                <Border Width="28" Height="28" CornerRadius="8" Background="{DynamicResource PrimaryRed}"
-                                        VerticalAlignment="Center">
-                                    <TextBlock x:Name="TopBarProfileInitialsText" Text="AB" FontSize="9" FontWeight="Medium"
-                                               Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                </Border>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="5,0,3,0">
-                                    <TextBlock x:Name="TopBarProfileNameText" Text="Arung" FontSize="10" FontWeight="Medium"
-                                               Foreground="{DynamicResource TextDark}" TextTrimming="CharacterEllipsis" />
-                                    <TextBlock x:Name="TopBarProfileRoleText" Text="Bendahara" FontSize="8"
-                                               Foreground="{DynamicResource TextGray}" Margin="0,1,0,0" />
-                                </StackPanel>
-                                <Path Grid.Column="2" Data="M4,7 L8,11 L12,7" Stroke="{DynamicResource TextGray}"
-                                      StrokeThickness="1.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                                      Width="12" Height="12" Stretch="Uniform" VerticalAlignment="Center" />
-                            </Grid>
-                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>
+
+            <Popup x:Name="DateCalendarPopup" PlacementTarget="{Binding ElementName=TopBarDateButton}"
+                   Placement="Custom" StaysOpen="True" AllowsTransparency="True" PopupAnimation="Fade">
+                <Border Padding="8" Background="{DynamicResource SurfaceBackground}"
+                        BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="14">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="22" Opacity="0.26" ShadowDepth="4" Color="Black" />
+                    </Border.Effect>
+                    <Calendar x:Name="TopBarCalendar" Style="{StaticResource CalendarBaseStyle}"
+                              Language="id-ID" FocusVisualStyle="{x:Null}"
+                              BorderBrush="Transparent" BorderThickness="0" SelectionMode="None"
+                              CalendarItemStyle="{StaticResource TopBarCalendarItemStyle}"
+                              IsTodayHighlighted="True" DisplayMode="Month" />
+                </Border>
+            </Popup>
 
             <Popup x:Name="NotificationPopup" PlacementTarget="{Binding ElementName=NotificationButton}"
                    Placement="Custom" StaysOpen="True" AllowsTransparency="True" PopupAnimation="Fade">
@@ -237,18 +766,47 @@
             </Popup>
 
             <Popup x:Name="ProfilePopup" PlacementTarget="{Binding ElementName=ProfileButton}"
-                   Placement="Custom" StaysOpen="True" AllowsTransparency="True" PopupAnimation="Fade">
+                   Placement="Custom" StaysOpen="True" AllowsTransparency="True" PopupAnimation="Fade"
+                   Opened="ProfilePopup_Opened" Closed="ProfilePopup_Closed">
                 <Border Width="230" Padding="13" Background="{DynamicResource SurfaceBackground}"
                         BorderBrush="{DynamicResource BorderColor}" BorderThickness="1" CornerRadius="14">
                     <Border.Effect>
                         <DropShadowEffect BlurRadius="24" Opacity="0.28" ShadowDepth="5" Color="Black" />
                     </Border.Effect>
                     <StackPanel>
-                        <TextBlock x:Name="ProfileMenuNameText" Text="Arung" FontSize="13" FontWeight="Medium"
-                                   Foreground="{DynamicResource TextDark}" />
-                        <TextBlock x:Name="ProfileMenuUsernameText" Text="Bendahara" FontSize="9"
-                                   Foreground="{DynamicResource TextGray}" Margin="0,2,0,8" />
+                        <Grid Margin="0,0,0,9">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="42" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Width="36" Height="36" CornerRadius="11" Background="{DynamicResource PrimaryRed}"
+                                    VerticalAlignment="Center">
+                                <Grid>
+                                    <Image x:Name="ProfileMenuImage" Width="36" Height="36" Stretch="UniformToFill"
+                                           Visibility="Collapsed">
+                                        <Image.Clip>
+                                            <RectangleGeometry Rect="0,0,36,36" RadiusX="11" RadiusY="11" />
+                                        </Image.Clip>
+                                    </Image>
+                                    <TextBlock x:Name="ProfileMenuInitialsText" Text="AB" FontSize="10" FontWeight="Medium"
+                                               Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                            </Border>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock x:Name="ProfileMenuNameText" Text="Arung" FontSize="13" FontWeight="Medium"
+                                           Foreground="{DynamicResource TextDark}" />
+                                <TextBlock x:Name="ProfileMenuUsernameText" Text="@arung · Bendahara" FontSize="9"
+                                           Foreground="{DynamicResource TextGray}" Margin="0,2,0,0" />
+                            </StackPanel>
+                        </Grid>
                         <Border Height="1" Background="{DynamicResource BorderColor}" Margin="0,0,0,7" />
+                        <Button Style="{StaticResource ShellMenuButton}" Click="ProfileSettingsButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE77B;" FontFamily="Segoe MDL2 Assets" FontSize="14"
+                                           Width="24" VerticalAlignment="Center" />
+                                <TextBlock Text="Pengaturan profil" FontSize="10" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
                         <Button Style="{StaticResource ShellMenuButton}" Click="TopBarThemeButton_Click">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock x:Name="TopBarThemeIcon" Text="&#xE708;" FontFamily="Segoe MDL2 Assets"
@@ -268,10 +826,38 @@
                 </Border>
             </Popup>
 
-            <Frame x:Name="ContentFrame" Grid.Row="1" ClipToBounds="True" NavigationUIVisibility="Hidden"
-                   Background="{DynamicResource PageBackground}" Navigated="ContentFrame_Navigated" />
+            <ContentControl x:Name="ContentHost" Grid.Row="1" ClipToBounds="True"
+                            HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                            Background="{DynamicResource PageBackground}" />
+
+            <Grid x:Name="PageLoadingOverlay" Grid.Row="1" Panel.ZIndex="5" Visibility="Collapsed"
+                  Background="{DynamicResource PageBackground}" IsHitTestVisible="True"
+                  AutomationProperties.Name="Memuat halaman">
+                <ContentControl x:Name="PageSkeletonContent" Content=" " />
+            </Grid>
+
+            <ProgressBar x:Name="PageLoadingBar" Grid.Row="1" Style="{StaticResource RoundedProgressBar}"
+                         Height="4" VerticalAlignment="Top"
+                         Panel.ZIndex="6" Minimum="0" Maximum="100" Value="0" IsIndeterminate="False" Visibility="Collapsed"
+                         Background="{DynamicResource BorderColor}" Foreground="{DynamicResource PrimaryRed}"
+                         BorderThickness="0" IsHitTestVisible="False"
+                         AutomationProperties.Name="Progres pemuatan halaman" />
         </Grid>
 
+        <Border x:Name="StartupLoadingOverlay" Grid.Column="0" Grid.ColumnSpan="2"
+                Background="{DynamicResource PageBackground}" Panel.ZIndex="20">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="280">
+                <Image Source="/Assets/kasmate-logo.jpeg" Width="72" Height="72" Stretch="Uniform"
+                       HorizontalAlignment="Center" Margin="0,0,0,14" />
+                <TextBlock Text="KasMate" Foreground="{DynamicResource TextDark}" FontSize="22"
+                           FontWeight="SemiBold" HorizontalAlignment="Center" />
+                <TextBlock Text="Menghubungkan ke database..." Foreground="{DynamicResource TextGray}"
+                           FontSize="13" HorizontalAlignment="Center" Margin="0,6,0,14" />
+                <ProgressBar Style="{StaticResource RoundedProgressBar}" IsIndeterminate="True" Height="4"
+                             Width="280" Foreground="{DynamicResource PrimaryRed}"
+                             Background="{DynamicResource SubtleBackground}" BorderThickness="0" />
+            </StackPanel>
+        </Border>
         <!--  Modal overlay: dialogs render here, inside the main window, instead of as separate OS windows  -->
         <Border x:Name="ModalOverlay" Grid.Column="0" Grid.ColumnSpan="2" Background="#99000000"
                 Visibility="Collapsed" MouseLeftButtonDown="ModalOverlay_MouseLeftButtonDown">

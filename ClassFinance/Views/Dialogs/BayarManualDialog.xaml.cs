@@ -42,7 +42,7 @@ namespace ClassFinance.Views.Dialogs
             DatePickerInput.SelectedDate = DateTime.Now;
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
             if (!decimal.TryParse(AmountBox.Text.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) || amount <= 0)
             {
@@ -71,7 +71,16 @@ namespace ClassFinance.Views.Dialogs
             else
             {
                 // Normal or partial payment logic
-                _bendahara.CatatPembayaran(_tagihan.Id, amount, method, date: paymentDate);
+                try
+                {
+                    await _bendahara.CatatPembayaranAsync(_tagihan.Id, amount, method, date: paymentDate);
+                }
+                catch (Exception exception)
+                {
+                    ErrorText.Text = exception.Message;
+                    ErrorText.Visibility = Visibility.Visible;
+                    return;
+                }
                 _onSaved?.Invoke();
                 _mainWindow.CloseModal();
             }

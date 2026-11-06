@@ -86,7 +86,7 @@ namespace ClassFinance.Views
         public decimal Expense { get; set; }
     }
 
-    public partial class DashboardPage : Page
+    public partial class DashboardPage : UserControl
     {
         private static readonly CultureInfo IdId = CultureInfo.GetCultureInfo("id-ID");
         private readonly User _currentUser;
@@ -155,11 +155,16 @@ namespace ClassFinance.Views
 
             if (!Dispatcher.CheckAccess())
             {
-                Dispatcher.BeginInvoke(new Action(Refresh));
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    Refresh();
+                    _mainWindow.MarkPageDataCurrent(this);
+                }));
                 return;
             }
 
             Refresh();
+            _mainWindow.MarkPageDataCurrent(this);
         }
 
         private void RefreshWeeklyPaymentStatus()
@@ -215,13 +220,16 @@ namespace ClassFinance.Views
             _ => DataStore.Instance.KelasList.FirstOrDefault()?.Id ?? 0
         };
 
+        public void RefreshAfterWeeklyBillingUpdate() => Refresh();
+
+        public void RefreshForNavigation() => Refresh();
+
         private void Refresh()
         {
             var store = DataStore.Instance;
             var kelas = store.KelasList.FirstOrDefault(k => k.Id == _kelasId);
             if (kelas == null)
             {
-                SubtitleText.Text = "Data kelas tidak tersedia.";
                 SaldoText.Text = "Rp 0";
                 TotalSiswaText.Text = "0";
                 BelumLunasText.Text = "Rp 0";
@@ -235,10 +243,10 @@ namespace ClassFinance.Views
                 CashFlowEmptyText.Visibility = Visibility.Visible;
                 NoSiswaText.Visibility = Visibility.Visible;
                 NoTransaksiText.Visibility = Visibility.Visible;
+                _mainWindow.MarkPageDataCurrent(this);
                 return;
             }
 
-            SubtitleText.Text = $"Kelas {kelas.Name} · Tahun ajaran {kelas.AcademicYear} · {DateTime.Now.ToString("d MMMM yyyy", IdId)}";
             SaldoText.Text = $"Rp {kelas.HitungSaldo().ToString("N0", IdId)}";
 
             var students = store.Users.OfType<Siswa>()
@@ -270,6 +278,9 @@ namespace ClassFinance.Views
             var openEntries = classEntries
                 .Where(entry => entry.Status != StatusTagihan.Proses && Outstanding(entry) > 0)
                 .ToList();
+            var entriesByStudent = classEntries
+                .GroupBy(entry => entry.SiswaId)
+                .ToDictionary(group => group.Key, group => group.ToList());
             var owingStudentIds = openEntries.Select(entry => entry.SiswaId).Distinct().ToHashSet();
             var outstandingTotal = openEntries.Sum(Outstanding);
             TotalStudentCountBadgeText.Text = $"{students.Count} Siswa";
@@ -280,7 +291,9 @@ namespace ClassFinance.Views
                 : $"{owingStudentIds.Count} siswa menunggak";
             var displayStudents = students.Select(student =>
             {
-                var entries = classEntries.Where(entry => entry.SiswaId == student.Id).ToList();
+                var entries = entriesByStudent.TryGetValue(student.Id, out var studentEntries)
+                    ? studentEntries
+                    : new List<TagihanSiswa>();
                 var dueEntries = entries
                     .Where(entry => entry.Status != StatusTagihan.Proses && Outstanding(entry) > 0)
                     .ToList();
@@ -308,6 +321,7 @@ namespace ClassFinance.Views
             RefreshTransactions();
             BuildCashFlow(store);
             RenderCashFlow();
+            _mainWindow.MarkPageDataCurrent(this);
         }
 
         private static decimal Outstanding(TagihanSiswa entry) =>
@@ -827,10 +841,10 @@ namespace ClassFinance.Views
         }
 
         private void LihatSiswaButton_Click(object sender, RoutedEventArgs e) =>
-            _mainWindow.NavigateTo(new SiswaPage(_currentUser, _mainWindow));
+            _mainWindow.NavigateTo(() => new SiswaPage(_currentUser, _mainWindow), "students");
 
         private void LihatSemuaButton_Click(object sender, RoutedEventArgs e) =>
-            _mainWindow.NavigateTo(new RiwayatTransaksiPage(_currentUser, _mainWindow));
+            _mainWindow.NavigateTo(() => new RiwayatTransaksiPage(_currentUser, _mainWindow), "history");
 
         private void TransactionTypeFilter_Click(object sender, RoutedEventArgs e)
         {

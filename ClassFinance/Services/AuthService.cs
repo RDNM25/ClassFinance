@@ -1,4 +1,5 @@
-using System.Linq;
+using System;
+using System.Threading.Tasks;
 using ClassFinance.Models;
 
 namespace ClassFinance.Services
@@ -7,7 +8,7 @@ namespace ClassFinance.Services
     {
         public static User CurrentUser { get; private set; }
 
-        public static User Login(string username, string password)
+        public static async Task<User> LoginAsync(string username, string password)
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
@@ -15,16 +16,22 @@ namespace ClassFinance.Services
                 return null;
             }
 
-            var user = DataStore.Instance.Users
-                .FirstOrDefault(u => u != null
-                                      && string.Equals(u.Username, username, System.StringComparison.OrdinalIgnoreCase)
-                                      && u.VerifyPassword(password));
+            var identity = await KasMateApiClient.Instance.LoginAsync(username.Trim(), password);
+            if (identity == null) return CurrentUser = null;
+
+            User user = identity.Role?.Replace("_", string.Empty).Equals("walikelas", StringComparison.OrdinalIgnoreCase) == true
+                ? new WaliKelas { KelasId = identity.ClassId ?? 0 }
+                : new Bendahara();
+            user.Id = identity.Id;
+            user.Name = identity.Name;
+            user.Username = identity.Username;
             CurrentUser = user;
             return user;
         }
 
         public static void Logout()
         {
+            _ = KasMateApiClient.Instance.LogoutAsync();
             CurrentUser = null;
         }
     }

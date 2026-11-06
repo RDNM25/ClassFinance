@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Globalization;
+using System.Threading.Tasks;
 using ClassFinance.Services;
 
 namespace ClassFinance.Models
@@ -27,15 +28,21 @@ namespace ClassFinance.Models
 
         public void MarkAsRead() => IsRead = true;
 
-        public static Notifikasi Kirim(int userId, string title, string message, int? billId = null)
+        public static async Task<Notifikasi> KirimAsync(int userId, string title, string message, int? billId = null)
         {
             var n = Buat(userId, title, message, billId);
             DataStore.Instance.NotifikasiList.Add(n);
-            DataStore.Instance.SaveChanges();
+            await DataStore.Instance.SaveChangesAsync();
             return n;
         }
 
-        public static void KirimUntukTagihanBaru(int kelasId, int tagihanId)
+        public static async Task KirimUntukTagihanBaruAsync(int kelasId, int tagihanId)
+        {
+            if (TambahkanUntukTagihanBaru(kelasId, tagihanId) > 0)
+                await DataStore.Instance.SaveChangesAsync();
+        }
+
+        internal static int TambahkanUntukTagihanBaru(int kelasId, int tagihanId)
         {
             var tagihan = DataStore.Instance.TagihanList.First(t => t.Id == tagihanId);
             if (!tagihan.IsWeeklyOccurrence)
@@ -53,11 +60,10 @@ namespace ClassFinance.Models
                 created++;
             }
 
-            if (created > 0)
-                store.SaveChanges();
+            return created;
         }
 
-        public static void KirimPembaruanJadwalMingguan(JadwalTagihanMingguan schedule)
+        public static async Task KirimPembaruanJadwalMingguanAsync(JadwalTagihanMingguan schedule)
         {
             var store = DataStore.Instance;
             var effectiveWeek = schedule.StartsOn.ToString("dd MMM yyyy", IdId);
@@ -73,10 +79,10 @@ namespace ClassFinance.Models
             }
 
             if (created > 0)
-                store.SaveChanges();
+                await store.SaveChangesAsync();
         }
 
-        public static HasilPengingatTagihan KirimPengingatTagihan(int tagihanId)
+        public static async Task<HasilPengingatTagihan> KirimPengingatTagihanAsync(int tagihanId)
         {
             var store = DataStore.Instance;
             var bill = store.TagihanList.FirstOrDefault(x => x.Id == tagihanId)
@@ -110,7 +116,7 @@ namespace ClassFinance.Models
             }
 
             if (result.JumlahTerkirim > 0)
-                store.SaveChanges();
+                await store.SaveChangesAsync();
 
             return result;
         }

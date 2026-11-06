@@ -1,0 +1,8 @@
+name: KasMateAPI Local
+values:
+  - key: username
+    value: ''
+  - key: password
+    value: ''
+  - key: token
+    value: ''

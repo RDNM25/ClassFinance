@@ -38,7 +38,7 @@ namespace ClassFinance.Views.Dialogs
             }
         }
 
-        private void Save_Click(object sender, RoutedEventArgs e)
+        private async void Save_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(NameBox.Text) ||
                 !decimal.TryParse(AmountBox.Text.Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) || amount <= 0)
@@ -59,13 +59,13 @@ namespace ClassFinance.Views.Dialogs
 
             try
             {
-                _bendahara.SimpanJadwalTagihanMingguan(
+                await _bendahara.SimpanJadwalTagihanMingguanAsync(
                     _kelasId, NameBox.Text, amount, startsOn, endsOn, ActiveCheckBox.IsChecked == true);
-                JadwalTagihanMingguanService.PastikanMingguTerbuat(_kelasId, DateTime.Today);
+                await JadwalTagihanMingguanService.PastikanMingguTerbuatAsync(_kelasId, DateTime.Today);
                 _onSaved?.Invoke();
                 _mainWindow.CloseModal();
             }
-            catch (Exception exception) when (exception is ArgumentException or InvalidOperationException)
+            catch (Exception exception)
             {
                 ErrorText.Text = exception.Message;
                 ErrorText.Visibility = Visibility.Visible;

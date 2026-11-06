@@ -145,11 +145,11 @@
                             <ColumnDefinition Width="0.9*" />
                             <ColumnDefinition Width="1.15*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="MINGGU / PERIODE" FontSize="9" Foreground="{DynamicResource TextGray}" />
-                        <TextBlock Grid.Column="1" Text="TANGGAL" FontSize="9" Foreground="{DynamicResource TextGray}" />
-                        <TextBlock Grid.Column="2" Text="STATUS" FontSize="9" Foreground="{DynamicResource TextGray}" />
-                        <TextBlock Grid.Column="3" Text="METODE" FontSize="9" Foreground="{DynamicResource TextGray}" />
-                        <TextBlock Grid.Column="4" Text="NOMINAL" FontSize="9" Foreground="{DynamicResource TextGray}" TextAlignment="Right" />
+                        <TextBlock Text="MINGGU / PERIODE" Style="{StaticResource TableHeaderText}" />
+                        <TextBlock Grid.Column="1" Text="TANGGAL" Style="{StaticResource TableHeaderText}" />
+                        <TextBlock Grid.Column="2" Text="STATUS" Style="{StaticResource TableHeaderText}" />
+                        <TextBlock Grid.Column="3" Text="METODE" Style="{StaticResource TableHeaderText}" />
+                        <TextBlock Grid.Column="4" Text="NOMINAL" Style="{StaticResource TableHeaderText}" TextAlignment="Right" />
                     </Grid>
                     <Border Height="1" Background="{DynamicResource BorderColor}" Margin="0,0,0,6" />
 
